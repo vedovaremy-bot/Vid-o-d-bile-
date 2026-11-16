@@ -9,3 +9,15 @@ Fichier final : `video01_pigeon_proces.mp4`
    `python3 tts.py`  -> `audio_mix.wav`, `timings.json`
 3. Animation + sous-titres mot par mot (`scene.html`, rendu via Playwright) :
    `node render.js` -> `out/video.mp4`  (`node render.js 5 12` = images de test)
+
+## Vidéo 02 — « L'escargot qui te poursuit depuis 7 ans » (80 s)
+Fichier final : `video02_escargot_7ans.mp4` — voix `fr_FR-miro-high` (plus naturelle) + mastering.
+
+Moteur commun dans `lib/` (`engine.js`, `tts.py`, `render.js`). Nouvelle vidéo :
+```
+mkdir videoXX && cd videoXX   # script.json + scene.html (voir video02)
+python3 ../lib/tts.py         # VOICE=fr_FR-upmc-medium SPEAKER=1 pour changer de voix
+node ../lib/render.js
+```
+Les modèles de voix (`voices/`) se téléchargent depuis
+`https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-<voix>.tar.bz2`.

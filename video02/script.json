@@ -1,0 +1,26 @@
+{
+  "title": "L'escargot qui te poursuit depuis 7 ans",
+  "music": {"bpm": 104, "prog": [[57,60,64,69],[53,57,60,65],[48,52,55,60],[55,59,62,67]]},
+  "sfx": [
+    {"word": "coquille", "type": "crack", "gain": 1.0},
+    {"word": "toc", "type": "knock", "gain": 1.0},
+    {"word": "venger", "type": "thud", "gain": 0.7},
+    {"word": "quarantetrois", "type": "pop", "gain": 0.6}
+  ],
+  "segments": [
+    {"scene": "hook",     "text": "Un *escargot* te poursuit depuis *sept ans*. Et demain matin... il arrive *chez toi*."},
+    {"scene": "beach",    "text": "Tout a commencé en vacances. Tu as marché sur sa maison. Sa *coquille*. Par accident."},
+    {"scene": "revenge",  "text": "Tu t'es excusé. Lui, il t'a regardé... et il a juré de se *venger*."},
+    {"scene": "journey",  "text": "Depuis, il avance. Un *centimètre* par minute. Jour et nuit. Sans *jamais* s'arrêter."},
+    {"scene": "salt",     "text": "Il a traversé trois *autoroutes*, une forêt, et même un champ de *sel*. Il a failli *fondre*."},
+    {"scene": "train",    "text": "Il a pris le *train*. Sans billet. Le contrôleur n'a *rien* pu faire."},
+    {"scene": "moving",   "text": "Toi, tu as déménagé *quatre fois*. Mais à chaque fois... une petite trace de *bave* t'attendait sur la porte."},
+    {"scene": "street",   "text": "Ce matin, ton voisin t'appelle. Il y a un escargot au bout de ta rue. Avec des *lunettes de soleil*."},
+    {"scene": "barricade","text": "Tu paniques. Tu bloques la porte. Tu remplis toute la maison de *sel*."},
+    {"scene": "door",     "text": "Six heures. Silence total. Puis... *toc*. *toc*. *toc*."},
+    {"scene": "door",     "text": "Tu ouvres. Il est là. Tu fermes les yeux..."},
+    {"scene": "bill",     "text": "Et il te tend un papier. La *facture* pour réparer sa coquille. *Quarante-trois euros*."},
+    {"scene": "bill",     "text": "Sept ans de route... pour un *devis*."},
+    {"scene": "outro",    "text": "Abonne-toi. Parce que sa cousine, la *limace*... elle, elle n'a *pas* pardonné."}
+  ]
+}
