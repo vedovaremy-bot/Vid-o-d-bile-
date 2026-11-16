@@ -136,7 +136,12 @@ def knock(d=.15):
 def crack(d=.25):
     n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT; x = rng.normal(0, 1, n)
     return x*np.exp(-tt*25)*(rng.random(n) > .7)
-SFX = {"thud": thud, "pop": pop, "knock": knock, "crack": crack, "whoosh": whoosh}
+def flush(d=1.4):
+    n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT; x = rng.normal(0, 1, n); y = np.zeros(n); acc = 0
+    for i in range(n): acc += .08*(x[i]-acc); y[i] = acc
+    gurgle = 1 + .6*np.sin(2*np.pi*(9 + 6*tt)*tt)
+    return y*gurgle*np.minimum(1, tt*12)*np.exp(-tt*1.6)*6
+SFX = {"flush": flush, "thud": thud, "pop": pop, "knock": knock, "crack": crack, "whoosh": whoosh}
 sfx = np.zeros_like(music)
 prev = None
 for s in segs:

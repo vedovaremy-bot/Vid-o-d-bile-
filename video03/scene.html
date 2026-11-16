@@ -1,0 +1,242 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size = 60, tailX = 0) {
+  rr(x - w / 2, y - h / 2, w, h, 40, '#fff'); poly([[x + tailX - 30, y + h / 2 - 4], [x + tailX + 30, y + h / 2 - 4], [x + tailX - 10, y + h / 2 + 60]], '#fff');
+  line(x + tailX - 26, y + h / 2 - 2, x + tailX + 26, y + h / 2 - 2, '#fff', 10);
+  txt(s, x, y + 4, size, OUT, 'Anton');
+}
+
+// ------------------------------------------------------------ le caca (personnage)
+// o: {mouth:'smile'|'open'|'angry'|'talk', angry, shades, hat:'plunger'|'crown', arms:[l,r], sash, blink, flip}
+function poop(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (!o.noShadow) shadow(0, 0, 150);
+  const sq = 1 + Math.sin(t * 7) * .035;
+  ctx.scale(1 / sq, sq);
+  const C = '#8b5a2b', L = '#b07a43';
+  // bras
+  const [al, ar] = o.arms || [.4, -.4];
+  for (const [side, a] of [[-1, al], [1, ar]]) {
+    ctx.save(); ctx.translate(side * 120, -130); ctx.rotate(a * side);
+    line(0, 0, side * 90, 0, OUT, 26); line(0, 0, side * 90, 0, C, 16); ell(side * 95, 0, 20, 20, C, 5); ctx.restore();
+  }
+  ell(0, -60, 155, 62, C); ell(-40, -78, 60, 14, L, 0);
+  ell(0, -150, 120, 54, C); ell(-30, -168, 45, 12, L, 0);
+  ell(0, -228, 84, 44, C); ell(-20, -244, 30, 10, L, 0);
+  ctx.beginPath(); ctx.moveTo(-30, -262); ctx.quadraticCurveTo(10, -300, 0, -330); ctx.quadraticCurveTo(50, -300, 40, -255); shape(C);
+  // visage (sur le tiers du milieu)
+  const ey = -160;
+  if (o.blink) { line(-62, ey, -26, ey, OUT, 6); line(26, ey, 62, ey, OUT, 6); }
+  else {
+    ell(-44, ey, 26, 30, '#fff', 5); ell(44, ey, 26, 30, '#fff', 5);
+    ell(-38, ey + 6, 11, 13, '#111', 0); ell(50, ey + 6, 11, 13, '#111', 0); ell(-34, ey + 1, 4, 4, '#fff', 0); ell(54, ey + 1, 4, 4, '#fff', 0);
+  }
+  if (o.angry) { line(-80, ey - 46, -18, ey - 26, OUT, 9); line(80, ey - 46, 18, ey - 26, OUT, 9); }
+  if (o.shades) { rr(-95, ey - 30, 86, 56, 18, '#111', 5); rr(9, ey - 30, 86, 56, 18, '#111', 5); line(-10, ey - 12, 10, ey - 12, '#111', 8); ctx.globalAlpha = .45; line(-80, ey - 18, -55, ey - 18, '#fff', 6); ctx.globalAlpha = 1; }
+  const m = o.mouth || 'smile', my = -88;
+  if (m === 'open' || (m === 'talk' && Math.sin(t * 16) > 0)) ell(0, my, 26, 22, '#5a1e1e', 5);
+  else if (m === 'angry') { ctx.beginPath(); ctx.arc(0, my + 22, 28, Math.PI * 1.15, Math.PI * 1.85); shape(null, 7); }
+  else { ctx.beginPath(); ctx.arc(0, my - 18, 34, Math.PI * .15, Math.PI * .85); shape(null, 7); }
+  if (o.sash) { ctx.save(); ctx.rotate(-.35); rr(-170, -110, 340, 50, 8, '#e74c3c', 5); txt(o.sash, 0, -84, 34, '#fff', 'Anton'); ctx.restore(); }
+  if (o.hat === 'plunger') { ctx.save(); ctx.translate(10, -290); ctx.rotate(.15); rr(-12, -260, 24, 240, 8, '#c58b4d'); ctx.beginPath(); ctx.arc(0, 10, 85, Math.PI, 0); ctx.closePath(); shape('#d63031'); ctx.restore(); }
+  if (o.hat === 'crown') { ctx.save(); ctx.translate(5, -300); poly([[-80, 30], [-90, -60], [-45, -15], [0, -80], [45, -15], [90, -60], [80, 30]], '#f9ca24'); ell(0, -80, 12, 12, '#e74c3c', 4); ctx.restore(); }
+  ctx.restore();
+}
+// ------------------------------------------------------------ toilettes (vue de face)
+// inside(): fonction qui dessine ce qui sort de la cuvette (avant la face avant)
+function toilet(x, y, s, t, inside, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  shadow(0, 0, 260);
+  rr(-230, -820, 460, 300, 30, '#fdfdfd'); rr(120, -790, 80, 34, 14, '#c8d6e5'); // réservoir + bouton
+  rr(-160, -540, 320, 60, 10, '#eef2f5');
+  ell(0, -440, 290, 120, '#fdfdfd');               // abattant/rebord
+  ell(0, -440, 220, 82, o.water || '#7ec8f2', 6);  // eau
+  if (o.swirl) { ctx.save(); ctx.globalAlpha = .7; for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.ellipse(0, -440, 180 - i * 55, 64 - i * 20, 0, t * 6 + i, t * 6 + i + 4); shape(null, 8, '#fff'); } ctx.restore(); }
+  ctx.restore();
+  if (inside) inside();
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  // face avant : moitié basse du rebord + pied
+  ctx.beginPath(); ctx.ellipse(0, -440, 290, 120, 0, 0, Math.PI); ctx.ellipse(0, -440, 220, 82, 0, Math.PI, 0, true); ctx.closePath(); shape('#fdfdfd');
+  ctx.beginPath(); ctx.moveTo(-250, -380); ctx.quadraticCurveTo(-200, -200, -150, -150); ctx.lineTo(-170, 0); ctx.lineTo(170, 0); ctx.lineTo(150, -150); ctx.quadraticCurveTo(200, -200, 250, -380); ctx.quadraticCurveTo(0, -300, -250, -380); shape('#f4f6f8');
+  ctx.restore();
+}
+function bathroom(dark) {
+  ctx.fillStyle = dark ? '#1c2833' : '#bfe3ef'; ctx.fillRect(-400, -400, W + 800, 1800);
+  ctx.globalAlpha = dark ? .25 : .5; for (let x = -400; x < W + 400; x += 120) line(x, -400, x, 1400, '#fff', 4); for (let y = -400; y < 1400; y += 120) line(-400, y, W + 400, y, '#fff', 4); ctx.globalAlpha = 1;
+  for (let i = -4; i < 14; i++) for (let j = 0; j < 8; j++) { ctx.fillStyle = (i + j) % 2 ? (dark ? '#2c3e50' : '#f5f6fa') : (dark ? '#17202a' : '#576574'); ctx.fillRect(i * 120, 1400 + j * 120, 120, 120); }
+  rr(80, 300, 220, 300, 20, dark ? '#34495e' : '#dff9fb'); // miroir
+}
+function confetti(g, n = 60) { const R = rnd(13); for (let i = 0; i < n; i++) { const x = R() * W, sp = 200 + R() * 300, y = ((g * sp + R() * H) % (H + 100)) - 50; ctx.save(); ctx.translate(x, y); ctx.rotate(g * 4 + i); rr(-12, -6, 24, 12, 3, ['#ff4757', '#ffd32a', '#2ed573', '#1e90ff', '#ff6b81'][i % 5], 0); ctx.restore(); } }
+function toiletPaper(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); rr(-70, -60, 140, 120, 20, '#fff'); ell(-70, 0, 26, 60, '#f1f2f6'); ell(-70, 0, 10, 20, '#ced6e0', 4); rr(40, 50, 60, 120, 6, '#fff', 4); ctx.restore(); }
+
+function grass(y) { ctx.fillStyle = '#7bc35b'; ctx.fillRect(-400, y, W + 800, H + 800 - y); }
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    bathroom();
+    const ch = lw(/chasse/i, 'hook');
+    toilet(560, 1500, 1.25, g, () => {
+      const up = ease((lt - ch - .6) / .6);
+      ctx.save();
+      poop(560, 1010 - up * 90, .9, g, { arms: [-1.3, 1.3], angry: lt > lw(/refusé/i, 'hook'), mouth: lt > lw(/refusé/i, 'hook') ? 'angry' : 'open', noShadow: true });
+      ctx.restore();
+    }, { swirl: lt > ch && lt < ch + 1.6 });
+    human(960, 1950, .85, g, { expr: lt > ch + .8 ? 'shock' : 'neutral', flip: true, armR: lt < ch + .4 ? 2.2 : -.15 });
+    popText('REFUSÉ', 540, 330, 220, '#ff3838', lw(/refusé/i, 'hook'), lt, -.08);
+  },
+  refuse(lt, d, g) {
+    bathroom();
+    toilet(540, 2300, 2.1, g, () => {
+      ctx.save();
+      poop(540, 1450, 1.5, g, { arms: [-1.2, 1.2], angry: true, mouth: lt > lw(/non/i, 'refuse') ? 'open' : 'angry', blink: (g % 2.4) > 2.25, noShadow: true });
+      ctx.restore();
+    });
+    const n = lw(/non/i, 'refuse');
+    if (lt > n) { const k = easeOutBack((lt - n) / .3); ctx.save(); ctx.translate(540, 360); ctx.scale(k, k); bubble(0, 0, 520, 230, 'NON.', 170); ctx.restore(); }
+  },
+  talk(lt, d, g) {
+    bathroom();
+    toilet(320, 1650, 1.0, g, () => poop(320, 1260, .7, g, { mouth: 'talk', arms: [.9 + Math.sin(g * 5) * .4, -.5] }));
+    human(860, 1950, .95, g, { expr: lt > lw(/égouts/i, 'talk') ? 'shock' : 'neutral', flip: true });
+    const j = lw(/trois/i, 'talk'), m = lw(/mieux/i, 'talk');
+    if (lt > j - .2) { const k = easeOutBack((lt - j + .2) / .3); ctx.save(); ctx.translate(380, 560); ctx.scale(k, k); bubble(0, 0, 560, 200, lt > m ? 'PAS LES ÉGOUTS !' : '3 JOURS !!', lt > m ? 70 : 110, -100); ctx.restore(); }
+    popText('MÉRITE MIEUX', 540, 260, 130, '#ffd32a', m, lt, .04);
+  },
+  surf(lt, d, g) {
+    bathroom();
+    toilet(540, 2250, 2.0, g, () => {
+      ctx.save();
+      const sx = 540 + Math.sin(g * 4) * 160, rot = Math.sin(g * 4 + 1) * .25;
+      ctx.save(); ctx.translate(sx, 1330); ctx.rotate(rot);
+      rr(-230, -36, 460, 60, 30, '#ff9f43'); line(-180, -6, 180, -6, '#fff', 8);
+      poop(0, -30, 1.0, g, { shades: true, mouth: 'smile', arms: [-.9, .9], noShadow: true });
+      ctx.restore(); ctx.restore();
+    }, { swirl: true });
+    popText('ENCORE', 280, 300, 140, '#fff', lw(/encore/i, 'surf', 1), lt, -.1);
+    popText('SURF', 760, 470, 170, '#ffd32a', lw(/surf/i, 'surf'), lt, .08);
+  },
+  plunger(lt, d, g) {
+    bathroom();
+    const st = lw(/vole/i, 'plunger');
+    toilet(330, 1700, 1.0, g, () => poop(330, 1300, .75, g, { hat: lt > st ? 'plunger' : null, mouth: 'smile', shades: lt > st + .5, arms: lt > st ? [-1.2, 1.2] : [.4, -.4] }));
+    human(830, 1950, .95, g, { flip: true, expr: lt > st ? 'shock' : 'angry', armR: lt < st ? 1.4 : -.15 });
+    if (lt < st) { ctx.save(); ctx.translate(lerp(560, 640, Math.sin(g * 6) * .5 + .5), 1060); ctx.rotate(-.6 + Math.PI); ctx.beginPath(); ctx.arc(0, 200, 75, Math.PI, 0); ctx.closePath(); shape('#d63031'); rr(-12, -40, 24, 240, 8, '#c58b4d'); ctx.restore(); }
+    popText('VENTOUSE', 540, 300, 150, '#ffd32a', lw(/ventouse/i, 'plunger'), lt, -.05, st);
+    popText('VOLÉE !', 540, 300, 170, '#ff3838', st, lt, .05);
+  },
+  sofa(lt, d, g) {
+    room(); sofa(540, 1560, .95);
+    poop(540, 1330, .8, g, { mouth: 'open', arms: [-.2 + Math.abs(Math.sin(g * 3)) * -.8, -.3] });
+    // paquet de chips
+    ctx.save(); ctx.translate(330, 1260); ctx.rotate(-.2); poly([[-70, -110], [70, -110], [60, 110], [-60, 110]], '#f1c40f'); txt('CHIPS', 0, 0, 44, '#c0392b', 'Anton'); ctx.restore();
+    // la télé au premier plan (dos)
+    ctx.save(); ctx.globalAlpha = .9; rr(-40, 1720, 520, 260, 10, '#222'); ctx.restore();
+    ctx.globalAlpha = .25 + Math.random() * .0; ell(540, 1330, 380, 260, `hsl(${(g * 120) % 360},80%,70%)`, 0); ctx.globalAlpha = 1;
+    human(950, 1950, .9, g, { flip: true, expr: 'angry' });
+    popText('TA SÉRIE', 540, 330, 150, '#ffd32a', lw(/série/i, 'sofa'), lt, -.05);
+  },
+  tiktok(lt, d, g) {
+    ctx.fillStyle = '#1e1e2e'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    rr(150, 150, 780, 1560, 80, '#111', 10); rr(180, 200, 720, 1460, 50, '#ff9ff3', 0);
+    ctx.save(); ctx.beginPath(); ctx.roundRect(180, 200, 720, 1460, 50); ctx.clip();
+    bathroom(); poop(540, 1680, 1.4, g, { mouth: 'talk', shades: true, arms: [-1, 1 + Math.sin(g * 6) * .4] });
+    // coeurs
+    for (let i = 0; i < 10; i++) { const k = (g * .6 + i * .1) % 1; ctx.globalAlpha = 1 - k; txt('♥', 800 + Math.sin(i * 3 + g * 2) * 50, 1500 - k * 900, 70 + (i % 3) * 20, ['#ff4757', '#ff6b81', '#fff'][i % 3], 'serif'); } ctx.globalAlpha = 1;
+    ctx.restore();
+    rr(220, 250, 150, 70, 14, '#ff3838', 0); txt('LIVE', 295, 288, 52, '#fff', 'Anton');
+    const v = lw(/deux/i, 'tiktok');
+    const views = lt < v ? Math.floor(lt * 1200) : Math.floor(lerp(Math.floor(v * 1200), 2000000, ease((lt - v) / 1.2)));
+    rr(400, 250, 450, 70, 14, 'rgba(0,0,0,.5)', 0); txt('👁 ' + views.toLocaleString('fr-FR'), 625, 288, 46, '#fff', 'Mont');
+    popText('2 MILLIONS', 540, 760, 170, '#ffd32a', v, lt, -.05);
+  },
+  perfume(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#5a4220'); gr.addColorStop(1, '#0c0904'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const R = rnd(3); for (let i = 0; i < 25; i++) { const x = R() * W, y = R() * H, tw = (Math.sin(g * 4 + i) + 1) / 2; ctx.globalAlpha = tw; txt('✦', x, y, 30 + R() * 30, '#ffe8a3', 'serif'); } ctx.globalAlpha = 1;
+    // flacon
+    ctx.save(); ctx.translate(780, 1800); rr(-130, -300, 260, 300, 40, 'rgba(255,215,130,.75)'); rr(-50, -360, 100, 70, 10, '#d4af37'); poop(0, -360, .35, g, { noShadow: true, mouth: 'smile' }); txt('N°2', 0, -140, 90, '#5a4220', 'Anton'); ctx.restore();
+    poop(320, 1800, 1.15, g, { shades: true, mouth: 'smile', arms: [-.3, -1.4] });
+    const n2 = lw(/numéro/i, 'perfume');
+    popText('ÉGÉRIE', 540, 330, 160, '#ffe8a3', lw(/parfum/i, 'perfume'), lt, -.04, n2 - .1);
+    if (lt > n2) { const k = easeOutBack((lt - n2) / .35); ctx.save(); ctx.translate(540, 500); ctx.scale(k, k); txt('NUMÉRO DEUX', 0, 0, 150, '#ffe8a3', 'Anton', 'center', 16, '#3a2a10'); txt('— eau de toilette —', 0, 120, 52, '#ffe8a3', 'Mont'); ctx.restore(); }
+  },
+  election(lt, d, g) {
+    sky('#74b9ff', '#dff3ff'); clouds(g);
+    // affiche
+    rr(140, 250, 800, 700, 20, '#fff'); rr(170, 280, 740, 120, 10, '#0652dd', 0); txt('VOTEZ CACA', 540, 345, 96, '#fff', 'Anton');
+    poop(540, 900, .95, g, { mouth: 'smile', noShadow: true });
+    const sl = lw(/slogan/i, 'election');
+    if (lt > sl) { const k = easeOutBack((lt - sl) / .3); ctx.save(); ctx.translate(540, 1050); ctx.scale(k, k); ctx.rotate(-.03); rr(-430, -60, 860, 120, 16, '#e74c3c', 6); txt('« JE NE LÂCHE RIEN »', 0, 4, 76, '#fff', 'Anton'); ctx.restore(); }
+    // pupitre + foule
+    rr(390, 1500, 300, 420, 10, '#0652dd'); txt('★', 540, 1640, 110, '#fff', 'serif');
+    poop(540, 1500, .75, g, { mouth: 'talk', arms: [-1, .3 + Math.sin(g * 5) * .5] });
+    const R = rnd(8); for (let i = 0; i < 14; i++) { const x = R() * W, y = 1820 + R() * 140; ell(x, y - 110, 55, 55, '#2d3436', 0); rr(x - 70, y - 60, 140, 200, 50, '#2d3436', 0); }
+  },
+  victory(lt, d, g) {
+    ctx.fillStyle = '#1e3799'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    ctx.save(); ctx.translate(540, 1100); ctx.rotate(g * .2); for (let i = 0; i < 16; i++) { ctx.rotate(Math.PI / 8); poly([[0, 0], [-110, -1600], [110, -1600]], i % 2 ? '#273c75' : '#1e3799', 0); } ctx.restore();
+    confetti(g);
+    poop(540, 1700, 1.4, g, { hat: 'crown', sash: 'PRÉSIDENT', mouth: 'open', arms: [-2.2, 2.2] });
+    const n = lw(/quatre/i, 'victory');
+    if (lt > n) { const k = clamp((lt - n) / 1.0); popText(Math.round(k * 99) + ' %', 540, 500, 280, '#ffd32a', n, lt, -.05); }
+    popText('ÉLU !', 540, 250, 170, '#fff', lw(/gagne/i, 'victory'), lt, .05);
+  },
+  law(lt, d, g) {
+    const gv = lw(/grève/i, 'law');
+    if (lt < gv - .3) {
+      ctx.fillStyle = '#dcdde1'; ctx.fillRect(-400, -400, W + 800, H + 800);
+      ctx.save(); ctx.translate(540, 680); ctx.scale(.85, .85); ctx.rotate(-.03);
+      rr(-420, -560, 840, 1120, 14, '#fffdf3');
+      txt('LOI N°1', 0, -460, 110, '#2c3e50'); line(-340, -380, 340, -380, '#2c3e50', 5);
+      // icône chasse d'eau barrée
+      ctx.save(); ctx.translate(0, 0); ctx.scale(.55, .55); toilet(0, 300, 1, g, null); ctx.restore();
+      if (lt > lw(/interdit/i, 'law')) { ell(0, -60, 260, 260, null, 30); ctx.save(); ctx.strokeStyle = '#e74c3c'; ell(0, -60, 260, 260, null, 0); ctx.restore(); line(-185, -245, 185, 125, '#e74c3c', 30); ctx.beginPath(); ctx.arc(0, -60, 260, 0, 7); ctx.lineWidth = 30; ctx.strokeStyle = '#e74c3c'; ctx.stroke(); }
+      txt('CHASSE D\'EAU', 0, 360, 90, '#2c3e50'); txt('INTERDITE', 0, 460, 110, '#e74c3c');
+      ctx.restore();
+      popText('TOUT LE PAYS', 540, 1560, 130, '#ffd32a', lw(/tout/i, 'law'), lt, .04);
+    } else {
+      sky(); grass(1300);
+      const R = rnd(31);
+      for (let i = 0; i < 4; i++) { const x = 140 + i * 270, y = 1950; human(x, y, .62, g + i, { cap: '#e67e22', shirt: '#2980b9', expr: 'angry', armR: 2.6 }); ctx.save(); ctx.translate(x + 70, y - 760 + Math.sin(g * 5 + i) * 15); rr(-110, -160, 220, 140, 8, '#fff'); txt('GRÈVE', 0, -90, 56, '#e74c3c'); line(0, -20, 0, 120, '#8d6e63', 12); ctx.restore(); }
+      popText('PLOMBIERS', 540, 380, 160, '#ff3838', 0, lt - gv + .3, -.05);
+      popText('MÊME TA MÈRE', 540, 620, 130, '#ffd32a', lw(/mère/i, 'law'), lt, .05);
+    }
+  },
+  assistant(lt, d, g) {
+    // couloir du palais
+    ctx.fillStyle = '#7f1d1d'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let x = -100; x < W + 200; x += 300) { rr(x, 0, 90, 1500, 10, '#e5c07b'); }
+    ctx.fillStyle = '#b33939'; ctx.fillRect(-400, 1400, W + 800, 900); rr(-400, 1500, W + 800, 300, 0, '#c0392b', 0);
+    const walk = (g * 60) % 40;
+    poop(330, 1700, .85, g, { hat: 'crown', sash: 'PRÉSIDENT', shades: true, mouth: 'smile' });
+    human(800, 1950, .95, g, { flip: true, expr: 'sad', armL: -1.3, armR: 1.3, shirt: '#111' });
+    toiletPaper(800, 1420 + Math.sin(g * 6) * 6, 1.1);
+    popText('ASSISTANT', 540, 330, 170, '#ffd32a', lw(/assistant/i, 'assistant'), lt, -.04);
+  },
+  outro(lt, d, g) {
+    bathroom(true);
+    ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(0, 0, W, H);
+    toilet(540, 1750, 1.3, g, () => {
+      ctx.save();
+      const up = ease((lt - lw(/ton/i, 'outro')) / .8);
+      ctx.globalAlpha = .95; poop(540, 1240 - up * 120, 1.0, g, { angry: true, mouth: 'smile', noShadow: true }); ctx.globalAlpha = 1;
+      ctx.restore();
+    }, { water: '#2c3e50' });
+    const p = easeOutBack((lt - .1) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 450); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+};
+</script></body></html>

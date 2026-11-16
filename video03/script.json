@@ -1,0 +1,97 @@
+{
+ "title": "Ton caca a refusé de partir",
+ "music": {
+  "bpm": 116
+ },
+ "sfx": [
+  {
+   "word": "chasse",
+   "type": "flush",
+   "gain": 0.8
+  },
+  {
+   "word": "encore",
+   "type": "flush",
+   "gain": 0.6
+  },
+  {
+   "word": "non",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "deux",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "gagne",
+   "type": "pop",
+   "gain": 0.7,
+   "repeat": 3,
+   "gap": 0.15
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ce matin, tu as tiré la *chasse*... et ton *caca* a refusé de partir."
+  },
+  {
+   "scene": "refuse",
+   "text": "Il s'accroche au bord de la cuvette. Il te regarde droit dans les yeux. Et il dit : *non*."
+  },
+  {
+   "scene": "talk",
+   "text": "Il t'explique qu'il a passé *trois jours* dans ton ventre... et qu'il mérite *mieux* que les égouts."
+  },
+  {
+   "scene": "surf",
+   "text": "Tu tires encore. Et *encore*. Lui, il fait du *surf* dans la cuvette."
+  },
+  {
+   "scene": "plunger",
+   "text": "Tu sors la *ventouse*. Il te la vole... et il la met sur sa tête comme un *chapeau*."
+  },
+  {
+   "scene": "sofa",
+   "text": "Le soir, il est installé sur ton *canapé*. Il mange tes *chips*. Il regarde *ta* série."
+  },
+  {
+   "scene": "tiktok",
+   "text": "Il ouvre un compte *TikTok*. Premier live : *deux millions* de vues."
+  },
+  {
+   "scene": "perfume",
+   "text": "Les marques l'appellent. Il devient l'égérie d'un *parfum*. Personne ne pose de questions."
+  },
+  {
+   "scene": "perfume",
+   "text": "Le parfum s'appelle : *Numéro Deux*."
+  },
+  {
+   "scene": "election",
+   "text": "Trois mois plus tard, il se présente aux *élections*. Son slogan : moi, je ne *lâche* rien."
+  },
+  {
+   "scene": "victory",
+   "text": "Il *gagne*. Avec *quatre-vingt-dix-neuf* pour cent des voix."
+  },
+  {
+   "scene": "law",
+   "text": "Sa première loi : il est *interdit* de tirer la chasse. Dans *tout* le pays."
+  },
+  {
+   "scene": "law",
+   "text": "Les plombiers font *grève*. Même ta *mère* a voté pour lui."
+  },
+  {
+   "scene": "assistant",
+   "text": "Et toi ? Tu es devenu son *assistant*. Tu lui portes son *papier toilette*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... sinon ce soir, c'est *ton* caca qui vient te *parler*."
+  }
+ ]
+}

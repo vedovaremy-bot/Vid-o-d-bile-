@@ -21,3 +21,6 @@ node ../lib/render.js
 ```
 Les modèles de voix (`voices/`) se téléchargent depuis
 `https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-<voix>.tar.bz2`.
+
+## Vidéo 03 — « Ton caca a refusé de partir » (70 s)
+Fichier final : `video03_caca_president.mp4` — voix 1 (`fr_FR-tom-medium`).
