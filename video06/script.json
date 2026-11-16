@@ -1,0 +1,87 @@
+{
+ "title": "Tu as répondu toi aussi au serveur",
+ "music": {
+  "bpm": 118
+ },
+ "sfx": [
+  {
+   "word": "aussi",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "table",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "deux",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "main",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "chien",
+   "type": "pop",
+   "gain": 0.6
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Le serveur t'a dit *bon appétit*... et tu as répondu : *toi aussi*."
+  },
+  {
+   "scene": "sit",
+   "text": "Il s'arrête. Il te regarde. Il pose son plateau... et il s'assoit à ta *table*."
+  },
+  {
+   "scene": "fries",
+   "text": "Il mange tes *frites*. Il boit ton *coca*. Et il te dit : bah quoi ? Tu m'as invité, non ?"
+  },
+  {
+   "scene": "bill",
+   "text": "Tu paies l'addition. Pour *deux*. Tu sors du restaurant... et il te *suit*."
+  },
+  {
+   "scene": "bus",
+   "text": "Dans le bus, il s'assoit à côté de toi. Et il te prend la *main*. Les gens vous regardent. Il leur dit : c'est mon *chéri*."
+  },
+  {
+   "scene": "brush",
+   "text": "Le soir, chez toi, sa *brosse à dents* est déjà dans ta salle de bain."
+  },
+  {
+   "scene": "family",
+   "text": "Le lendemain, il te présente sa *famille*. Ils emménagent *tous* dans ton salon. Son grand-père dort dans ta *baignoire*."
+  },
+  {
+   "scene": "mom",
+   "text": "Ta mère l'adore. Elle dit qu'il est beaucoup plus *poli* que toi. Elle lui a même donné *ta* chambre."
+  },
+  {
+   "scene": "wedding",
+   "text": "Six mois plus tard, vous êtes à la *mairie*. Le maire te demande : voulez-vous l'épouser ?"
+  },
+  {
+   "scene": "wedding",
+   "text": "Et toi, par réflexe, tu réponds : *toi aussi*."
+  },
+  {
+   "scene": "dog",
+   "text": "Aujourd'hui, vous êtes mariés. Vous avez un *chien*. Il s'appelle *Bon Appétit*."
+  },
+  {
+   "scene": "moral",
+   "text": "Alors la prochaine fois qu'un serveur te dit bon appétit... *réfléchis bien*."
+  },
+  {
+   "scene": "outro",
+   "text": "Et toi, tu as déjà répondu *toi aussi* ? Avoue en *commentaire*... et abonne-toi."
+  }
+ ]
+}

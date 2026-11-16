@@ -1,0 +1,232 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size, tailX = 0, t0 = 0, lt = 1) {
+  if (lt < t0) return; const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+  rr(-w / 2, -h / 2, w, h, 40, '#fff'); poly([[tailX - 24, h / 2 - 4], [tailX + 24, h / 2 - 4], [tailX - 4, h / 2 + 56]], '#fff'); line(tailX - 20, h / 2 - 2, tailX + 20, h / 2 - 2, '#fff', 10);
+  txt(s, 0, 4, size, OUT, 'Anton'); ctx.restore();
+}
+function hearts(g, x, y, n = 5) { for (let i = 0; i < n; i++) { const k = (g * .7 + i / n) % 1; ctx.globalAlpha = 1 - k; txt('♥', x + Math.sin(i * 2 + g * 2) * 70, y - k * 400, 60 + (i % 3) * 20, '#ff4757', 'serif', 'center', 6); } ctx.globalAlpha = 1; }
+
+// ------------------------------------------------------------ personnages
+const WAITER = { shirt: '#1e1e1e', pants: '#1e1e1e', bowtie: '#c0392b', mustache: true, hair: '#2d3436' };
+const waiter = (x, y, s, g, o = {}) => human(x, y, s, g, { ...WAITER, ...o });
+function tray(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ell(0, 0, 130, 26, '#b2bec3'); ell(-30, -30, 60, 22, '#fff'); poly([[-60, -40], [0, -40], [-10, -90], [-50, -90]], '#f9ca24', 4); ctx.restore(); }
+function fries(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ell(0, 0, 150, 40, '#fff'); for (let i = 0; i < 9; i++) { ctx.save(); ctx.translate(-80 + i * 20, -20); ctx.rotate((i - 4) * .12); rr(-9, -90, 18, 100, 4, '#f9ca24', 4); ctx.restore(); } ctx.restore(); }
+function dog(x, y, s, g) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 140);
+  const wag = Math.sin(g * 14) * .5;
+  ctx.save(); ctx.translate(110, -150); ctx.rotate(-.8 + wag); rr(-12, -110, 24, 110, 12, '#d9a066'); ctx.restore();
+  rr(-90, -110, 40, 110, 18, '#d9a066'); rr(50, -110, 40, 110, 18, '#d9a066');
+  ell(0, -170, 140, 85, '#d9a066');
+  ctx.save(); ctx.translate(-120, -260);
+  ell(-70, 10, 40, 80, '#a0663a'); ell(70, 10, 40, 80, '#a0663a');
+  ell(0, 0, 95, 85, '#d9a066'); ell(0, 40, 50, 36, '#f3d2a2'); ell(0, 22, 18, 13, '#111', 0);
+  ell(-35, -15, 11, 13, '#111', 0); ell(35, -15, 11, 13, '#111', 0); ell(-32, -19, 4, 4, '#fff', 0); ell(38, -19, 4, 4, '#fff', 0);
+  ell(10, 75, 18, 24, '#ff7aa2', 4);
+  rr(-70, 70, 140, 26, 12, '#e74c3c', 5); ell(0, 112, 26, 26, '#f9ca24', 5);
+  ctx.restore(); ctx.restore();
+}
+
+// ------------------------------------------------------------ décors
+function restaurant() {
+  ctx.fillStyle = '#7b2d26'; ctx.fillRect(-400, -400, W + 800, 1800);
+  ctx.globalAlpha = .18; for (let x = -400; x < W + 400; x += 80) rr(x, -400, 40, 1800, 0, '#000', 0); ctx.globalAlpha = 1;
+  rr(620, 260, 340, 260, 10, '#e1b12c'); rr(640, 280, 300, 220, 4, '#2d3436', 0); txt('MENU', 790, 330, 46, '#fff', 'Anton'); ctx.globalAlpha = .5; for (let i = 0; i < 3; i++) line(680, 380 + i * 36, 900, 380 + i * 36, '#fff', 6); ctx.globalAlpha = 1;
+  for (const x of [200, 880]) { line(x, -400, x, 120, '#2d3436', 4); poly([[x - 70, 200], [x + 70, 200], [x + 40, 120], [x - 40, 120]], '#f6e58d'); ctx.globalAlpha = .12; poly([[x - 70, 200], [x + 70, 200], [x + 300, 1400], [x - 300, 1400]], '#fff3c4', 0); ctx.globalAlpha = 1; }
+  ctx.fillStyle = '#5d3a1a'; ctx.fillRect(-400, 1400, W + 800, 900);
+}
+function table(x, y, w = 640) {
+  rr(x - w / 2, y, w, 70, 10, '#fff');
+  ctx.save(); ctx.beginPath(); ctx.roundRect(x - w / 2, y, w, 300, 10); ctx.clip();
+  for (let i = 0; i < w / 40; i++) for (let j = 0; j < 8; j++) if ((i + j) % 2) { ctx.fillStyle = '#e74c3c'; ctx.fillRect(x - w / 2 + i * 40, y + j * 40, 40, 40); }
+  ctx.restore(); rr(x - w / 2, y, w, 300, 10, null);
+}
+function livingRoom() {
+  ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, 1800);
+  rr(640, 280, 300, 220, 10, '#6d4c41'); rr(660, 300, 260, 180, 4, '#81ecec', 0);
+  ctx.fillStyle = '#a0785a'; ctx.fillRect(-400, 1400, W + 800, 900);
+  ell(540, 1720, 520, 160, '#0984e3', 0);
+}
+function bathroom() {
+  ctx.fillStyle = '#c7ecee'; ctx.fillRect(-400, -400, W + 800, 1800);
+  ctx.globalAlpha = .5; for (let x = -400; x < W + 400; x += 110) line(x, -400, x, 1400, '#fff', 4); for (let y = -400; y < 1400; y += 110) line(-400, y, W + 400, y, '#fff', 4); ctx.globalAlpha = 1;
+  ctx.fillStyle = '#535c68'; ctx.fillRect(-400, 1400, W + 800, 900);
+}
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    restaurant();
+    human(330, 1950, .95, g, { expr: lt > lw(/toi/i, 'hook') + .5 ? 'shock' : 'neutral' });
+    table(380, 1420, 600); fries(380, 1440, .8);
+    waiter(820, 1950, .95, g, { flip: true, expr: lt > lw(/toi/i, 'hook') + .3 ? 'shock' : 'neutral', armL: -.2, armR: 1.5 });
+    tray(940, 1180, .8);
+    bubble(760, 560, 480, 150, 'BON APPÉTIT !', 74, 60, lw(/bon/i, 'hook'), lt);
+    bubble(330, 860, 420, 150, 'TOI AUSSI !', 80, -20, lw(/toi/i, 'hook'), lt);
+    popText('…', 820, 300, 200, '#fff', lw(/aussi/i, 'hook') + .5, lt, 0);
+  },
+  sit(lt, d, g) {
+    restaurant();
+    const s = lw(/assoit/i, 'sit');
+    human(260, 1950, .95, g, { expr: lt > s ? 'shock' : 'neutral', lookX: 8 });
+    const k = ease((lt - s + .3) / .8);
+    waiter(lerp(900, 740, k), lerp(1950, 2050, k), .95, g, { flip: true, expr: 'neutral', blink: (g % 2.5) > 2.35 });
+    table(500, 1420, 700);
+    if (lt > lw(/pose/i, 'sit')) tray(620, 1430, .7);
+    if (lt < lw(/pose/i, 'sit')) tray(900, 1180, .8);
+    popText('IL S\'ASSOIT', 540, 360, 170, '#ffd32a', s, lt, -.05);
+  },
+  fries(lt, d, g) {
+    restaurant();
+    human(240, 1950, .95, g, { expr: 'shock' });
+    waiter(780, 2050, .95, g, { flip: true, expr: 'neutral', armR: 1.6 + Math.sin(g * 10) * .25 });
+    table(500, 1420, 760); fries(560, 1440, .8);
+    // verre de coca
+    rr(330, 1290, 90, 150, 12, '#4a2511'); rr(330, 1290, 90, 30, 8, '#c0392b', 4);
+    const q = lw(/quoi/i, 'fries');
+    bubble(700, 560, 620, 170, 'TU M\'AS INVITÉ, NON ?', 62, 60, q, lt);
+    popText('MES FRITES ?!', 540, 330, 140, '#ffd32a', lw(/frites/i, 'fries'), lt, -.05, q - .1);
+  },
+  bill(lt, d, g) {
+    const out = lw(/sors/i, 'bill');
+    if (lt < out - .2) {
+      ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+      ctx.save(); ctx.translate(540, 820); ctx.rotate(-.04);
+      ctx.beginPath(); ctx.moveTo(-300, -520); ctx.lineTo(300, -520); for (let i = 0; i <= 12; i++) ctx.lineTo(300 - i * 50, 520 + (i % 2) * 30); ctx.closePath(); shape('#fffdf3');
+      txt('ADDITION', 0, -430, 90, '#2d3436');
+      [['Frites', '4,50 €'], ['Coca', '3,00 €'], ['Frites (lui)', '4,50 €'], ['Coca (lui)', '3,00 €'], ['Dessert (lui)', '6,00 €']].forEach(([a, b], i) => { txt(a, -250, -300 + i * 80, 46, '#2d3436', 'Mont', 'left'); txt(b, 250, -300 + i * 80, 46, '#2d3436', 'Mont', 'right'); });
+      line(-250, 130, 250, 130, '#2d3436', 5); txt('TOTAL 21 €', 0, 220, 90, '#e74c3c');
+      ctx.restore();
+      popText('x2', 860, 400, 200, '#ffd32a', lw(/deux/i, 'bill'), lt, .1);
+    } else {
+      sky(); clouds(g); ctx.fillStyle = '#95a5a6'; ctx.fillRect(-400, 1350, W + 800, 1000);
+      rr(-100, 300, 600, 1060, 6, '#7b2d26'); rr(80, 720, 240, 640, 10, '#5d3a1a'); txt('RESTO', 200, 500, 100, '#f6e58d', 'Anton');
+      const k = clamp((lt - out) / 3);
+      human(lerp(420, 700, k), 1950, .9, g, { pose: 'run', expr: 'shock' });
+      waiter(lerp(220, 520, k), 1950, .9, g, { pose: 'run', expr: 'neutral' });
+      popText('IL TE SUIT', 540, 330, 170, '#ff3838', lw(/suit/i, 'bill'), lt, -.05);
+    }
+  },
+  bus(lt, d, g) {
+    ctx.fillStyle = '#74b9ff'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    // paysage qui défile dans les vitres
+    for (let i = 0; i < 6; i++) { const x = ((-g * 700 + i * 300) % 1800 + 1800) % 1800 - 300; rr(x, 520, 160, 420, 6, ['#fab1a0', '#ffeaa7', '#81ecec'][i % 3], 0); }
+    ctx.fillStyle = '#f5f6fa'; ctx.fillRect(-400, -400, W + 800, 450); ctx.fillRect(-400, 1000, W + 800, 1400);
+    for (let x = 0; x < W; x += 360) rr(x - 10, 450, 20, 560, 4, '#dfe6e9', 0);
+    rr(-400, 440, W + 800, 20, 0, '#b2bec3', 0);
+    human(340, 1980, .9, g, { expr: 'shock', armR: .9 });
+    waiter(700, 1980, .9, g, { expr: 'neutral', flip: true, armR: .9 });
+    // sièges
+    rr(140, 1450, 800, 300, 40, '#0984e3'); rr(140, 1700, 800, 300, 20, '#0652dd');
+    if (lt > lw(/main/i, 'bus')) { ell(520, 1440, 50, 40, '#f3c9a4'); hearts(g, 520, 1300); }
+    const ch = lw(/chéri/i, 'bus');
+    bubble(760, 760, 500, 150, 'C\'EST MON CHÉRI', 64, -40, ch, lt);
+    popText('LA MAIN', 540, 300, 170, '#ff4757', lw(/main/i, 'bus'), lt, -.05, ch - .1);
+  },
+  brush(lt, d, g) {
+    bathroom();
+    rr(600, 300, 380, 480, 20, '#dff9fb'); rr(600, 300, 380, 480, 20, null, 10); // miroir
+    rr(560, 1000, 460, 80, 20, '#fff'); rr(640, 1080, 300, 340, 10, '#fff');
+    // gobelet avec 2 brosses
+    rr(740, 880, 100, 130, 14, '#fd79a8'); line(770, 880, 750, 760, '#0984e3', 14); line(810, 880, 830, 760, '#e74c3c', 14);
+    rr(735, 740, 30, 40, 6, '#fff', 3); rr(815, 740, 30, 40, 6, '#fff', 3);
+    human(300, 1950, .95, g, { expr: 'shock', pose: 'shock' });
+    popText('2 BROSSES', 540, 330, 170, '#ffd32a', lw(/brosse/i, 'brush'), lt, -.05);
+    ctx.save(); const k = easeOutBack((lt - lw(/brosse/i, 'brush')) / .3); if (k > 0) { ctx.translate(840, 650); ctx.scale(k, k); ell(0, 0, 70, 70, '#e74c3c', 0); txt('LUI', 0, 4, 48, '#fff', 'Anton'); } ctx.restore();
+  },
+  family(lt, d, g) {
+    const gp = lw(/grand/i, 'family') - .3;
+    if (lt < gp) {
+      livingRoom();
+      const n = Math.min(7, Math.floor(clamp((lt - lw(/famille/i, 'family') + .2) / 2.2) * 7) + 1);
+      const R = rnd(9);
+      for (let i = 0; i < n; i++) { const s = .5 + R() * .4; waiter(110 + i * 140, 1950 - R() * 60, s, g + i, { flip: i % 2 === 1, expr: 'neutral', longHair: i % 3 === 1, mustache: i % 3 !== 1 }); }
+      popText('SA FAMILLE', 540, 330, 170, '#ffd32a', lw(/famille/i, 'family'), lt, -.05);
+      if (lt > lw(/tous/i, 'family')) popText('x' + n, 880, 560, 160, '#fff', lw(/tous/i, 'family'), lt, .1);
+    } else {
+      bathroom();
+      // baignoire avec le grand-père
+      waiter(560, 1750, .8, g, { hair: '#dfe6e9', expr: 'sleep' });
+      rr(160, 1350, 760, 360, 80, '#fff'); rr(200, 1700, 60, 80, 10, '#b2bec3'); rr(820, 1700, 60, 80, 10, '#b2bec3');
+      for (let i = 0; i < 3; i++) { const z = (g * .8 + i * .33) % 1; ctx.globalAlpha = 1 - z; txt('Z', 700 + z * 100, 1000 - z * 200, 60 + z * 30, '#2d3436', 'Anton'); ctx.globalAlpha = 1; }
+      popText('PAPI', 540, 330, 190, '#ffd32a', 0, lt - gp, -.05);
+    }
+  },
+  mom(lt, d, g) {
+    livingRoom();
+    const ch = lw(/chambre/i, 'mom') - .3;
+    human(220, 1950, .9, g, { expr: 'sad' });
+    human(560, 1950, .88, g, { longHair: true, hair: '#8e6e53', shirt: '#e17055', expr: 'neutral', armR: -1.3 });
+    waiter(820, 1950, .9, g, { flip: true, expr: 'neutral' });
+    hearts(g, 690, 1000, 4);
+    if (lt > ch) { const k = easeOutBack((lt - ch) / .3); ctx.save(); ctx.translate(540, 620); ctx.scale(k, k); rr(-300, -80, 600, 160, 20, '#fff', 6); txt('CHAMBRE DE : LUI', 0, 6, 64, '#2d3436', 'Anton'); line(-260, 6, -10, 6, '#e74c3c', 0); ctx.restore(); }
+    popText('PLUS POLI QUE TOI', 540, 330, 120, '#ffd32a', lw(/poli/i, 'mom'), lt, -.04, ch);
+  },
+  wedding(lt, d, g) {
+    // mairie
+    ctx.fillStyle = '#f5f0e1'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let x = -100; x < W + 200; x += 260) rr(x, 150, 70, 1300, 10, '#e8dcc0');
+    // drapeau
+    ['#0055a4', '#fff', '#ef4135'].forEach((c, i) => rr(410 + i * 90, 520, 90, 180, 0, c, 4));
+    ctx.fillStyle = '#b33939'; ctx.fillRect(-400, 1400, W + 800, 900);
+    human(540, 1600, .8, g, { sash: true, hair: '#b2bec3', bald: false, shirt: '#2d3436', expr: 'neutral' });
+    rr(220, 1230, 640, 420, 10, '#8d6e63'); txt('RF', 540, 1440, 90, '#f5f0e1', 'Anton'); // pupitre du maire
+    human(280, 1980, .95, g, { expr: 'neutral' });
+    waiter(800, 1980, .95, g, { flip: true, expr: 'neutral', shirt: '#fdfdfd', bowtie: '#2d3436' });
+    const ta = wordTime(/toi/i, 0, null) > 0 ? null : null;
+    const second = g >= SPANS.find(s => s.scene === 'wedding').start + 4.8;
+    const tAussi = (() => { let n = 0; for (const s of T.segments) for (const w of s.words) if (/aussi/i.test(w.w)) { n++; if (n === 2) return w.s; } return 1e9; })();
+    if (g < tAussi - .6) bubble(540, 560, 600, 160, 'VOULEZ-VOUS L\'ÉPOUSER ?', 56, 0, lw(/voulez/i, 'wedding'), lt);
+    if (g > tAussi - .4) { bubble(300, 760, 440, 160, 'TOI AUSSI !', 84, -40, 0, g - tAussi + .4); hearts(g, 800, 1100, 6); popText('MARIÉS', 540, 330, 190, '#ff4757', 0, g - tAussi - .3, -.05); }
+    else popText('MAIRIE', 540, 330, 170, '#0055a4', lw(/mairie/i, 'wedding'), lt, -.05);
+  },
+  dog(lt, d, g) {
+    livingRoom();
+    human(220, 1950, .85, g, { expr: 'neutral', armR: -.6 });
+    waiter(880, 1950, .85, g, { flip: true, expr: 'neutral' });
+    dog(600, 1900, 1.15, g);
+    const n = lw(/bon/i, 'dog');
+    if (lt > n) { const k = easeOutBack((lt - n) / .35); ctx.save(); ctx.translate(540, 520); ctx.scale(k, k); ctx.rotate(-.05); rr(-360, -110, 720, 220, 110, '#f9ca24', 8); txt('« BON APPÉTIT »', 0, 6, 100, '#2d3436', 'Anton'); ctx.restore(); }
+    popText('MARIÉS', 540, 330, 150, '#fff', 0.1, lt, .04, n - .2);
+  },
+  moral(lt, d, g) {
+    restaurant();
+    const k = ease(lt / d);
+    ctx.save(); ctx.translate(540, 1300); ctx.scale(1 + k * .25, 1 + k * .25); ctx.translate(-540, -1300);
+    human(330, 1950, .95, g, { expr: 'shock' });
+    for (let i = 0; i < 2; i++) { const q = (g * 1.5 + i * .5) % 1; ell(230 + i * 200, 1040 + q * 100, 12, 18, '#74b9ff', 3); }
+    table(380, 1420, 600);
+    waiter(820, 1950, .95, g, { flip: true, expr: 'neutral', hair: '#e1b12c', armR: 1.5 });
+    ctx.restore();
+    bubble(760, 560, 480, 150, 'BON APPÉTIT !', 74, 60, .2, lt);
+    popText('RÉFLÉCHIS BIEN', 540, 300, 130, '#ff3838', lw(/réfléchis/i, 'moral'), lt, -.04);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const k = easeOutBack((lt - .1) / .4);
+    ctx.save(); ctx.translate(540, 900); ctx.scale(k, k);
+    rr(-400, -260, 800, 420, 60, '#fff'); poly([[-200, 150], [-80, 150], [-220, 300]], '#fff');
+    txt('💬', -270, -150, 90, '#000', 'serif');
+    txt('TOI AUSSI ?', 0, -40, 150, '#2d3436', 'Anton');
+    txt('Avoue en commentaire 👇', 0, 90, 54, '#636e72', 'Mont');
+    ctx.restore();
+    const p = easeOutBack((lt - lw(/abonne/i, 'outro')) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 1620); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+};
+</script></body></html>
