@@ -1,0 +1,120 @@
+{
+ "title": "Ta mamie a mis KO un champion de MMA",
+ "music": {
+  "bpm": 120,
+  "prog": [
+   [
+    57,
+    60,
+    64,
+    69
+   ],
+   [
+    55,
+    59,
+    62,
+    67
+   ],
+   [
+    53,
+    57,
+    60,
+    65
+   ],
+   [
+    52,
+    56,
+    59,
+    64
+   ]
+  ]
+ },
+ "sfx": [
+  {
+   "word": "ko",
+   "type": "thud",
+   "gain": 0.8
+  },
+  {
+   "word": "sonne",
+   "type": "pop",
+   "gain": 0.9,
+   "repeat": 3,
+   "gap": 0.12
+  },
+  {
+   "word": "sac",
+   "type": "thud",
+   "gain": 0.9
+  },
+  {
+   "word": "effondre",
+   "type": "thud",
+   "gain": 0.9
+  },
+  {
+   "word": "ours",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "ceinture",
+   "type": "pop",
+   "gain": 0.7
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ta *mamie* a quatre-vingt-douze ans... et elle vient de mettre *K.O.* un champion de *MMA*."
+  },
+  {
+   "scene": "form",
+   "text": "Tout commence un dimanche. Elle te demande de l'aider à remplir un *formulaire*. Elle dit que c'est pour un club de *tricot*."
+  },
+  {
+   "scene": "reveal",
+   "text": "En vrai... c'était une inscription au plus grand tournoi de *combat* du pays."
+  },
+  {
+   "scene": "arrival",
+   "text": "Le jour J, elle arrive avec son *déambulateur*. Toute la salle *rigole*."
+  },
+  {
+   "scene": "opponent",
+   "text": "Son adversaire : cent trente kilos de muscles. Surnommé... *le Broyeur*."
+  },
+  {
+   "scene": "bell",
+   "text": "La cloche *sonne*. Le Broyeur fonce sur elle. Mamie ne bouge pas. Elle remonte juste ses *lunettes*."
+  },
+  {
+   "scene": "bag",
+   "text": "Mamie ouvre son sac à main... et lui met un *coup de sac*. Il y avait *six* pots de confiture dedans."
+  },
+  {
+   "scene": "ko",
+   "text": "Le Broyeur s'*effondre*. K.O. en *trois* secondes. Le public devient *fou*."
+  },
+  {
+   "scene": "series",
+   "text": "Elle enchaîne. Elle bat un *boxeur*, un *catcheur*... et un *ours*."
+  },
+  {
+   "scene": "belt",
+   "text": "En finale, elle gagne la *ceinture* en or. Elle s'en sert pour tenir sa *jupe*."
+  },
+  {
+   "scene": "sponsors",
+   "text": "Les sponsors l'appellent. Elle refuse *tout*. Elle veut juste une chose : que tu l'appelles *plus souvent*."
+  },
+  {
+   "scene": "call",
+   "text": "Alors maintenant, tu l'appelles tous les jours. Pas par amour. Par *peur*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et appelle ta mamie. *Tout de suite*."
+  }
+ ]
+}

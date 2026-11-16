@@ -27,3 +27,6 @@ Fichier final : `video03_caca_president.mp4` — voix 1 (`fr_FR-tom-medium`).
 
 ## Vidéo 04 — « Ton chat a vendu ta maison » (70 s)
 Fichier final : `video04_chat_maison.mp4` — voix 1 (`fr_FR-tom-medium`).
+
+## Vidéo 05 — « Ta mamie a mis K.O. un champion de MMA » (70 s)
+Fichier final : `video05_mamie_mma.mp4` — voix 1 (`fr_FR-tom-medium`).
