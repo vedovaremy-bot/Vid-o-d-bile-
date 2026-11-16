@@ -7,12 +7,12 @@ import numpy as np
 from piper import PiperVoice, SynthesisConfig
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VOICE = os.environ.get("VOICE", "fr_FR-miro-high")
+VOICE = os.environ.get("VOICE", "fr_FR-tom-medium")   # voix choisie par l'utilisateur (voix 1)
 CFG = SynthesisConfig(
     speaker_id=int(os.environ["SPEAKER"]) if "SPEAKER" in os.environ else None,
-    length_scale=float(os.environ.get("LENGTH_SCALE", "0.92")),
-    noise_scale=float(os.environ.get("NOISE", "0.72")),     # + = intonation plus vivante
-    noise_w_scale=float(os.environ.get("NOISE_W", "0.9")),  # + = rythme plus varié
+    length_scale=float(os.environ.get("LENGTH_SCALE", "0.86")),
+    noise_scale=float(os.environ.get("NOISE", "0.667")),     # + = intonation plus vivante
+    noise_w_scale=float(os.environ.get("NOISE_W", "0.8")),  # + = rythme plus varié
 )
 SR_OUT = 44100
 script = json.load(open("script.json", encoding="utf-8"))
@@ -83,8 +83,9 @@ def wwrite(p, a, sr):
     with wave.open(p, "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(sr); w.writeframes((np.clip(a, -1, 1)*32767).astype(np.int16).tobytes())
 wwrite(f"{tmp}/v.wav", raw, SR)
+MASTER = os.environ.get("MASTER", "0") == "1"   # traitement voix désactivé par défaut (voix 1 brute, validée)
 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", f"{tmp}/v.wav", "-af",
-    "aresample=44100:resampler=soxr,highpass=f=75,equalizer=f=160:t=q:w=1.2:g=3,equalizer=f=3200:t=q:w=1.5:g=2.5,"
+    "aresample=44100:resampler=soxr,alimiter=limit=0.95" if not MASTER else "aresample=44100:resampler=soxr,highpass=f=75,equalizer=f=160:t=q:w=1.2:g=3,equalizer=f=3200:t=q:w=1.5:g=2.5,"
     "equalizer=f=7500:t=q:w=2:g=-2,acompressor=threshold=-20dB:ratio=3:attack=5:release=80:makeup=2,"
     "aecho=0.8:0.6:28|47:0.10|0.06,alimiter=limit=0.95", "-ar", str(SR_OUT), f"{tmp}/vm.wav"], check=True)
 with wave.open(f"{tmp}/vm.wav") as w:

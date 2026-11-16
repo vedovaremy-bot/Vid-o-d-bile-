@@ -11,7 +11,7 @@ Fichier final : `video01_pigeon_proces.mp4`
    `node render.js` -> `out/video.mp4`  (`node render.js 5 12` = images de test)
 
 ## Vidéo 02 — « L'escargot qui te poursuit depuis 7 ans » (80 s)
-Fichier final : `video02_escargot_7ans.mp4` — voix `fr_FR-miro-high` (plus naturelle) + mastering.
+Fichier final : `video02_escargot_7ans.mp4` — voix `fr_FR-miro-high` (test). **Voix retenue pour la suite : `fr_FR-tom-medium` (voix 1).**
 
 Moteur commun dans `lib/` (`engine.js`, `tts.py`, `render.js`). Nouvelle vidéo :
 ```
