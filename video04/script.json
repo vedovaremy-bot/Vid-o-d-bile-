@@ -1,0 +1,26 @@
+{
+  "title": "Ton chat a vendu ta maison",
+  "music": {"bpm": 108, "prog": [[62,65,69,74],[58,62,65,70],[60,64,67,72],[57,61,64,69]]},
+  "sfx": [
+    {"word": "maison", "type": "thud", "gain": 0.6},
+    {"word": "patte", "type": "pop", "gain": 0.7},
+    {"word": "cravate", "type": "pop", "gain": 0.6},
+    {"word": "décolle", "type": "whoosh", "gain": 1.0},
+    {"word": "yacht", "type": "pop", "gain": 0.6}
+  ],
+  "segments": [
+    {"scene": "hook",     "text": "Pendant que tu dormais... ton *chat* a vendu ta *maison*."},
+    {"scene": "kitchen",  "text": "Tu te réveilles, et il y a deux *inconnus* dans ta cuisine. Ils mesurent les murs."},
+    {"scene": "contract", "text": "Sur la table, un *contrat* de vente. Signé avec une *patte*."},
+    {"scene": "cat",      "text": "Tu regardes ton chat. Il fait semblant de *dormir*. Mais il porte une *cravate*."},
+    {"scene": "listing",  "text": "Tu ouvres ton téléphone. L'annonce est en ligne depuis trois jours. Titre : maison calme, *humain inclus*."},
+    {"scene": "listing",  "text": "Prix : trois cent mille euros. Plus *un sachet* de croquettes, pour les frais."},
+    {"scene": "bank",     "text": "Tu fouilles ses affaires. Il a ouvert un *compte en banque*. Et il a déjà un billet d'avion. Pour les *Bahamas*."},
+    {"scene": "escape",   "text": "Tu essaies de l'attraper. Il saute par la fenêtre... directement dans un *taxi*."},
+    {"scene": "airport",  "text": "Tu fonces à l'aéroport. Trop tard. L'avion *décolle*. Il te fait *coucou* par le hublot."},
+    {"scene": "yacht",    "text": "Le lendemain, il poste une photo. Lui, sur un *yacht*. Lunettes de soleil. Entouré de *poissons* grillés."},
+    {"scene": "pet",      "text": "Et toi ? Les nouveaux propriétaires t'ont gardé. Comme *animal de compagnie*."},
+    {"scene": "kibble",   "text": "Ils te donnent des croquettes deux fois par jour. Et franchement... c'est pas si *mauvais*."},
+    {"scene": "outro",    "text": "Abonne-toi... et va vérifier ce que ton chat fait sur ton téléphone. *Maintenant*."}
+  ]
+}
