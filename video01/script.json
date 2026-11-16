@@ -1,0 +1,21 @@
+{
+  "title": "Le pigeon qui t'a fait un procès",
+  "segments": [
+    {"scene": "hook",    "text": "Un *pigeon* vient de te traîner au *tribunal*. Et le pire... c'est qu'il va *gagner*."},
+    {"scene": "balcony", "text": "Tout commence un lundi matin. Tu ouvres ta fenêtre, et il y a un *pigeon* sur ton balcon."},
+    {"scene": "balcony", "text": "Avec une *valise*."},
+    {"scene": "contract","text": "Il te fixe droit dans les yeux, et il pose un papier devant toi. Un *bail* de location."},
+    {"scene": "contract","text": "Signé. *Par toi.* Juste à côté d'une petite trace de *miettes*."},
+    {"scene": "cousins", "text": "Le lendemain, il a installé un *canapé*, une *télé*... et il a invité *quarante-deux* cousins."},
+    {"scene": "party",   "text": "Le soir, c'est la *fête*. Musique à fond. Ils *roucoulent* jusqu'à quatre heures du matin."},
+    {"scene": "broom",   "text": "Là, tu *craques*. Tu prends un *balai*, et tu ouvres la fenêtre pour tous les chasser."},
+    {"scene": "phone",   "text": "Grave *erreur*. Le pigeon sort son téléphone... et appelle son *avocat*."},
+    {"scene": "phone",   "text": "Un *goéland*."},
+    {"scene": "court",   "text": "Une semaine plus tard, tu es au *tribunal*. Le juge ? Un vieux *hibou*."},
+    {"scene": "court",   "text": "Le goéland plaide : expulsion *abusive*, coups de *balai*, et vol de miettes de *croissant*."},
+    {"scene": "verdict", "text": "Le hibou tape son marteau. *Coupable.*"},
+    {"scene": "verdict", "text": "Tu dois lui payer un *loyer*. Trois *baguettes* par semaine. *À vie.*"},
+    {"scene": "ending",  "text": "Aujourd'hui, c'est *toi* qui dors sur le balcon. Et lui, il dort dans *ton lit*."},
+    {"scene": "outro",   "text": "Alors ce soir, regarde bien ta fenêtre. Et *abonne-toi*... sinon, c'est *chez toi* qu'il vient."}
+  ]
+}
