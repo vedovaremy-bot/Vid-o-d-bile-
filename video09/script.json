@@ -1,0 +1,116 @@
+{
+ "title": "Ton nez s'est barré",
+ "music": {
+  "bpm": 126,
+  "prog": [
+   [
+    60,
+    64,
+    67,
+    72
+   ],
+   [
+    65,
+    69,
+    72,
+    77
+   ],
+   [
+    67,
+    71,
+    74,
+    79
+   ],
+   [
+    60,
+    64,
+    67,
+    72
+   ]
+  ]
+ },
+ "sfx": [
+  {
+   "word": "éternué",
+   "type": "thud",
+   "gain": 0.9
+  },
+  {
+   "word": "barré",
+   "type": "whoosh",
+   "gain": 0.9
+  },
+  {
+   "word": "sentir",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "ouïe",
+   "type": "pop",
+   "gain": 0.7
+  },
+  {
+   "word": "douze",
+   "type": "pop",
+   "gain": 0.7,
+   "repeat": 4,
+   "gap": 0.1
+  },
+  {
+   "word": "atchoum",
+   "type": "thud",
+   "gain": 1.0
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Tu as *éternué* tellement fort... que ton *nez* s'est *barré*."
+  },
+  {
+   "scene": "escape",
+   "text": "Il saute de ton visage, il ouvre la fenêtre... et il s'enfuit en courant. Avec des petites *jambes*."
+  },
+  {
+   "scene": "chase",
+   "text": "Tu lui cours après en criant : reviens ! Et il te répond : désolé... mais je ne peux plus te *sentir*."
+  },
+  {
+   "scene": "nonose",
+   "text": "Sans nez, tu ne sens plus rien. Ni les croissants. Ni les *chaussettes* de ton coloc. Franchement... c'est *génial*."
+  },
+  {
+   "scene": "perfume",
+   "text": "Pendant ce temps, ton nez devient *parfumeur*. Tout le monde dit qu'il a du *flair*. Son parfum le plus vendu s'appelle : *Eau de Narine*."
+  },
+  {
+   "scene": "rich",
+   "text": "Il devient *riche*. Il s'achète une voiture de sport. Et des mouchoirs en *or*."
+  },
+  {
+   "scene": "love",
+   "text": "Puis il tombe amoureux. D'une *oreille*. Elle, elle est tout *ouïe*. Et lui, il la *renifle* tous les matins."
+  },
+  {
+   "scene": "wedding",
+   "text": "Ils se marient. Et celui qui les marie... c'est un *coude*. Personne ne sait pourquoi."
+  },
+  {
+   "scene": "door",
+   "text": "Un an plus tard, on sonne chez toi. C'est ton nez. Avec sa femme... et *douze* bébés nez."
+  },
+  {
+   "scene": "door",
+   "text": "Il te dit : on peut revenir ? Ils sont *tous* enrhumés."
+  },
+  {
+   "scene": "thirteen",
+   "text": "Aujourd'hui, tu as *treize* nez sur la figure. Et tu éternues toutes les *quatre secondes*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... sinon ce soir, c'est *ton* nez qui s'en va. *Atchoum*."
+  }
+ ]
+}

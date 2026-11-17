@@ -40,3 +40,7 @@ Fichier final : `video07_like_ex.mp4` — voix 1. Appel à l'action : identifier
 
 ## Vidéo 08 — « Tu as refusé de faire demi-tour » (70 s)
 Fichier final : `video08_gps_vexe.mp4` — voix 1.
+
+## Vidéo 09 — « Ton nez s'est barré » (70 s)
+Fichier final : `video09_nez_barre.mp4` — voix 1. Retour à l'absurde pur (demande de l'utilisateur :
+les vidéos doivent être *vraiment* débiles, comme le pigeon et le caca — pas de "relatable" trop logique).
