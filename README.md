@@ -48,3 +48,4 @@ les vidéos doivent être *vraiment* débiles, comme le pigeon et le caca — pa
 ## Vidéo 10 — « Une saucisse a pris ta place au travail » (70 s)
 Fichier final : `video10_saucisse_bureau.mp4` — voix 1. Vers 10-13 s, le personnage principal (la saucisse)
 regarde la caméra et réclame un like (« Lâche un like… sinon je prends aussi ta place à la maison »).
+Version ElevenLabs (voix `3Tp5mYhT9wrfnry9pzvV`, 68 s) : `video10_saucisse_bureau_elevenlabs.mp4`.

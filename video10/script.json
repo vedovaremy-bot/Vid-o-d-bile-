@@ -1,26 +1,120 @@
 {
-  "title": "Une saucisse a pris ta place au travail",
-  "music": {"bpm": 120, "prog": [[62,66,69,74],[59,62,66,71],[55,59,62,67],[57,61,64,69]]},
-  "sfx": [
-    {"word": "saucisse", "type": "pop", "gain": 0.5},
-    {"word": "like", "type": "pop", "gain": 0.9, "repeat": 2, "gap": 0.12},
-    {"word": "applaudit", "type": "pop", "gain": 0.6, "repeat": 4, "gap": 0.1},
-    {"word": "placard", "type": "thud", "gain": 0.8},
-    {"word": "barbecue", "type": "thud", "gain": 0.8},
-    {"word": "moutarde", "type": "whoosh", "gain": 0.9}
-  ],
-  "segments": [
-    {"scene": "hook",     "text": "Une *saucisse* a pris ta place au travail... et *personne* n'a remarqué."},
-    {"scene": "desk",     "text": "Lundi matin, tu arrives au bureau. Elle est assise à *ta* place. Avec *ta* cravate."},
-    {"scene": "like",     "text": "Elle se tourne vers toi. Elle te fixe. Et elle dit : toi, là. Lâche un *like*. Sinon, je prends aussi ta place à la *maison*."},
-    {"scene": "boss",     "text": "Ton patron arrive. Il regarde la saucisse. Et il dit : *excellent* travail, champion."},
-    {"scene": "meeting",  "text": "En réunion, elle fait une présentation. Elle dit juste un mot : *saucisse*. Tout le monde *applaudit*."},
-    {"scene": "promo",    "text": "Elle obtient une *augmentation*. Un bureau avec vue. Et toi, on te met au *placard*. Littéralement."},
-    {"scene": "lunch",    "text": "Le midi, à la cantine, elle mange des *chipolatas*. Ses propres *cousines*. Personne ne dit rien."},
-    {"scene": "bbq",      "text": "Un jour, tu craques. Tu arrives au bureau avec un *barbecue*."},
-    {"scene": "flee",     "text": "La saucisse panique. Elle s'enfuit par la fenêtre... et elle glisse sur la *moutarde*."},
-    {"scene": "back",     "text": "Tu récupères ta place. Ton patron te regarde... et il dit : vous êtes *qui*, vous ?"},
-    {"scene": "minister", "text": "Aujourd'hui, la saucisse est *ministre*. Et toi, tu vends des *hot-dogs* devant le ministère."},
-    {"scene": "outro",    "text": "Abonne-toi... et vérifie bien que ton collègue n'est pas une *saucisse*."}
+ "title": "Une saucisse a pris ta place au travail",
+ "engine": "elevenlabs",
+ "el_voice": "3Tp5mYhT9wrfnry9pzvV",
+ "music": {
+  "bpm": 120,
+  "prog": [
+   [
+    62,
+    66,
+    69,
+    74
+   ],
+   [
+    59,
+    62,
+    66,
+    71
+   ],
+   [
+    55,
+    59,
+    62,
+    67
+   ],
+   [
+    57,
+    61,
+    64,
+    69
+   ]
   ]
+ },
+ "sfx": [
+  {
+   "word": "saucisse",
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "word": "like",
+   "type": "pop",
+   "gain": 0.9,
+   "repeat": 2,
+   "gap": 0.12
+  },
+  {
+   "word": "applaudit",
+   "type": "pop",
+   "gain": 0.6,
+   "repeat": 4,
+   "gap": 0.1
+  },
+  {
+   "word": "placard",
+   "type": "thud",
+   "gain": 0.8
+  },
+  {
+   "word": "barbecue",
+   "type": "thud",
+   "gain": 0.8
+  },
+  {
+   "word": "moutarde",
+   "type": "whoosh",
+   "gain": 0.9
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Une *saucisse* a pris ta place au travail... et *personne* n'a remarqué."
+  },
+  {
+   "scene": "desk",
+   "text": "Lundi matin, tu arrives au bureau. Elle est assise à *ta* place. Avec *ta* cravate."
+  },
+  {
+   "scene": "like",
+   "text": "Elle se tourne vers toi. Elle te fixe. Et elle dit : toi, là. Lâche un *like*. Sinon, je prends aussi ta place à la *maison*."
+  },
+  {
+   "scene": "boss",
+   "text": "Ton patron arrive. Il regarde la saucisse. Et il dit : *excellent* travail, champion."
+  },
+  {
+   "scene": "meeting",
+   "text": "En réunion, elle fait une présentation. Elle dit juste un mot : *saucisse*. Tout le monde *applaudit*. Le directeur *pleure* d'émotion."
+  },
+  {
+   "scene": "promo",
+   "text": "Elle obtient une *augmentation*. Un bureau avec vue. Et toi, on te met au *placard*. Littéralement. Avec une petite lampe."
+  },
+  {
+   "scene": "lunch",
+   "text": "Le midi, à la cantine, elle mange des *chipolatas*. Ses propres *cousines*. Personne ne dit rien."
+  },
+  {
+   "scene": "bbq",
+   "text": "Un jour, tu craques. Tu arrives au bureau avec un *barbecue*. Et un paquet de *merguez*. Ses pires *ennemies*."
+  },
+  {
+   "scene": "flee",
+   "text": "La saucisse panique. Elle s'enfuit par la fenêtre... et elle glisse sur la *moutarde*."
+  },
+  {
+   "scene": "back",
+   "text": "Tu récupères ta place. Ton patron te regarde... et il dit : vous êtes *qui*, vous ?"
+  },
+  {
+   "scene": "minister",
+   "text": "Aujourd'hui, la saucisse est *ministre*. Et toi, tu vends des *hot-dogs* devant le ministère."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et vérifie bien que ton collègue n'est pas une *saucisse*."
+  }
+ ]
 }

@@ -84,7 +84,7 @@ if ENGINE == "elevenlabs":
             letters = [k for k in range(j, min(pos, len(chars))) if re.match(r"\w", chars[k])] or [min(j, len(chars)-1)]
             words.append({"w": tk, "s": round(t + max(0, cs[letters[0]] - o), 3), "e": round(t + max(0, ce[letters[-1]] - o), 3)})
         s_start = t; audio.append(a); t += len(a) / SR
-        p = 0.22; audio.append(np.zeros(int(p*SR), np.float32)); t += p
+        p = float(os.environ.get("EL_PAUSE", "0.3")); audio.append(np.zeros(int(p*SR), np.float32)); t += p
         segs.append({"scene": seg["scene"], "start": round(s_start, 3), "end": round(t, 3), "words": words})
 
 for seg in (script["segments"] if ENGINE == "piper" else []):
