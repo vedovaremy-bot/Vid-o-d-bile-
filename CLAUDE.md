@@ -11,5 +11,8 @@
   **personnage principal** qui regarde la caméra et réclame le like à sa façon (« lâche un like », « oublie pas le like »,
   « mets-moi un like »… avec une menace ou une blague débile), à un **moment différent à chaque fois** (début, milieu,
   juste avant la chute…), pas toujours vers 10 s. Exemple : vidéo 10 (la saucisse).
-- Musique de fond : **très basse** (défaut `volume` 0.025, environ 4 fois moins fort qu'avant, adoucie, sans charleston)
-  ou absente (`"music": false` dans script.json). L'utilisateur trouvait la musique trop forte : ne jamais la remonter.
+- **Pas de musique de fond** (défaut de `lib/tts.py`, demandé par l'utilisateur). À la place, des **bruitages qui collent
+  à l'action** (bibliothèque `lib/sfx.py`) : alarme en fond quand une alarme sonne, bruit de chute quand quelqu'un retombe,
+  plouf, sirène, pas, porte, applaudissements, trombone de l'échec… Les déclarer dans `script.json` → `sfx`
+  (par mot : `{"word": "...", "type": "land"}`, ou par scène : `{"scene": "...", "at": 0.5, "type": "alarm", "dur": 3}`).
+  Mettre des bruitages à chaque action visible.

@@ -49,3 +49,7 @@ les vidéos doivent être *vraiment* débiles, comme le pigeon et le caca — pa
 Fichier final : `video10_saucisse_bureau.mp4` — voix 1. Vers 10-13 s, le personnage principal (la saucisse)
 regarde la caméra et réclame un like (« Lâche un like… sinon je prends aussi ta place à la maison »).
 Version ElevenLabs (voix `3Tp5mYhT9wrfnry9pzvV`, 68 s) : `video10_saucisse_bureau_elevenlabs.mp4`.
+
+## Vidéo 11 — « Ton réveil ne s'arrête plus » (74 s)
+Fichier final : `video11_reveil.mp4` — voix ElevenLabs, sans musique, ~30 bruitages synchronisés (`lib/sfx.py`),
+like réclamé par le réveil vers 25 s.

@@ -142,7 +142,7 @@ total = len(voice_track) / SR_OUT + 1.0
 # -------- musique de fond
 mus = script.get("music", {}) or {}
 # volume de la musique : très bas par défaut (l'utilisateur la trouvait trop forte). "music": false => pas de musique
-MUSIC_VOL = 0.0 if script.get("music") is False else float(os.environ.get("MUSIC_VOL", mus.get("volume", 0.025)))
+MUSIC_VOL = 0.0 if script.get("music") is False else float(os.environ.get("MUSIC_VOL", mus.get("volume", 0.0)))
 def pluck(freq, dur, decay=0.996):
     n = int(SR_OUT*dur); p = int(SR_OUT/freq); buf = rng.uniform(-1, 1, p); out = np.zeros(n)
     for i in range(n):
@@ -156,7 +156,7 @@ def add(buf, sig, t0, g):
     i = int(t0*SR_OUT); j = min(len(buf), i+len(sig))
     if 0 <= i < len(buf): buf[i:j] += sig[:j-i]*g
 pattern = [0,2,1,3,2,1,3,2]
-for k in range(int(total/step)+1):
+for k in (range(int(total/step)+1) if MUSIC_VOL > 0 else []):
     chord = prog[(k//8) % len(prog)]; t0 = k*step; m = chord[pattern[k % 8]] + mus.get("transpose", 12)
     if m not in cache: cache[m] = pluck(note(m), .5)
     add(music, cache[m], t0, .22 if k % 2 == 0 else .15)
@@ -164,50 +164,52 @@ for k in range(int(total/step)+1):
         b = chord[0]-24
         if ("b", b) not in cache: cache[("b", b)] = pluck(note(b), .9, .998)
         add(music, cache[("b", b)], t0, .35)
-music = music[:int(total*SR_OUT)]; music /= np.abs(music).max()+1e-9
+music = music[:int(total*SR_OUT)]; music /= np.abs(music).max()+1e-9 if MUSIC_VOL > 0 else 1
 # adoucit la musique (passe-bas) pour qu'elle reste en fond
-_k = np.exp(-2*np.pi*1800/SR_OUT); _y = np.zeros_like(music); _acc = 0.0
-for _i in range(len(music)): _acc = (1-_k)*music[_i] + _k*_acc; _y[_i] = _acc
-music = _y / (np.abs(_y).max()+1e-9)
+if MUSIC_VOL > 0:
+    _k = np.exp(-2*np.pi*1800/SR_OUT); _y = np.zeros_like(music); _acc = 0.0
+    for _i in range(len(music)): _acc = (1-_k)*music[_i] + _k*_acc; _y[_i] = _acc
+    music = _y / (np.abs(_y).max()+1e-9)
 
-# -------- bruitages
-def whoosh(d=.35):
-    n = int(d*SR_OUT); x = rng.normal(0, 1, n); y = np.zeros(n); a = np.linspace(.02, .35, n); acc = 0
-    for i in range(n): acc += a[i]*(x[i]-acc); y[i] = acc
-    return y*np.sin(np.linspace(0, np.pi, n))**2
-def thud(d=.4):
-    n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT; f = 140*np.exp(-tt*9)+45
-    return np.sin(2*np.pi*np.cumsum(f)/SR_OUT)*np.exp(-tt*10) + rng.normal(0, 1, n)*np.exp(-tt*60)*.4
-def pop(d=.12):
-    n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT; f = 900*np.exp(-tt*25)+300
-    return np.sin(2*np.pi*np.cumsum(f)/SR_OUT)*np.exp(-tt*30)
-def knock(d=.15):
-    n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT
-    return (np.sin(2*np.pi*180*tt)+.5*np.sin(2*np.pi*420*tt))*np.exp(-tt*45) + rng.normal(0, 1, n)*np.exp(-tt*120)*.5
-def crack(d=.25):
-    n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT; x = rng.normal(0, 1, n)
-    return x*np.exp(-tt*25)*(rng.random(n) > .7)
+# -------- bruitages (bibliothèque lib/sfx.py)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sfx as SFXLIB
 def flush(d=1.4):
     n = int(d*SR_OUT); tt = np.arange(n)/SR_OUT; x = rng.normal(0, 1, n); y = np.zeros(n); acc = 0
     for i in range(n): acc += .08*(x[i]-acc); y[i] = acc
     gurgle = 1 + .6*np.sin(2*np.pi*(9 + 6*tt)*tt)
     return y*gurgle*np.minimum(1, tt*12)*np.exp(-tt*1.6)*6
-SFX = {"flush": flush, "thud": thud, "pop": pop, "knock": knock, "crack": crack, "whoosh": whoosh}
-sfx = np.zeros_like(music)
+SFX = dict(SFXLIB.SFX); SFX["flush"] = flush
+fx = np.zeros_like(music); amb = np.zeros_like(music)
 prev = None
-for s in segs:
-    if prev is not None and s["scene"] != prev: add(sfx, whoosh(), s["start"]-.18, .5)
+for s in segs:   # petit whoosh discret aux changements de scène
+    if prev is not None and s["scene"] != prev: add(fx, SFX["whoosh"](), s["start"]-.18, .25)
     prev = s["scene"]
+def norm_word(x): return re.sub(r"\W", "", x.lower())
 for rule in script.get("sfx", []):
-    for s in segs:
-        for w in s["words"]:
-            if re.sub(r"\W", "", w["w"].lower()).startswith(rule["word"]):
-                for r in range(rule.get("repeat", 1)):
-                    add(sfx, SFX[rule["type"]](), w["s"] + rule.get("offset", 0) + r*rule.get("gap", .3), rule.get("gain", .7))
+    kind = rule["type"]; dur = rule.get("dur")
+    sig = SFX[kind](dur) if dur else SFX[kind]()
+    times = []
+    if "scene" in rule:
+        st = [s["start"] for s in segs if s["scene"] == rule["scene"]]
+        if st: times = [st[0] + rule.get("at", 0)]
+    else:
+        k = 0
+        for s in segs:
+            if rule.get("in") and s["scene"] != rule["in"]: continue
+            for w in s["words"]:
+                if norm_word(w["w"]).startswith(norm_word(rule["word"])):
+                    if rule.get("n") is None or rule["n"] == k: times.append(w["s"])
+                    k += 1
+    target = amb if rule.get("ambient", kind in SFXLIB.LONG) else fx
+    for t0 in times:
+        for r in range(rule.get("repeat", 1)):
+            add(target, sig, t0 + rule.get("offset", 0) + r*rule.get("gap", .3), rule.get("gain", .7))
 
 vt = np.zeros_like(music); vt[:len(voice_track)] = voice_track[:len(vt)]
 env = np.convolve(np.abs(vt), np.ones(4410)/4410, mode="same")
-mix = vt + music*MUSIC_VOL*(1-.6*np.clip(env*12, 0, 1)) + sfx*.35
+duck = 1-.6*np.clip(env*12, 0, 1)
+mix = vt + music*MUSIC_VOL*duck + fx*.45 + amb*.3*(1-.45*np.clip(env*12, 0, 1))
 mix /= max(1.0, np.abs(mix).max()/.97)
 wwrite("audio_mix.wav", mix, SR_OUT); wwrite("voice_only.wav", vt, SR_OUT)
 json.dump({"duration": round(total, 3), "segments": segs}, open("timings.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
