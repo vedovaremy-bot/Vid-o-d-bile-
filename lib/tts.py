@@ -1,6 +1,6 @@
 """Voix off + timings mot par mot + musique + bruitages.
 Usage (depuis le dossier de la vidéo) : python3 ../lib/tts.py
-Variables : VOICE (défaut fr_FR-miro-high), SPEAKER, LENGTH_SCALE, NOISE, NOISE_W
+Variables : ENGINE (piper|elevenlabs), VOICE (défaut fr_FR-tom-medium), EL_VOICE, EL_MODEL, SPEAKER, LENGTH_SCALE, NOISE, NOISE_W\nscript.json peut aussi contenir "engine": "elevenlabs" et "el_voice": "<voice_id>"
 Les bruitages se déclarent dans script.json : "sfx": [{"word": "toc", "type": "knock"}, ...]"""
 import json, os, re, subprocess, sys, tempfile, wave
 import numpy as np
@@ -16,8 +16,14 @@ CFG = SynthesisConfig(
 )
 SR_OUT = 44100
 script = json.load(open("script.json", encoding="utf-8"))
-voice = PiperVoice.load(os.path.join(ROOT, "voices", VOICE + ".onnx"))
-SR = voice.config.sample_rate
+ENGINE = os.environ.get("ENGINE", script.get("engine", "piper"))      # "piper" (voix 1) ou "elevenlabs"
+EL_VOICE = os.environ.get("EL_VOICE", script.get("el_voice", ""))
+EL_MODEL = os.environ.get("EL_MODEL", "eleven_multilingual_v2")
+if ENGINE == "piper":
+    voice = PiperVoice.load(os.path.join(ROOT, "voices", VOICE + ".onnx"))
+    SR = voice.config.sample_rate
+else:
+    SR = 44100
 rng = np.random.default_rng(3)
 
 def trim(a, sr):
@@ -40,7 +46,48 @@ def sentences(text):
 audio = [np.zeros(int(0.12*SR), np.float32)]
 t = 0.12
 segs = []
-for seg in script["segments"]:
+
+def el_tts(text, prev_text, next_text):
+    """ElevenLabs : audio (float, 44.1 kHz) + alignement caractère par caractère. Cache local."""
+    import base64, hashlib, urllib.request
+    key = hashlib.md5(json.dumps([EL_VOICE, EL_MODEL, text, prev_text, next_text]).encode()).hexdigest()
+    os.makedirs(".el_cache", exist_ok=True); cp = f".el_cache/{key}.json"
+    if os.path.exists(cp): d = json.load(open(cp))
+    else:
+        body = {"text": text, "model_id": EL_MODEL, "language_code": "fr", "previous_text": prev_text, "next_text": next_text,
+                "voice_settings": {"stability": float(os.environ.get("EL_STABILITY", "0.4")), "similarity_boost": 0.8, "style": float(os.environ.get("EL_STYLE", "0.35")), "use_speaker_boost": True}}
+        req = urllib.request.Request(f"https://api.elevenlabs.io/v1/text-to-speech/{EL_VOICE}/with-timestamps?output_format=mp3_44100_128",
+            data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "xi-api-key": os.environ.get("ELEVEN_API_KEY", "via-proxy")})
+        d = json.load(urllib.request.urlopen(req, timeout=120)); json.dump(d, open(cp, "w"))
+    tmpd = tempfile.mkdtemp(); open(f"{tmpd}/a.mp3", "wb").write(base64.b64decode(d["audio_base64"]))
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", f"{tmpd}/a.mp3", "-ac", "1", "-ar", "44100", f"{tmpd}/a.wav"], check=True)
+    with wave.open(f"{tmpd}/a.wav") as w: a = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
+    return a, d["alignment"]
+
+if ENGINE == "elevenlabs":
+    cleans = [sg["text"].replace("*", "") for sg in script["segments"]]
+    for i, seg in enumerate(script["segments"]):
+        clean = cleans[i]
+        a, al = el_tts(clean, " ".join(cleans[max(0, i-2):i]), cleans[i+1] if i+1 < len(cleans) else "")
+        # coupe le silence de début, garde l'offset pour les timings
+        idx = np.where(np.abs(a) > 0.01)[0]; off = max(0, idx[0] - int(.03*SR)) if len(idx) else 0
+        end = min(len(a), idx[-1] + int(.08*SR)) if len(idx) else len(a)
+        a = a[off:end]; o = off / SR
+        chars, cs, ce = al["characters"], al["character_start_times_seconds"], al["character_end_times_seconds"]
+        txt = re.sub(r'((?:\.\.\.|[.,!?:…])+)\*', r'*\1', seg["text"])
+        words = []; pos = 0
+        for tk in txt.split():
+            ct = tk.replace("*", "")
+            j = clean.find(ct, pos)
+            if j < 0: j = pos
+            pos = j + len(ct)
+            letters = [k for k in range(j, min(pos, len(chars))) if re.match(r"\w", chars[k])] or [min(j, len(chars)-1)]
+            words.append({"w": tk, "s": round(t + max(0, cs[letters[0]] - o), 3), "e": round(t + max(0, ce[letters[-1]] - o), 3)})
+        s_start = t; audio.append(a); t += len(a) / SR
+        p = 0.22; audio.append(np.zeros(int(p*SR), np.float32)); t += p
+        segs.append({"scene": seg["scene"], "start": round(s_start, 3), "end": round(t, 3), "words": words})
+
+for seg in (script["segments"] if ENGINE == "piper" else []):
     s_start = t; words = []
     for sent in sentences(seg["text"]):
         clean = sent.replace("*", "")
@@ -160,4 +207,4 @@ mix = vt + music*.10*(1-.55*np.clip(env*12, 0, 1)) + sfx*.35
 mix /= max(1.0, np.abs(mix).max()/.97)
 wwrite("audio_mix.wav", mix, SR_OUT); wwrite("voice_only.wav", vt, SR_OUT)
 json.dump({"duration": round(total, 3), "segments": segs}, open("timings.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-print("voix: %s | durée totale: %.1fs" % (VOICE, total))
+print("voix: %s | durée totale: %.1fs" % (VOICE if ENGINE == "piper" else "ElevenLabs " + EL_VOICE, total))
