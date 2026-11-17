@@ -44,3 +44,7 @@ Fichier final : `video08_gps_vexe.mp4` — voix 1.
 ## Vidéo 09 — « Ton nez s'est barré » (70 s)
 Fichier final : `video09_nez_barre.mp4` — voix 1. Retour à l'absurde pur (demande de l'utilisateur :
 les vidéos doivent être *vraiment* débiles, comme le pigeon et le caca — pas de "relatable" trop logique).
+
+## Vidéo 10 — « Une saucisse a pris ta place au travail » (70 s)
+Fichier final : `video10_saucisse_bureau.mp4` — voix 1. Vers 10-13 s, le personnage principal (la saucisse)
+regarde la caméra et réclame un like (« Lâche un like… sinon je prends aussi ta place à la maison »).
