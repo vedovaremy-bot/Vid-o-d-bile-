@@ -37,3 +37,6 @@ callback de la blague au mariage, question en commentaire à la fin.
 
 ## Vidéo 07 — « Tu as liké une photo de ton ex de 2017 » (70 s)
 Fichier final : `video07_like_ex.mp4` — voix 1. Appel à l'action : identifier quelqu'un en commentaire.
+
+## Vidéo 08 — « Tu as refusé de faire demi-tour » (70 s)
+Fichier final : `video08_gps_vexe.mp4` — voix 1.

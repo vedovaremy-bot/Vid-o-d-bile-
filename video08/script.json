@@ -1,0 +1,112 @@
+{
+ "title": "Tu as refusé de faire demi-tour",
+ "music": {
+  "bpm": 110,
+  "prog": [
+   [
+    60,
+    64,
+    67,
+    72
+   ],
+   [
+    55,
+    59,
+    62,
+    67
+   ],
+   [
+    57,
+    60,
+    64,
+    69
+   ],
+   [
+    53,
+    57,
+    60,
+    65
+   ]
+  ]
+ },
+ "sfx": [
+  {
+   "word": "erreur",
+   "type": "thud",
+   "gain": 0.7
+  },
+  {
+   "word": "vaches",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "flotte",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "portières",
+   "type": "knock",
+   "gain": 0.9,
+   "repeat": 2,
+   "gap": 0.15
+  },
+  {
+   "word": "mère",
+   "type": "thud",
+   "gain": 0.5
+  },
+  {
+   "word": "ex",
+   "type": "thud",
+   "gain": 0.9
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ton GPS t'a dit : *faites demi-tour*. Tu as *refusé*. Grosse *erreur*."
+  },
+  {
+   "scene": "sigh",
+   "text": "Il répète : faites demi-tour. Toi, tu continues tout droit. Alors il *soupire*. Un vrai soupir."
+  },
+  {
+   "scene": "cows",
+   "text": "Au carrefour suivant, il te dit : tournez à droite. Tu tournes... et tu es au milieu d'un champ de *vaches*."
+  },
+  {
+   "scene": "lake",
+   "text": "Ensuite, il t'envoie sur une *plage*. Puis dans un *lac*. Ta voiture *flotte*. Un *canard* te double."
+  },
+  {
+   "scene": "locked",
+   "text": "Tu veux l'éteindre. Il verrouille les *portières*. Et il met la radio à fond. Que des chansons *tristes*."
+  },
+  {
+   "scene": "mom",
+   "text": "Huit cents kilomètres plus tard, il s'arrête devant une petite maison. C'est chez sa *mère*."
+  },
+  {
+   "scene": "map",
+   "text": "Sa mère, c'est une vieille *carte routière*. Elle te sert du thé. Et elle te dit : mon fils fait ce métier depuis dix ans... et personne ne l'écoute *jamais*."
+  },
+  {
+   "scene": "cry",
+   "text": "Tu te sens *coupable*. Tu t'excuses. Le GPS se met à *pleurer*. Des larmes coulent de l'écran."
+  },
+  {
+   "scene": "sunset",
+   "text": "Vous repartez ensemble, au coucher du soleil. Et il te dit : vous êtes arrivé à *destination*."
+  },
+  {
+   "scene": "ex",
+   "text": "Tu sors de la voiture... t'es devant chez ton *ex*. Il ne t'a *jamais* pardonné."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et la prochaine fois, *écoute* ton GPS."
+  }
+ ]
+}

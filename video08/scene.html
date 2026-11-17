@@ -1,0 +1,230 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size, tailX = 0, t0 = 0, lt = 1, until = 1e9) {
+  if (lt < t0 || lt > until) return; const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+  rr(-w / 2, -h / 2, w, h, 40, '#fff'); poly([[tailX - 24, h / 2 - 4], [tailX + 24, h / 2 - 4], [tailX - 4, h / 2 + 56]], '#fff'); line(tailX - 20, h / 2 - 2, tailX + 20, h / 2 - 2, '#fff', 10);
+  txt(s, 0, 4, size, OUT, 'Anton'); ctx.restore();
+}
+
+// ------------------------------------------------------------ le GPS (personnage)
+// o: {mood: 'neutral'|'angry'|'sad'|'cry'|'smug'|'happy', talk, tears}
+function gps(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  line(0, 120, 0, 230, '#2d3436', 26); ell(0, 240, 60, 22, '#2d3436');           // support ventouse
+  rr(-200, -140, 400, 270, 34, '#1e1e1e');
+  const m = o.mood || 'neutral';
+  const scr = m === 'angry' ? ['#ff7675', '#d63031'] : m === 'sad' || m === 'cry' ? ['#74b9ff', '#0652dd'] : ['#81ecec', '#00b894'];
+  const gr = ctx.createLinearGradient(0, -120, 0, 110); gr.addColorStop(0, scr[0]); gr.addColorStop(1, scr[1]);
+  rr(-180, -120, 360, 230, 22, gr, 0);
+  ctx.save(); ctx.globalAlpha = .25; line(-180, 60, 180, -40, '#fff', 14); line(-60, -120, 20, 110, '#fff', 10); ctx.restore();
+  // visage
+  const ey = -30;
+  for (const sx of [-1, 1]) {
+    ell(sx * 70, ey, 34, 38, '#fff', 5);
+    if (m === 'smug') { ell(sx * 70, ey + 8, 14, 14, '#111', 0); ctx.save(); ctx.beginPath(); ctx.ellipse(sx * 70, ey, 35, 39, 0, Math.PI, 0); shape(scr[0], 5); ctx.restore(); }
+    else ell(sx * 70 + 4, ey + 6, 15, 17, '#111', 0);
+    if (m === 'angry') line(sx * 110, ey - 50, sx * 30, ey - 30, OUT, 10);
+    if (m === 'sad' || m === 'cry') line(sx * 105, ey - 36, sx * 35, ey - 52, OUT, 9);
+  }
+  const talk = o.talk && Math.sin(t * 16) > 0;
+  if (talk) ell(0, 60, 30, 22, '#2d3436', 5);
+  else if (m === 'angry' || m === 'sad' || m === 'cry') { ctx.beginPath(); ctx.arc(0, 90, 34, Math.PI * 1.15, Math.PI * 1.85); shape(null, 8); }
+  else { ctx.beginPath(); ctx.arc(0, 30, 40, Math.PI * .15, Math.PI * .85); shape(null, 8); }
+  if (o.tears || m === 'cry') for (const sx of [-1, 1]) { const k = (t * 1.6 + (sx > 0 ? .5 : 0)) % 1; ell(sx * 70, ey + 40 + k * 260, 12, 18, '#74b9ff', 4); }
+  ctx.restore();
+}
+// ------------------------------------------------------------ voiture (vue de l'intérieur)
+function carView(g, outside, o = {}) {
+  outside();
+  const shake = o.bumpy ? Math.sin(g * 30) * 4 : 0;
+  ctx.save(); ctx.translate(0, shake);
+  // toi au volant
+  human(320, 2270, 1.0, g, { expr: o.expr || 'neutral', armL: .9, armR: -.9 });
+  // habitacle
+  ctx.fillStyle = '#2d3436';
+  ctx.fillRect(-400, -400, W + 800, 520);                                          // toit
+  poly([[-400, 120], [-10, 120], [-140, 1650], [-400, 1650]], '#2d3436', 0);       // montant gauche
+  poly([[W + 400, 120], [W + 10, 120], [W + 140, 1650], [W + 400, 1650]], '#2d3436', 0);
+  rr(380, 120, 320, 70, 14, '#1e1e1e', 0); rr(400, 130, 280, 50, 10, '#636e72', 0); // rétro
+  ctx.beginPath(); ctx.moveTo(-400, 1700); ctx.quadraticCurveTo(540, 1610, W + 400, 1700); ctx.lineTo(W + 400, H + 400); ctx.lineTo(-400, H + 400); ctx.closePath(); shape('#3d3d46', 0);
+  rr(-400, 1790, W + 800, 20, 0, '#2d3436', 0);
+  // volant
+  ctx.beginPath(); ctx.ellipse(320, 1790, 230, 130, 0, 0, 7); ctx.lineWidth = 36; ctx.strokeStyle = '#111'; ctx.stroke();
+  ell(320, 1810, 70, 44, '#111', 0);
+  // radio
+  rr(770, 1760, 290, 110, 16, '#111', 0); txt(o.radio || '88.8 FM', 915, 1817, 50, o.radio ? '#ff7675' : '#55efc4', 'Anton');
+  gps(800, 1430, .85, g, o.gps || {});
+  ctx.restore();
+}
+function road(horizon = 1000, col = '#636e72') {
+  ctx.fillStyle = '#78e08f'; ctx.fillRect(-400, horizon, W + 800, 1200);
+  poly([[480, horizon], [600, horizon], [1300, 1500], [-220, 1500]], col, 0);
+  for (let i = 0; i < 6; i++) { const k = ((i / 6 + performance.now() * 0) % 1); }
+}
+function roadLines(g, horizon = 1000) {
+  for (let i = 0; i < 6; i++) { const k = ((i / 6) + g * .8) % 1; const y = horizon + k * k * 520, w2 = 6 + k * 40, h2 = 20 + k * 90; rr(540 - w2 / 2, y, w2, h2, 4, '#fff', 0); }
+}
+function cow(x, y, s, t, flip) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (flip ? -1 : 1), s);
+  for (const lx of [-90, -40, 50, 100]) rr(lx - 14, -110, 28, 110, 10, '#fff');
+  ell(0, -170, 150, 90, '#fff'); ell(-50, -190, 40, 30, '#2d3436', 0); ell(60, -150, 46, 34, '#2d3436', 0); ell(-90, -140, 26, 22, '#2d3436', 0);
+  ctx.save(); ctx.translate(150, -230 + Math.sin(t * 3) * 6);
+  poly([[-30, -60], [-50, -100], [-10, -70]], '#dfe6e9'); poly([[30, -60], [50, -100], [10, -70]], '#dfe6e9');
+  ell(0, 0, 66, 60, '#fff'); ell(0, 34, 50, 32, '#ffb8b8'); ell(-14, 34, 6, 8, OUT, 0); ell(14, 34, 6, 8, OUT, 0);
+  ell(-24, -14, 9, 11, '#111', 0); ell(24, -14, 9, 11, '#111', 0);
+  ctx.restore(); ctx.restore();
+}
+function duck(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ell(0, 0, 70, 44, '#f9ca24'); ell(50, -50, 38, 36, '#f9ca24'); poly([[80, -50], [120, -42], [80, -34]], '#e67e22', 4); ell(58, -58, 7, 8, '#111', 0); ctx.restore(); }
+// la carte routière (la mère du GPS)
+function mapMom(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  shadow(0, 0, 160);
+  line(-60, -200, -70, 0, OUT, 12); line(60, -200, 70, 0, OUT, 12);
+  ell(0, -110, 260, 30, 'rgba(0,0,0,0)', 0);
+  ctx.translate(0, -620);
+  poly([[-230, -230], [-75, -260], [75, -230], [230, -260], [230, 260], [75, 230], [-75, 260], [-230, 230]], '#f5ecd2');
+  line(-75, -260, -75, 260, '#d9c9a0', 6); line(75, -230, 75, 230, '#d9c9a0', 6);
+  ctx.save(); ctx.globalAlpha = .55; ctx.beginPath(); ctx.moveTo(-200, 200); ctx.bezierCurveTo(-100, 50, 50, 150, 200, -150); shape(null, 10, '#e74c3c'); line(-200, -100, 200, 0, '#0984e3', 8); ctx.restore();
+  ell(0, -300, 70, 56, '#dfe6e9'); // chignon
+  for (const sx of [-1, 1]) { ell(sx * 70, -60, 42, 38, 'rgba(200,230,255,.3)', 7); ell(sx * 70, -56, 13, 15, '#111', 0); line(sx * 110, -120, sx * 30, -104, OUT, 8); }
+  line(-28, -60, 28, -60, OUT, 6);
+  if (o.talk && Math.sin(t * 15) > 0) ell(0, 40, 26, 20, '#7a2b2b', 5); else line(-40, 40, 40, 40, OUT, 8);
+  // bras + tasse
+  line(-230, 40, -330, 160, OUT, 12); line(230, 40, 330, 120, OUT, 12);
+  if (o.tea) { rr(300, 60, 90, 90, 14, '#fff'); ctx.beginPath(); ctx.arc(395, 105, 24, -1.2, 1.2); shape(null, 8); ctx.globalAlpha = .6; for (let i = 0; i < 2; i++) { ctx.beginPath(); ctx.moveTo(330 + i * 30, 50); ctx.quadraticCurveTo(310 + i * 30 + Math.sin(t * 3) * 14, 10, 340 + i * 30, -30); shape(null, 5, '#fff'); } ctx.globalAlpha = 1; }
+  ctx.restore();
+}
+function cottage(x, y, s, door = '#6d4c41') {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  rr(-300, -440, 600, 440, 6, '#fff1e0'); poly([[-340, -430], [0, -680], [340, -430]], '#8e44ad');
+  rr(-70, -250, 140, 250, 8, door); rr(-240, -360, 130, 120, 6, '#ffd56b'); rr(110, -360, 130, 120, 6, '#ffd56b');
+  ctx.restore();
+}
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    const r = lw(/refusé/i, 'hook');
+    carView(g, () => { sky(); clouds(g); road(); roadLines(g); }, { gps: { mood: lt > r + .3 ? 'angry' : 'neutral', talk: lt < r }, expr: 'neutral' });
+    bubble(760, 760, 520, 150, 'FAITES DEMI-TOUR', 64, 40, lw(/faites/i, 'hook'), lt);
+    popText('NON.', 300, 860, 170, '#fff', r, lt, -.1);
+    popText('ERREUR', 540, 330, 190, '#ff3838', lw(/erreur/i, 'hook'), lt, .05);
+  },
+  sigh(lt, d, g) {
+    const s = lw(/soupire/i, 'sigh');
+    carView(g, () => { sky(); clouds(g); road(); roadLines(g); }, { gps: { mood: lt > s ? 'smug' : 'angry', talk: lt < lw(/toi/i, 'sigh') }, expr: 'neutral' });
+    bubble(760, 760, 520, 150, 'FAITES DEMI-TOUR', 64, 40, 0.1, lt, s - .2);
+    if (lt > s) { const k = clamp((lt - s) / 1.5); ctx.save(); ctx.globalAlpha = 1 - k; for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(800 - 80 - k * 200, 1000 - i * 40, 40 + i * 30 + k * 100, -1, 1); shape(null, 10, '#fff'); } ctx.restore(); }
+    popText('*SOUPIR*', 540, 500, 160, '#ffd32a', s, lt, -.05);
+    popText('TOUT DROIT', 540, 330, 130, '#fff', lw(/continues/i, 'sigh'), lt, .04, s);
+  },
+  cows(lt, d, g) {
+    const tn = lw(/tournes/i, 'cows') + .2;
+    carView(g, () => {
+      sky(); clouds(g);
+      if (lt < tn) { road(); roadLines(g); }
+      else {
+        ctx.fillStyle = '#6ab04c'; ctx.fillRect(-400, 1000, W + 800, 1200);
+        for (let i = 0; i < 10; i++) line(-400 + i * 200, 1000, -800 + i * 300, 1600, '#5a9e3c', 8);
+        const R = rnd(4); for (let i = 0; i < 5; i++) cow(80 + i * 230, 1180 + R() * 120, .5 + R() * .25, g + i, i % 2);
+      }
+    }, { gps: { mood: lt > tn ? 'smug' : 'neutral', talk: lt < tn - .5 }, expr: lt > tn ? 'shock' : 'neutral', bumpy: lt > tn });
+    bubble(760, 760, 520, 150, 'TOURNEZ À DROITE', 62, 40, lw(/tournez/i, 'cows'), lt, tn);
+    popText('MEUUH', 540, 400, 170, '#fff', lw(/vaches/i, 'cows'), lt, -.06);
+  },
+  lake(lt, d, g) {
+    const lk = lw(/lac/i, 'lake') - .2;
+    carView(g, () => {
+      sky('#48dbfb', '#c8f7ff'); clouds(g);
+      if (lt < lk) { ctx.fillStyle = '#0abde3'; ctx.fillRect(-400, 980, W + 800, 140); ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, 1100, W + 800, 1000); ell(800, 1200, 120, 40, '#ff6b6b'); }
+      else {
+        ctx.fillStyle = '#1e90ff'; ctx.fillRect(-400, 900 + Math.sin(g * 2) * 20, W + 800, 1300);
+        for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.arc(i * 160 - ((g * 60) % 160), 905 + Math.sin(g * 2) * 20, 50, Math.PI, 0); ctx.fillStyle = '#54a0ff'; ctx.fill(); }
+        const dt = lw(/canard/i, 'lake');
+        if (lt > dt - .5) duck(lerp(1200, -200, clamp((lt - dt + .5) / 2.5)), 1000 + Math.sin(g * 3) * 10, 1.2);
+      }
+    }, { gps: { mood: 'smug' }, expr: 'shock', bumpy: lt > lk });
+    popText('PLAGE', 540, 330, 180, '#ffd32a', lw(/plage/i, 'lake'), lt, -.05, lk);
+    popText('LAC', 540, 330, 220, '#fff', lk + .2, lt, .05, lw(/canard/i, 'lake') - .1);
+    popText('DOUBLÉ PAR UN CANARD', 540, 330, 100, '#ffd32a', lw(/canard/i, 'lake'), lt, -.04);
+    if (lt > lk) { ctx.save(); ctx.globalAlpha = .25; ctx.fillStyle = '#0984e3'; ctx.fillRect(0, 1400 + Math.sin(g * 2) * 20, W, 600); ctx.restore(); }
+  },
+  locked(lt, d, g) {
+    const p = lw(/portières/i, 'locked'), rd = lw(/radio/i, 'locked');
+    carView(g, () => { sky('#636e72', '#b2bec3'); road(1000, '#4b4b52'); roadLines(g); for (let i = 0; i < 40; i++) { const R = rnd(i + 9); line(R() * W, (g * 900 + R() * 1200) % 1200, R() * W - 10, (g * 900 + R() * 1200) % 1200 + 40, 'rgba(255,255,255,.5)', 3); } },
+      { gps: { mood: 'angry' }, expr: lt > p ? 'shock' : 'angry', radio: lt > rd ? '♫ TRISTE ♫' : null });
+    if (lt > p) { const k = easeOutBack((lt - p) / .3); ctx.save(); ctx.translate(120, 700); ctx.scale(k, k); rr(-80, -40, 160, 130, 20, '#e74c3c', 6); ctx.beginPath(); ctx.arc(0, -40, 50, Math.PI, 0); shape(null, 18, '#e74c3c'); ctx.restore(); }
+    popText('VERROUILLÉ', 540, 330, 160, '#ff3838', p, lt, -.05, rd);
+    if (lt > rd) for (let i = 0; i < 5; i++) { const y = 1500 - ((g * 160 + i * 140) % 700), x = 650 + i * 70 + Math.sin(g * 3 + i) * 20; ctx.globalAlpha = clamp((y - 800) / 300); txt('♪', x, y, 80, '#74b9ff', 'serif', 'center', 8); ctx.globalAlpha = 1; }
+    popText('CHANSONS TRISTES', 540, 330, 120, '#74b9ff', lw(/tristes/i, 'locked'), lt, .04);
+  },
+  mom(lt, d, g) {
+    sky('#ffbe76', '#ffe8cc'); ctx.fillStyle = '#6ab04c'; ctx.fillRect(-400, 1300, W + 800, 1000);
+    cottage(560, 1320, 1.0);
+    // voiture garée
+    rr(-60, 1500, 600, 220, 60, '#0984e3'); rr(40, 1400, 380, 140, 40, '#0984e3'); rr(70, 1420, 150, 100, 14, '#9fd8ff'); rr(240, 1420, 150, 100, 14, '#9fd8ff');
+    ell(80, 1730, 60, 60, '#222'); ell(400, 1730, 60, 60, '#222');
+    gps(310, 1460, .3, g, { mood: 'happy' });
+    popText('800 KM', 540, 300, 190, '#fff', lw(/huit/i, 'mom'), lt, -.05, lw(/mère/i, 'mom') - .1);
+    popText('CHEZ SA MÈRE', 540, 300, 150, '#ffd32a', lw(/mère/i, 'mom'), lt, .04);
+  },
+  map(lt, d, g) {
+    ctx.fillStyle = '#fbe9c6'; ctx.fillRect(-400, -400, W + 800, 1800); ctx.fillStyle = '#a1887f'; ctx.fillRect(-400, 1400, W + 800, 900);
+    rr(100, 300, 280, 220, 10, '#6d4c41'); rr(120, 320, 240, 180, 4, '#55efc4', 0);
+    // table
+    rr(380, 1500, 700, 50, 10, '#8d6e63'); rr(420, 1550, 30, 400, 6, '#6d4c41'); rr(1000, 1550, 30, 400, 6, '#6d4c41');
+    mapMom(760, 1500, .9, g, { talk: lt > lw(/dit/i, 'map') - .1, tea: lt > lw(/thé/i, 'map') - .3 });
+    human(220, 1960, .9, g, { expr: lt > lw(/jamais/i, 'map') ? 'sad' : 'neutral' });
+    popText('CARTE ROUTIÈRE', 540, 250, 140, '#ffd32a', lw(/carte/i, 'map'), lt, -.04, lw(/dit/i, 'map'));
+    bubble(600, 420, 760, 170, 'PERSONNE NE L\'ÉCOUTE !', 62, 140, lw(/personne/i, 'map'), lt);
+  },
+  cry(lt, d, g) {
+    const pl = lw(/pleurer/i, 'cry');
+    carView(g, () => { sky('#fab1a0', '#ffeaa7'); road(); roadLines(g * .3); }, { gps: { mood: lt > pl ? 'cry' : 'sad' }, expr: 'sad' });
+    bubble(300, 760, 440, 150, 'PARDON…', 80, -40, lw(/excuses/i, 'cry'), lt);
+    popText('COUPABLE', 540, 330, 180, '#fff', lw(/coupable/i, 'cry'), lt, -.05, pl);
+    popText('IL PLEURE', 540, 330, 180, '#74b9ff', pl, lt, .05);
+  },
+  sunset(lt, d, g) {
+    carView(g, () => {
+      sky('#e17055', '#fdcb6e'); ell(540, 1000, 220, 220, '#ffeaa7', 0);
+      ctx.fillStyle = '#6c5ce7'; ctx.fillRect(-400, 1000, W + 800, 1200); poly([[480, 1000], [600, 1000], [1300, 1500], [-220, 1500]], '#4834d4', 0); roadLines(g * .6);
+    }, { gps: { mood: 'happy', talk: lt > lw(/vous/i, 'sunset', 1) - .2 && lt < d - .3 }, expr: 'neutral' });
+    for (let i = 0; i < 4; i++) { const k = (g * .5 + i / 4) % 1; ctx.globalAlpha = 1 - k; txt('♥', 560 + Math.sin(i * 2 + g) * 60, 1000 - k * 300, 60, '#ff7675', 'serif', 'center', 6); } ctx.globalAlpha = 1;
+    bubble(760, 760, 560, 150, 'ARRIVÉ À DESTINATION', 54, 40, lw(/vous/i, 'sunset', 1), lt);
+  },
+  ex(lt, d, g) {
+    sky('#2d3436', '#636e72'); ctx.fillStyle = '#4b6584'; ctx.fillRect(-400, 1400, W + 800, 1000);
+    cottage(560, 1420, 1.0, '#c0392b');
+    // paillasson + l'ex à la fenêtre
+    rr(440, 1400, 240, 50, 8, '#a0522d'); txt('BIENVENUE', 560, 1426, 30, '#fff', 'Anton');
+    ctx.save(); ctx.beginPath(); ctx.rect(316, 1060, 130, 120); ctx.clip(); human(380, 1400, .4, g, { longHair: true, hair: '#e1b12c', shirt: '#fd79a8', expr: 'angry' }); ctx.restore();
+    human(860, 1950, .95, g, { flip: true, expr: 'shock' });
+    gps(160, 1700, .55, g, { mood: 'smug' });
+    popText('TON EX', 540, 330, 220, '#ff3838', lw(/ex/i, 'ex'), lt, -.06);
+    popText('JAMAIS PARDONNÉ', 540, 560, 110, '#fff', lw(/jamais/i, 'ex'), lt, .04);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    gps(540, 1250, 2.0, g, { mood: 'smug' });
+    const p = easeOutBack((lt - .1) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 420); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+    popText('ÉCOUTE TON GPS', 540, 1700, 130, '#ffd32a', lw(/écoute/i, 'outro'), lt, -.04);
+  },
+};
+</script></body></html>
