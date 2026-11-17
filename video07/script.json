@@ -1,0 +1,114 @@
+{
+ "title": "Tu as liké une photo de ton ex de 2017",
+ "music": {
+  "bpm": 122,
+  "prog": [
+   [
+    57,
+    60,
+    64,
+    69
+   ],
+   [
+    53,
+    57,
+    60,
+    65
+   ],
+   [
+    55,
+    59,
+    62,
+    67
+   ],
+   [
+    52,
+    56,
+    59,
+    64
+   ]
+  ]
+ },
+ "sfx": [
+  {
+   "word": "liker",
+   "type": "pop",
+   "gain": 0.8
+  },
+  {
+   "word": "notification",
+   "type": "pop",
+   "gain": 0.8
+  },
+  {
+   "word": "quatrevingtdix",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "hélicoptère",
+   "type": "whoosh",
+   "gain": 0.8
+  },
+  {
+   "word": "2009",
+   "type": "thud",
+   "gain": 0.7
+  },
+  {
+   "word": "égalité",
+   "type": "pop",
+   "gain": 0.8
+  }
+ ],
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Tu viens de *liker* par erreur une photo de ton *ex*... qui date de *2017*."
+  },
+  {
+   "scene": "panic",
+   "text": "Tu paniques. Tu enlèves le like. Trop tard. La *notification* est partie."
+  },
+  {
+   "scene": "typing",
+   "text": "Ton téléphone vibre. Ton ex a vu. En ligne. En train d'*écrire*..."
+  },
+  {
+   "scene": "washer",
+   "text": "Pour te protéger, tu jettes ton téléphone dans la *machine à laver*. Programme : *quatre-vingt-dix* degrés. Il ressort tout *propre*... et toujours *allumé*."
+  },
+  {
+   "scene": "viral",
+   "text": "Mais c'est trop tard. Le like est devenu *viral*. Ta mère l'a vu. Ton patron l'a vu. Même ton *boulanger* l'a vu."
+  },
+  {
+   "scene": "news",
+   "text": "Le soir, au journal télévisé : une personne a liké une photo de *2017*. Le pays est *sous le choc*."
+  },
+  {
+   "scene": "heli",
+   "text": "Des journalistes campent devant chez toi. Un *hélicoptère* tourne au-dessus de ta maison. Ton voisin vend des *tickets* pour te voir."
+  },
+  {
+   "scene": "disguise",
+   "text": "Alors tu changes de nom. Tu te laisses pousser la *moustache*. Et tu pars vivre au *Groenland*."
+  },
+  {
+   "scene": "igloo",
+   "text": "Dix ans plus tard, dans ton igloo, ton téléphone vibre. Une *notification*."
+  },
+  {
+   "scene": "revenge",
+   "text": "Ton ex vient de liker une photo de toi. De *2009*. Avec ton *appareil dentaire*."
+  },
+  {
+   "scene": "home",
+   "text": "*Égalité*. Tu peux enfin rentrer chez toi."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et identifie la personne qui a *déjà* fait ça."
+  }
+ ]
+}

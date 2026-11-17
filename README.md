@@ -34,3 +34,6 @@ Fichier final : `video05_mamie_mma.mp4` — voix 1 (`fr_FR-tom-medium`).
 ## Vidéo 06 — « Tu as répondu "toi aussi" au serveur » (69 s)
 Fichier final : `video06_toi_aussi.mp4` — voix 1. Pensée pour la viralité : situation vécue par tout le monde,
 callback de la blague au mariage, question en commentaire à la fin.
+
+## Vidéo 07 — « Tu as liké une photo de ton ex de 2017 » (70 s)
+Fichier final : `video07_like_ex.mp4` — voix 1. Appel à l'action : identifier quelqu'un en commentaire.

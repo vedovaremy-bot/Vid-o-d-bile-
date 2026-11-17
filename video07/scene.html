@@ -1,0 +1,233 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function heart(x, y, r, fill, lw2 = 8) {
+  ctx.beginPath(); ctx.moveTo(x, y + r * .9);
+  ctx.bezierCurveTo(x - r * 1.6, y - r * .1, x - r * .9, y - r * 1.3, x, y - r * .45);
+  ctx.bezierCurveTo(x + r * .9, y - r * 1.3, x + r * 1.6, y - r * .1, x, y + r * .9); shape(fill, lw2);
+}
+const EX = { longHair: true, hair: '#e1b12c', shirt: '#fd79a8' };
+// photo "plage 2017" de l'ex
+function exPhoto(x, y, w, h, g) {
+  ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.fillStyle = '#81ecec'; ctx.fillRect(x, y, w, h); ctx.fillStyle = '#0abde3'; ctx.fillRect(x, y + h * .55, w, h * .15); ctx.fillStyle = '#ffeaa7'; ctx.fillRect(x, y + h * .7, w, h * .3);
+  ell(x + w * .8, y + h * .18, w * .08, w * .08, '#feca57', 0);
+  human(x + w / 2, y + h * 1.25, w / 900, g, { ...EX, expr: 'neutral', armR: 2.6 });
+  // filtre "vieux"
+  ctx.globalAlpha = .18; ctx.fillStyle = '#e17055'; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+  ctx.restore();
+}
+// interface du réseau social
+function app(g, liked, photo = exPhoto, user = 'ton_ex', date = '14 août 2017', likesTxt = '') {
+  rr(150, 150, 780, 1560, 80, '#111', 10); rr(180, 200, 720, 1460, 50, '#fff', 0);
+  ctx.save(); ctx.beginPath(); ctx.roundRect(180, 200, 720, 1460, 50); ctx.clip();
+  ctx.fillStyle = '#fff'; ctx.fillRect(180, 200, 720, 1460);
+  txt('PhotoGram', 220, 270, 56, '#2d3436', 'Anton', 'left');
+  ell(240, 370, 36, 36, '#fd79a8', 4); txt(user, 295, 370, 40, '#2d3436', 'Mont', 'left');
+  photo(180, 420, 720, 820, g);
+  heart(250, 1310, 36, liked ? '#ff3838' : '#fff', 7);
+  txt('💬', 350, 1312, 56, '#000', 'serif'); txt('➤', 440, 1312, 56, '#2d3436', 'serif');
+  txt(likesTxt, 220, 1400, 38, '#2d3436', 'Mont', 'left');
+  txt(date, 220, 1470, 36, '#b2bec3', 'Mont', 'left');
+  ctx.restore();
+}
+function finger(x, y, s = 1) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); rr(-40, 0, 80, 300, 40, '#f3c9a4'); rr(-24, 10, 48, 50, 16, '#fbe3d2', 4); ctx.restore(); }
+function room() {
+  ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, -400, W + 800, 1800);
+  rr(620, 260, 320, 260, 10, '#6d4c41'); rr(640, 280, 280, 220, 4, '#74b9ff', 0);
+  ctx.fillStyle = '#b5835a'; ctx.fillRect(-400, 1400, W + 800, 900);
+}
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const lk = lw(/liker/i, 'hook');
+    app(g, lt > lk, exPhoto, 'ton_ex', '14 août 2017', lt > lk ? '♥ Aimé par toi' : '');
+    // doigt qui tape deux fois
+    const tap = lt < lk + .3 ? Math.abs(Math.sin(lt * 9)) * 30 : -200;
+    if (tap > -100) finger(560, 900 + tap, 1.1);
+    if (lt > lk) { const k = easeOutBack((lt - lk) / .3); ctx.save(); ctx.translate(540, 830); ctx.scale(k, k); heart(0, 0, 150, '#ff3838', 10); ctx.restore(); }
+    popText('2017', 540, 120, 170, '#ffd32a', lw(/2017/i, 'hook'), lt, -.06);
+  },
+  panic(lt, d, g) {
+    room();
+    const k = Math.sin(g * 30) * 6;
+    human(540 + k, 1950, 1.05, g, { expr: 'shock', phone: true, armR: 2.6, armL: -2.6 });
+    const n = lw(/notification/i, 'panic');
+    if (lt > n) { const s = easeOutBack((lt - n) / .3); ctx.save(); ctx.translate(540, 560); ctx.scale(s, s); rr(-420, -90, 840, 180, 40, '#fff', 6); ell(-330, 0, 50, 50, '#fd79a8', 4); txt('toi a aimé ta photo (2017)', 40, 6, 46, '#2d3436', 'Mont'); ctx.restore(); }
+    popText('TROP TARD', 540, 300, 190, '#ff3838', lw(/tard/i, 'panic'), lt, -.05);
+    for (let i = 0; i < 3; i++) { const q = (g * 1.5 + i * .33) % 1; ell(400 + i * 140, 1000 + q * 120, 12, 18, '#74b9ff', 3); }
+  },
+  typing(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const sh = lt < 1.2 ? Math.sin(lt * 80) * 12 : 0;
+    ctx.save(); ctx.translate(sh, 0);
+    rr(150, 150, 780, 1560, 80, '#111', 10); rr(180, 200, 720, 1460, 50, '#f5f6fa', 0);
+    ell(300, 330, 60, 60, '#fd79a8', 4); txt('ton_ex', 390, 310, 50, '#2d3436', 'Mont', 'left');
+    if (lt > lw(/ligne/i, 'typing')) { ell(400, 360, 10, 10, '#2ed573', 0); txt('en ligne', 420, 360, 36, '#2ed573', 'Mont', 'left'); }
+    line(180, 420, 900, 420, '#dfe6e9', 4);
+    if (lt > lw(/vu/i, 'typing')) txt('Vu ✓✓', 860, 520, 40, '#0984e3', 'Mont', 'right');
+    if (lt > lw(/écrire/i, 'typing') - .2) { rr(220, 1450, 260, 110, 50, '#dfe6e9', 0); for (let i = 0; i < 3; i++) ell(290 + i * 60, 1505 - Math.max(0, Math.sin(g * 8 - i)) * 14, 16, 16, '#636e72', 0); }
+    ctx.restore();
+    popText('ÇA ÉCRIT…', 540, 900, 170, '#ff3838', lw(/écrire/i, 'typing'), lt, -.05);
+  },
+  washer(lt, d, g) {
+    // buanderie
+    ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, 1800); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1400, W + 800, 900);
+    rr(240, 520, 600, 900, 30, '#fff'); rr(270, 550, 540, 120, 20, '#dfe6e9', 4);
+    const prog = lw(/programme/i, 'washer');
+    ell(380, 610, 34, 34, '#636e72', 4); txt(lt > prog ? '90°' : '--', 660, 612, 64, lt > prog ? '#e74c3c' : '#636e72', 'Anton');
+    ell(540, 1020, 230, 230, '#636e72'); ell(540, 1020, 190, 190, '#74b9ff', 6);
+    const out = lw(/ressort/i, 'washer');
+    ctx.save(); ctx.beginPath(); ctx.arc(540, 1020, 190, 0, 7); ctx.clip();
+    const sp = lt > prog ? g * 8 : g * 1;
+    for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(540, 1020, 60 + i * 50, sp + i, sp + i + 2.5); shape(null, 10, 'rgba(255,255,255,.7)'); }
+    if (lt < out) { ctx.save(); ctx.translate(540 + Math.cos(sp) * 80, 1020 + Math.sin(sp) * 80); ctx.rotate(sp * 1.3); rr(-40, -75, 80, 150, 14, '#111', 4); rr(-32, -62, 64, 110, 6, '#74b9ff', 0); ctx.restore(); }
+    ctx.restore();
+    if (lt > out) {
+      const k = easeOutBack((lt - out) / .4);
+      ctx.save(); ctx.translate(540, 760); ctx.scale(k * 1.8, k * 1.8); rr(-50, -95, 100, 190, 16, '#111', 5); rr(-40, -80, 80, 140, 8, '#74b9ff', 0); heart(0, -10, 24, '#ff3838', 4); ctx.restore();
+      for (let i = 0; i < 6; i++) { const a = g * 2 + i; txt('✦', 540 + Math.cos(a) * 250, 760 + Math.sin(a) * 250, 60, '#fff', 'serif', 'center', 6); }
+      popText('TOUJOURS ALLUMÉ', 540, 300, 130, '#ff3838', lw(/allumé/i, 'washer'), lt, -.04);
+    } else popText('90°', 540, 300, 220, '#ff3838', prog + .6, lt, .06);
+  },
+  viral(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    // mur de téléphones qui partagent
+    const R = rnd(3);
+    const people = [['TA MÈRE', lw(/mère/i, 'viral'), { longHair: true, hair: '#8e6e53', shirt: '#e17055' }], ['TON PATRON', lw(/patron/i, 'viral'), { bald: true, shirt: '#2d3436', bowtie: '#0984e3' }], ['TON BOULANGER', lw(/boulanger/i, 'viral'), { shirt: '#fff', cap: '#fff', mustache: true }]];
+    people.forEach(([lab, t0, o], i) => {
+      if (lt < t0) return;
+      const k = easeOutBack((lt - t0) / .35), x = [250, 830, 540][i], y = [900, 900, 1500][i];
+      ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+      rr(-170, -260, 340, 480, 30, '#fff', 6);
+      ctx.save(); ctx.beginPath(); ctx.roundRect(-170, -260, 340, 400, 30); ctx.clip(); human(0, 590, .8, g + i, { ...o, expr: 'shock' }); ctx.restore();
+      txt(lab, 0, 180, 44, '#2d3436', 'Anton'); ctx.restore();
+    });
+    // compteur de partages
+    const v = lw(/viral/i, 'viral');
+    if (lt > v) { const n = Math.floor(lerp(1200, 9800000, ease((lt - v) / 5))); popText('VIRAL', 540, 250, 170, '#ff4757', v, lt, -.05); txt('↗ ' + n.toLocaleString('fr-FR') + ' partages', 540, 420, 56, '#fff', 'Mont'); }
+  },
+  news(lt, d, g) {
+    ctx.fillStyle = '#0c2461'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 12; i++) line(-400 + i * 160, 0, 200 + i * 160, 1400, '#1e3799', 30);
+    // présentateur
+    human(330, 1650, .95, g, { shirt: '#2d3436', bowtie: '#c0392b', hair: '#636e72', expr: lt > lw(/choc/i, 'news') ? 'shock' : 'neutral' });
+    rr(-100, 1250, 900, 500, 10, '#dfe6e9');
+    // écran incrusté
+    rr(560, 320, 460, 560, 20, '#fff', 6);
+    ctx.save(); ctx.translate(560, 320); ctx.scale(.42, .42); ctx.translate(-150, -150); app(g, true); ctx.restore();
+    // bandeau
+    rr(-20, 1500, W + 40, 120, 0, '#e74c3c', 0); rr(-20, 1500, 280, 120, 0, '#ffd32a', 0); txt('FLASH INFO', 120, 1562, 60, '#2d3436', 'Anton');
+    ctx.save(); ctx.beginPath(); ctx.rect(260, 1500, W, 120); ctx.clip(); txt('UNE PERSONNE A LIKÉ UNE PHOTO DE 2017 — LE PAYS SOUS LE CHOC — ', 1300 - (lt * 260) % 2600, 1562, 60, '#fff', 'Anton', 'left'); ctx.restore();
+    popText('SOUS LE CHOC', 540, 200, 150, '#ffd32a', lw(/choc/i, 'news'), lt, -.04);
+  },
+  heli(lt, d, g) {
+    sky('#2d3436', '#636e72');
+    // maison
+    rr(240, 900, 600, 600, 6, '#f6e3c5'); poly([[200, 910], [540, 650], [880, 910]], '#c0392b'); rr(470, 1200, 140, 300, 8, '#6d4c41');
+    ctx.fillStyle = '#4b6584'; ctx.fillRect(-400, 1500, W + 800, 900);
+    // hélico + projecteur
+    const hx = 540 + Math.cos(g * .8) * 300, hy = 330 + Math.sin(g * 1.6) * 40;
+    ctx.save(); ctx.globalAlpha = .25; poly([[hx - 30, hy + 40], [hx + 30, hy + 40], [740, 1500], [340, 1500]], '#fff9c4', 0); ctx.restore();
+    ell(hx, hy, 130, 70, '#2d3436'); rr(hx + 100, hy - 20, 200, 30, 10, '#2d3436'); ell(hx - 50, hy - 10, 50, 40, '#74b9ff', 4);
+    line(hx - 220 * Math.cos(g * 30), hy - 90, hx + 220 * Math.cos(g * 30), hy - 90, '#111', 12); line(hx, hy - 70, hx, hy - 90, '#111', 10);
+    txt('TV', hx + 30, hy + 20, 40, '#fff', 'Anton');
+    // journalistes
+    const R = rnd(7);
+    for (let i = 0; i < 5; i++) { const x = 120 + i * 210; human(x, 1960, .5, g + i, { shirt: ['#0984e3', '#e17055', '#00b894', '#6c5ce7', '#fdcb6e'][i], expr: 'neutral', armR: 2.2 }); ctx.save(); ctx.translate(x + 50, 1600 - Math.sin(g * 3 + i) * 10); rr(-12, -60, 24, 80, 8, '#2d3436'); ell(0, -70, 22, 22, '#636e72'); ctx.restore(); }
+    const tk = lw(/tickets/i, 'heli');
+    if (lt > tk) { const k = easeOutBack((lt - tk) / .35); ctx.save(); ctx.translate(880, 1300); ctx.scale(k, k); ctx.rotate(.1); rr(-180, -80, 360, 160, 14, '#ffd32a', 6); txt('🎟 VISITE : 5 €', 0, 6, 52, '#2d3436', 'Anton'); ctx.restore(); }
+    popText('HÉLICOPTÈRE', 540, 560, 140, '#ffd32a', lw(/hélicoptère/i, 'heli'), lt, -.04, tk);
+  },
+  disguise(lt, d, g) {
+    const gr = lw(/groenland/i, 'disguise') - .3;
+    if (lt < gr) {
+      room();
+      const m = lw(/moustache/i, 'disguise');
+      human(540, 1950, 1.1, g, { expr: 'neutral', mustache: lt > m, hair: lt > m ? '#2d3436' : undefined, glasses: lt > m });
+      // nouveau passeport
+      const nn = lw(/nom/i, 'disguise');
+      if (lt > nn) { const k = easeOutBack((lt - nn) / .35); ctx.save(); ctx.translate(800, 560); ctx.scale(k, k); ctx.rotate(.08); rr(-200, -130, 400, 260, 16, '#c0392b', 6); txt('PASSEPORT', 0, -70, 50, '#f6e58d', 'Anton'); txt('Nom : Gérard Inconnu', 0, 30, 32, '#fff', 'Mont'); ctx.restore(); }
+      popText('MOUSTACHE', 300, 300, 150, '#ffd32a', m, lt, -.06);
+    } else {
+      sky('#a5d8ff', '#e7f5ff');
+      ctx.fillStyle = '#fff'; ctx.fillRect(-400, 1300, W + 800, 1000);
+      for (let i = 0; i < 40; i++) { const R = rnd(i + 2); const y = (g * 120 + R() * H) % H; ell(R() * W, y, 6, 6, '#fff', 0); }
+      // avion qui s'éloigne
+      const k = clamp((lt - gr) / 3);
+      ctx.save(); ctx.translate(lerp(-200, 1300, k), lerp(700, 300, k)); rr(-160, -30, 320, 60, 30, '#fff'); poly([[-30, 0], [40, 0], [0, 90]], '#dfe6e9'); ctx.restore();
+      popText('GROENLAND', 540, 330, 200, '#0984e3', 0, lt - gr, -.05);
+      human(540, 1900, 1.0, g, { shirt: '#c0392b', cap: '#c0392b', mustache: true, hair: '#2d3436', glasses: true, expr: 'neutral' });
+    }
+  },
+  igloo(lt, d, g) {
+    sky('#1e272e', '#485460');
+    for (let i = 0; i < 30; i++) { const R = rnd(i + 5); ell(R() * W, R() * 800, 3, 3, '#fff', 0); }
+    // aurore boréale
+    ctx.save(); ctx.globalAlpha = .35; ctx.beginPath(); ctx.moveTo(-100, 500); for (let x = -100; x < W + 100; x += 40) ctx.lineTo(x, 400 + Math.sin(x * .01 + g) * 120); ctx.lineTo(W + 100, 700); ctx.lineTo(-100, 700); ctx.closePath(); ctx.fillStyle = '#55efc4'; ctx.fill(); ctx.restore();
+    ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, 1400, W + 800, 1000);
+    // igloo
+    ctx.beginPath(); ctx.arc(540, 1450, 460, Math.PI, 0); shape('#fff');
+    for (let r = 0; r < 4; r++) line(80, 1450 - r * 110, 1000, 1450 - r * 110, '#c8d6e5', 4);
+    ctx.beginPath(); ctx.arc(540, 1450, 150, Math.PI, 0); shape('#2d3436');
+    human(540, 1960, .75, g, { shirt: '#c0392b', cap: '#c0392b', mustache: true, hair: '#dfe6e9', glasses: true, expr: lt > lw(/notification/i, 'igloo') ? 'shock' : 'neutral', phone: true, armR: 2.6 });
+    popText('10 ANS PLUS TARD', 540, 260, 130, '#fff', 0.1, lt, -.04);
+    const n = lw(/notification/i, 'igloo');
+    if (lt > n) { const s = easeOutBack((lt - n) / .3); ctx.save(); ctx.translate(540, 780); ctx.scale(s, s); rr(-360, -80, 720, 160, 40, '#fff', 6); txt('🔔 1 nouvelle notification', 0, 6, 50, '#2d3436', 'Mont'); ctx.restore(); }
+  },
+  revenge(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    // photo de toi en 2009 avec appareil dentaire
+    const me = (x, y, w, h, g2) => {
+      ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+      ctx.fillStyle = '#a29bfe'; ctx.fillRect(x, y, w, h);
+      human(x + w / 2, y + h * 1.35, w / 720, g2, { expr: 'neutral', shirt: '#55efc4', hair: '#5a3a22' });
+      // sourire avec appareil
+      const hx = x + w / 2, hy = y + h * 1.35 - 790 * (w / 720) + 45 * (w / 720);
+      rr(hx - 60, hy, 120, 44, 18, '#fff', 5); for (let i = -2; i <= 2; i++) rr(hx + i * 22 - 8, hy + 12, 16, 16, 3, '#b2bec3', 3); line(hx - 56, hy + 20, hx + 56, hy + 20, '#636e72', 4);
+      ctx.globalAlpha = .2; ctx.fillStyle = '#fdcb6e'; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1;
+      ctx.restore();
+    };
+    const lk = lw(/liker/i, 'revenge');
+    app(g, lt > lk, me, 'toi', '3 mars 2009', lt > lk ? '♥ Aimé par ton_ex' : '');
+    popText('2009', 540, 120, 170, '#ffd32a', lw(/2009/i, 'revenge'), lt, -.06);
+    if (lt > lw(/appareil/i, 'revenge')) { const k = easeOutBack((lt - lw(/appareil/i, 'revenge')) / .3); ctx.save(); ctx.translate(780, 560); ctx.scale(k, k); ctx.rotate(.1); rr(-200, -60, 400, 120, 20, '#ff3838', 6); txt('APPAREIL DENTAIRE', 0, 4, 44, '#fff', 'Anton'); ctx.restore(); }
+  },
+  home(lt, d, g) {
+    // tableau des scores
+    ctx.fillStyle = '#111'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    rr(120, 300, 840, 600, 30, '#2d3436', 8);
+    txt('TOI', 330, 420, 80, '#fff', 'Anton'); txt('TON EX', 750, 420, 80, '#fff', 'Anton');
+    txt('1', 330, 640, 260, '#ffd32a', 'Anton'); txt('1', 750, 640, 260, '#ffd32a', 'Anton'); txt('-', 540, 640, 200, '#fff', 'Anton');
+    popText('ÉGALITÉ', 540, 1060, 180, '#2ed573', lw(/égalité/i, 'home'), lt, -.05);
+    human(540, 1950, .85, g, { expr: 'neutral', armL: -2.7, armR: 2.7, shirt: '#f7f7f5' });
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const k = easeOutBack((lt - .1) / .4);
+    ctx.save(); ctx.translate(540, 820); ctx.scale(k, k);
+    heart(0, 0, 230, '#ff3838', 12);
+    txt('OUPS', 0, -10, 130, '#fff', 'Anton', 'center', 14);
+    ctx.restore();
+    const p = easeOutBack((lt - lw(/identifie/i, 'outro')) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 1560); ctx.scale(p, p); rr(-380, -80, 760, 160, 80, '#fff', 0); txt('@ identifie-le/la 👇', 0, 6, 70, '#2d3436', 'Anton'); ctx.restore(); }
+    const s = easeOutBack((lt - .5) / .4);
+    if (s > 0) { ctx.save(); ctx.translate(540, 300); ctx.scale(s, s); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+};
+</script></body></html>
