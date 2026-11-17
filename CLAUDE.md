@@ -7,4 +7,7 @@
 - Format : vertical 1080x1920, **plus de 60 s**, histoire VRAIMENT débile et absurde (nonsense, jeux de mots idiots, personnages objets/animaux qui parlent — comme le pigeon ou le caca ; éviter les histoires trop logiques) racontée à la 2e personne (« tu »),
   hook très fort dans la 1re phrase, sous-titres mot par mot (blanc + mots-clés jaunes), style dessin animé 2D.
 - Pipeline : `videoXX/script.json` + `videoXX/scene.html` → `python3 ../lib/tts.py` → `node ../lib/render.js`.
-- Demande de like par le personnage principal vers 10 s (fait sur la vidéo 10) : pas encore confirmé pour toutes les vidéos, demander à l'utilisateur.
+- Demande de like : **pas dans toutes les vidéos** (environ une sur deux, en variant). Quand il y en a une, c'est le
+  **personnage principal** qui regarde la caméra et réclame le like à sa façon (« lâche un like », « oublie pas le like »,
+  « mets-moi un like »… avec une menace ou une blague débile), à un **moment différent à chaque fois** (début, milieu,
+  juste avant la chute…), pas toujours vers 10 s. Exemple : vidéo 10 (la saucisse).
