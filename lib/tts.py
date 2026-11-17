@@ -140,7 +140,9 @@ with wave.open(f"{tmp}/vm.wav") as w:
 total = len(voice_track) / SR_OUT + 1.0
 
 # -------- musique de fond
-mus = script.get("music", {})
+mus = script.get("music", {}) or {}
+# volume de la musique : très bas par défaut (l'utilisateur la trouvait trop forte). "music": false => pas de musique
+MUSIC_VOL = 0.0 if script.get("music") is False else float(os.environ.get("MUSIC_VOL", mus.get("volume", 0.025)))
 def pluck(freq, dur, decay=0.996):
     n = int(SR_OUT*dur); p = int(SR_OUT/freq); buf = rng.uniform(-1, 1, p); out = np.zeros(n)
     for i in range(n):
@@ -162,9 +164,11 @@ for k in range(int(total/step)+1):
         b = chord[0]-24
         if ("b", b) not in cache: cache[("b", b)] = pluck(note(b), .9, .998)
         add(music, cache[("b", b)], t0, .35)
-    hh = np.diff(rng.normal(0, 1, 1323)*np.exp(-np.linspace(0, 8, 1323)), prepend=0)
-    add(music, hh, t0, .05 if k % 2 else .025)
 music = music[:int(total*SR_OUT)]; music /= np.abs(music).max()+1e-9
+# adoucit la musique (passe-bas) pour qu'elle reste en fond
+_k = np.exp(-2*np.pi*1800/SR_OUT); _y = np.zeros_like(music); _acc = 0.0
+for _i in range(len(music)): _acc = (1-_k)*music[_i] + _k*_acc; _y[_i] = _acc
+music = _y / (np.abs(_y).max()+1e-9)
 
 # -------- bruitages
 def whoosh(d=.35):
@@ -203,7 +207,7 @@ for rule in script.get("sfx", []):
 
 vt = np.zeros_like(music); vt[:len(voice_track)] = voice_track[:len(vt)]
 env = np.convolve(np.abs(vt), np.ones(4410)/4410, mode="same")
-mix = vt + music*.10*(1-.55*np.clip(env*12, 0, 1)) + sfx*.35
+mix = vt + music*MUSIC_VOL*(1-.6*np.clip(env*12, 0, 1)) + sfx*.35
 mix /= max(1.0, np.abs(mix).max()/.97)
 wwrite("audio_mix.wav", mix, SR_OUT); wwrite("voice_only.wav", vt, SR_OUT)
 json.dump({"duration": round(total, 3), "segments": segs}, open("timings.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)

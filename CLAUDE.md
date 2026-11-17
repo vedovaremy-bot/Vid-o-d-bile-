@@ -11,3 +11,5 @@
   **personnage principal** qui regarde la caméra et réclame le like à sa façon (« lâche un like », « oublie pas le like »,
   « mets-moi un like »… avec une menace ou une blague débile), à un **moment différent à chaque fois** (début, milieu,
   juste avant la chute…), pas toujours vers 10 s. Exemple : vidéo 10 (la saucisse).
+- Musique de fond : **très basse** (défaut `volume` 0.025, environ 4 fois moins fort qu'avant, adoucie, sans charleston)
+  ou absente (`"music": false` dans script.json). L'utilisateur trouvait la musique trop forte : ne jamais la remonter.
