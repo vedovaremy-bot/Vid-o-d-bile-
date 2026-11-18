@@ -53,3 +53,6 @@ Version ElevenLabs (voix `3Tp5mYhT9wrfnry9pzvV`, 68 s) : `video10_saucisse_burea
 ## Vidéo 11 — « Ton réveil ne s'arrête plus » (74 s)
 Fichier final : `video11_reveil.mp4` — voix ElevenLabs, sans musique, ~30 bruitages synchronisés (`lib/sfx.py`),
 like réclamé par le réveil vers 25 s.
+
+## Vidéo 12 — « Ta baignoire est partie en vacances » (70 s)
+Fichier final : `video12_baignoire_vacances.mp4` — voix ElevenLabs, sans musique, ~40 bruitages, pas de demande de like (alternance).

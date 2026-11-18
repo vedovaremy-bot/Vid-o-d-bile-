@@ -1,0 +1,282 @@
+{
+ "title": "Ta baignoire est partie en vacances",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ta *baignoire* s'est détachée du mur... et elle est partie en *vacances*."
+  },
+  {
+   "scene": "stairs",
+   "text": "Tu l'entends descendre l'escalier. Boum. Boum. Boum. Puis la porte d'entrée *claque*."
+  },
+  {
+   "scene": "highway",
+   "text": "Tu cours à la fenêtre. Elle fonce sur l'autoroute. Elle double un *camion*. Elle *klaxonne*. Un radar la *flashe*. Elle fait un *bisou* à la caméra."
+  },
+  {
+   "scene": "beach",
+   "text": "Arrivée à la plage, elle se jette dans la *mer*. Elle fait du *surf*. Les mouettes l'*applaudissent*."
+  },
+  {
+   "scene": "chase",
+   "text": "Les garde-côtes la poursuivent. Mais elle est trop *rapide*. Elle s'est mis un moteur... de *mixeur*."
+  },
+  {
+   "scene": "pirate",
+   "text": "Elle débarque sur une île déserte. Elle devient *pirate*. Et elle tire des *savonnettes* au canon."
+  },
+  {
+   "scene": "ship",
+   "text": "Elle attaque un paquebot. Elle vole tous les *shampoings*. Elle devient la reine des *mers*. Les passagers sont obligés de se laver au *ketchup*."
+  },
+  {
+   "scene": "sink",
+   "text": "Pendant ce temps, toi, tu te laves comment ? Dans l'*évier*. Plié en quatre. Avec une *éponge*."
+  },
+  {
+   "scene": "return",
+   "text": "Trois mois plus tard, on sonne. Tu ouvres. C'est ta baignoire. *Bronzée*. Avec un *perroquet* sur le robinet."
+  },
+  {
+   "scene": "back",
+   "text": "Elle remonte dans la salle de bain. Elle se recolle au mur. Et elle te dit : à partir de maintenant... *l'eau froide*, c'est pour toi."
+  },
+  {
+   "scene": "parrot",
+   "text": "Le perroquet, lui, est resté. Et il répète en boucle : t'as pas pris ta *douche*. T'as pas pris ta *douche*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... avant que ton *lavabo* fasse pareil."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "détachée",
+   "type": "crack",
+   "gain": 1.0
+  },
+  {
+   "word": "détachée",
+   "type": "creak",
+   "offset": 0.1,
+   "gain": 0.6
+  },
+  {
+   "word": "vacances",
+   "type": "jump",
+   "gain": 0.6
+  },
+  {
+   "word": "descendre",
+   "type": "footsteps",
+   "dur": 1.0,
+   "gain": 0.6
+  },
+  {
+   "word": "boum",
+   "type": "land",
+   "gain": 0.9
+  },
+  {
+   "word": "claque",
+   "type": "door_slam",
+   "gain": 1.0
+  },
+  {
+   "word": "fonce",
+   "type": "engine",
+   "dur": 4.5,
+   "gain": 0.6
+  },
+  {
+   "word": "camion",
+   "type": "whoosh",
+   "gain": 0.8
+  },
+  {
+   "word": "klaxonne",
+   "type": "honk",
+   "gain": 0.9,
+   "repeat": 2,
+   "gap": 0.55
+  },
+  {
+   "word": "mer",
+   "in": "beach",
+   "type": "splash",
+   "gain": 1.0
+  },
+  {
+   "word": "surf",
+   "type": "wind",
+   "dur": 3.0,
+   "gain": 0.5
+  },
+  {
+   "word": "surf",
+   "type": "whoosh",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "mouettes",
+   "type": "birds",
+   "dur": 2.5,
+   "gain": 0.8
+  },
+  {
+   "word": "applaudissent",
+   "type": "applause",
+   "dur": 2.2,
+   "gain": 0.8
+  },
+  {
+   "word": "poursuivent",
+   "type": "siren",
+   "dur": 4.5,
+   "gain": 0.6
+  },
+  {
+   "word": "mixeur",
+   "type": "engine",
+   "offset": -0.3,
+   "dur": 1.8,
+   "gain": 0.9
+  },
+  {
+   "word": "île",
+   "type": "birds",
+   "dur": 2.0,
+   "gain": 0.5
+  },
+  {
+   "word": "pirate",
+   "type": "ding",
+   "gain": 0.5
+  },
+  {
+   "word": "savonnettes",
+   "type": "explosion",
+   "offset": 0.4,
+   "gain": 0.7
+  },
+  {
+   "word": "canon",
+   "type": "explosion",
+   "offset": 0.2,
+   "gain": 0.8
+  },
+  {
+   "word": "canon",
+   "type": "pop",
+   "offset": 0.8,
+   "gain": 0.6,
+   "repeat": 3,
+   "gap": 0.2
+  },
+  {
+   "word": "attaque",
+   "type": "explosion",
+   "gain": 0.6
+  },
+  {
+   "word": "vole",
+   "in": "ship",
+   "type": "cash",
+   "offset": 0.5,
+   "gain": 0.8
+  },
+  {
+   "word": "reine",
+   "type": "applause",
+   "dur": 1.8,
+   "gain": 0.6
+  },
+  {
+   "word": "évier",
+   "type": "splash",
+   "gain": 0.5
+  },
+  {
+   "word": "quatre",
+   "in": "sink",
+   "type": "crunch",
+   "gain": 0.6
+  },
+  {
+   "word": "éponge",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.7
+  },
+  {
+   "word": "sonne",
+   "in": "return",
+   "type": "ding",
+   "gain": 0.9
+  },
+  {
+   "word": "ouvres",
+   "type": "creak",
+   "gain": 0.6
+  },
+  {
+   "word": "perroquet",
+   "in": "return",
+   "type": "birds",
+   "dur": 1.5,
+   "gain": 0.7
+  },
+  {
+   "word": "remonte",
+   "type": "footsteps",
+   "dur": 1.6,
+   "gain": 0.6
+  },
+  {
+   "word": "recolle",
+   "type": "land",
+   "gain": 0.8
+  },
+  {
+   "word": "froide",
+   "type": "splash",
+   "gain": 0.6
+  },
+  {
+   "word": "froide",
+   "type": "sad_trombone",
+   "offset": 0.6,
+   "gain": 0.6
+  },
+  {
+   "word": "répète",
+   "type": "birds",
+   "dur": 3.5,
+   "gain": 0.5
+  },
+  {
+   "word": "lavabo",
+   "type": "boing",
+   "gain": 0.8
+  },
+  {
+   "word": "flashe",
+   "type": "pop",
+   "gain": 0.8
+  },
+  {
+   "word": "bisou",
+   "type": "pop",
+   "offset": 0.2,
+   "gain": 0.5
+  },
+  {
+   "word": "ketchup",
+   "type": "fart",
+   "offset": 0.3,
+   "gain": 0.6
+  }
+ ]
+}
