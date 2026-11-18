@@ -56,3 +56,7 @@ like réclamé par le réveil vers 25 s.
 
 ## Vidéo 12 — « Ta baignoire est partie en vacances » (70 s)
 Fichier final : `video12_baignoire_vacances.mp4` — voix ElevenLabs, sans musique, ~40 bruitages, pas de demande de like (alternance).
+
+## Vidéo 13 — « Le like de 2017 est vivant » (partie 2 de la vidéo 07, 68 s)
+Fichier final : `video13_like_ex_partie2.mp4` — suite de la vidéo qui a le mieux marché. Voix ElevenLabs, sans musique,
+bruitages, like réclamé par le like lui-même vers 35 s.

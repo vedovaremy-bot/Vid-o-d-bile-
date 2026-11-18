@@ -58,7 +58,14 @@ def el_tts(text, prev_text, next_text):
                 "voice_settings": {"stability": float(os.environ.get("EL_STABILITY", "0.4")), "similarity_boost": 0.8, "style": float(os.environ.get("EL_STYLE", "0.35")), "use_speaker_boost": True}}
         req = urllib.request.Request(f"https://api.elevenlabs.io/v1/text-to-speech/{EL_VOICE}/with-timestamps?output_format=mp3_44100_128",
             data=json.dumps(body).encode(), headers={"Content-Type": "application/json", "xi-api-key": os.environ.get("ELEVEN_API_KEY", "via-proxy")})
-        d = json.load(urllib.request.urlopen(req, timeout=120)); json.dump(d, open(cp, "w"))
+        import time
+        for attempt in range(4):
+            try:
+                d = json.load(urllib.request.urlopen(req, timeout=90)); break
+            except Exception as e:
+                if attempt == 3: raise
+                print(f"  ElevenLabs : nouvelle tentative ({e})"); time.sleep(5 * (attempt + 1))
+        json.dump(d, open(cp, "w"))
     tmpd = tempfile.mkdtemp(); open(f"{tmpd}/a.mp3", "wb").write(base64.b64decode(d["audio_base64"]))
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", f"{tmpd}/a.mp3", "-ac", "1", "-ar", "44100", f"{tmpd}/a.wav"], check=True)
     with wave.open(f"{tmpd}/a.wav") as w: a = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
