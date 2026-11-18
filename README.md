@@ -60,3 +60,6 @@ Fichier final : `video12_baignoire_vacances.mp4` — voix ElevenLabs, sans musiq
 ## Vidéo 13 — « Le like de 2017 est vivant » (partie 2 de la vidéo 07, 68 s)
 Fichier final : `video13_like_ex_partie2.mp4` — suite de la vidéo qui a le mieux marché. Voix ElevenLabs, sans musique,
 bruitages, like réclamé par le like lui-même vers 35 s.
+
+## Vidéo 14 — « L'armée des chaussettes perdues » (76 s)
+Fichier final : `video14_armee_chaussettes.mp4` — voix ElevenLabs, sans musique, ~35 bruitages (dont nouveaux : buzz, clank, washer, shrink), pas de demande de like.

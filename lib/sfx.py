@@ -291,7 +291,31 @@ def crowd(dur=3.0):
     t = _t(dur); return _norm(_lp(_noise(dur), 900) * (0.7 + 0.3 * np.sin(2 * np.pi * 1.7 * t)) * _env(len(t), .3, .5), .5)
 
 
+def buzz(dur=2.0):
+    """mouches qui volent"""
+    t = _t(dur); f = 210 + 25 * np.sin(2 * np.pi * 3.1 * t) + 15 * np.sin(2 * np.pi * 7.3 * t)
+    return _norm(_lp(np.sign(np.sin(2 * np.pi * np.cumsum(f) / SR)), 1800) * (0.6 + 0.4 * np.sin(2 * np.pi * .9 * t) ** 2) * _env(len(t), .1, .2), .4)
+
+
+def clank(dur=0.5):
+    """épées / métal qui s'entrechoquent"""
+    t = _t(dur); return _norm(sum(np.sin(2 * np.pi * f * t) * np.exp(-t * dcy) for f, dcy in [(1800, 9), (2650, 12), (4100, 16), (5300, 20)]) + _hp(_noise(dur), 3000) * np.exp(-t * 60), .7)
+
+
+def washer(dur=4.0):
+    """machine à laver qui tourne (ronronnement + eau qui clapote)"""
+    t = _t(dur); hum = _lp(np.sign(np.sin(2 * np.pi * 55 * t)), 300) * (0.7 + 0.3 * np.sin(2 * np.pi * 1.2 * t))
+    slosh = _lp(_noise(dur), 900) * (0.5 + 0.5 * np.sin(2 * np.pi * .8 * t) ** 2)
+    return _norm((hum + slosh * 1.5) * _env(len(t), .3, .3), .55)
+
+
+def shrink(dur=0.9):
+    """rétrécissement cartoon (son qui descend en sautillant)"""
+    t = _t(dur); f = np.geomspace(1400, 180, len(t)) * (1 + .15 * np.sign(np.sin(2 * np.pi * 18 * t)))
+    return _norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * _env(len(t), .01, .1), .6)
+
+
 SFX = {k: v for k, v in globals().items() if callable(v) and not k.startswith("_") and k not in ("np",)}
 SFX["zip"] = zip_
 LONG = {"alarm", "alarm_muffled", "phone_ring", "siren", "footsteps", "run", "applause", "snore", "tick", "rain", "wind",
-        "engine", "drumroll", "birds", "crowd", "bubbles"}
+        "engine", "drumroll", "birds", "crowd", "bubbles", "buzz", "washer"}

@@ -1,0 +1,236 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size, tailX = 0, t0 = 0, lt = 1, until = 1e9) {
+  if (lt < t0 || lt > until) return; const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+  rr(-w / 2, -h / 2, w, h, 40, '#fff'); poly([[tailX - 24, h / 2 - 4], [tailX + 24, h / 2 - 4], [tailX - 4, h / 2 + 56]], '#fff'); line(tailX - 20, h / 2 - 2, tailX + 20, h / 2 - 2, '#fff', 10);
+  txt(s, 0, 4, size, OUT, 'Anton'); ctx.restore();
+}
+function stink(x, y, g, n = 4, col = '#6ab04c') { ctx.save(); ctx.globalAlpha = .75; for (let i = 0; i < n; i++) { ctx.beginPath(); const xx = x - (n - 1) * 30 + i * 60; ctx.moveTo(xx, y); for (let j = 0; j < 6; j++) ctx.quadraticCurveTo(xx + (j % 2 ? 34 : -34), y - 30 - j * 50 + Math.sin(g * 4 + i) * 10, xx, y - 60 - j * 50); shape(null, 10, col); } ctx.restore(); }
+function fly(x, y, s, g, dead) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); if (dead) ctx.rotate(Math.PI); ell(0, 0, 18, 13, '#2d3436', 0); ctx.globalAlpha = .6; const w = dead ? 0 : Math.sin(g * 60) * 8; ell(-8, -14 - w, 12, 8, '#dfe6e9', 0); ell(8, -14 - w, 12, 8, '#dfe6e9', 0); ctx.globalAlpha = 1; if (dead) { line(-6, 4, -2, 8, '#fff', 2); line(-2, 4, -6, 8, '#fff', 2); } ctx.restore(); }
+
+// ------------------------------------------------------------ LA CHAUSSETTE (personnages)
+// o: {c1, c2 (rayures), old, flip, angry, talk, smug, sword, crown, sash, blink, march, shock, noShadow}
+function sock(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (!o.noShadow) shadow(0, 0, 120);
+  const c1 = o.old ? '#8a9a5b' : (o.c1 || '#ff7675'), c2 = o.old ? '#6b7a45' : (o.c2 || '#fff');
+  const step = o.march ? Math.sin(t * 9) * 12 : 0;
+  ctx.translate(0, -Math.abs(step));
+  ctx.save(); ctx.rotate(o.march ? Math.sin(t * 9) * .06 : 0);
+  // forme : jambe + pied (talon à gauche, orteils à droite)
+  ctx.beginPath(); ctx.moveTo(-80, -420); ctx.lineTo(60, -420); ctx.lineTo(60, -150); ctx.quadraticCurveTo(60, -110, 110, -110);
+  ctx.lineTo(150, -110); ctx.quadraticCurveTo(210, -100, 210, -50); ctx.quadraticCurveTo(210, 0, 150, 0); ctx.lineTo(-40, 0); ctx.quadraticCurveTo(-90, 0, -90, -60); ctx.lineTo(-80, -420); ctx.closePath();
+  shape(c1, 7);
+  ctx.save(); ctx.clip();
+  for (let i = 0; i < 6; i++) { ctx.fillStyle = c2; ctx.fillRect(-120, -400 + i * 60, 360, 24); }
+  ctx.fillStyle = 'rgba(0,0,0,.12)'; ctx.fillRect(130, -130, 120, 140); ctx.fillRect(-120, -80, 90, 90);
+  ctx.restore();
+  rr(-92, -460, 164, 56, 18, o.old ? '#7a8a4b' : '#fdfdfd', 7); // élastique
+  if (o.old) { ell(-30, -200, 18, 12, '#2d3436', 0); ell(170, -40, 14, 10, '#2d3436', 0); rr(20, -300, 40, 34, 4, '#c8a165', 4); }
+  // visage
+  const ey = -330;
+  if (o.blink) { line(-56, ey, -22, ey, OUT, 7); line(8, ey, 42, ey, OUT, 7); }
+  else { const r = o.shock ? 22 : 18; ell(-38, ey, r, r + 4, '#fff', 5); ell(24, ey, r, r + 4, '#fff', 5); ell(-36, ey + 4, 8, 10, '#111', 0); ell(27, ey + 4, 8, 10, '#111', 0);
+    if (o.smug || o.old) for (const sx of [-38, 24]) { ctx.save(); ctx.beginPath(); ctx.ellipse(sx, ey, r + 1, r + 5, 0, Math.PI, 0); shape(c1, 5); ctx.restore(); } }
+  if (o.angry) { line(-66, ey - 40, -16, ey - 26, OUT, 8); line(52, ey - 40, 2, ey - 26, OUT, 8); }
+  const my = ey + 64;
+  if (o.shock || (o.talk && Math.sin(t * 16) > 0)) ell(-6, my, 18, 15, '#7a2b2b', 5);
+  else if (o.angry) { ctx.beginPath(); ctx.arc(-6, my + 16, 22, Math.PI * 1.15, Math.PI * 1.85); shape(null, 6); }
+  else { ctx.beginPath(); ctx.arc(-6, my - 14, 24, Math.PI * .15, Math.PI * .85); shape(null, 6); }
+  if (o.old) { line(-60, my - 10, -40, my + 6, OUT, 4); ell(-80, ey + 10, 10, 6, '#ff7675', 0); }
+  if (o.sash) { ctx.save(); ctx.beginPath(); ctx.rect(-90, -420, 160, 300); ctx.clip(); ctx.translate(-10, -230); ctx.rotate(.7); ['#0055a4', '#fff', '#ef4135'].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(-200, -40 + i * 26, 400, 26); }); ctx.restore(); }
+  ctx.restore();
+  if (o.sword) { ctx.save(); ctx.translate(90, -260); ctx.rotate(-.7 + (o.march ? Math.sin(t * 9) * .2 : 0)); rr(-7, -170, 14, 200, 6, '#e1b12c', 4); ctx.restore(); line(60, -250, 100, -260, OUT, 10); }
+  if (o.crown) poly([[-70, -460], [-76, -530], [-40, -495], [-6, -545], [28, -495], [64, -530], [58, -460]], '#f9ca24', 5);
+  ctx.restore();
+}
+// ------------------------------------------------------------ décors
+function laundryRoom() {
+  ctx.fillStyle = '#dff9fb'; ctx.fillRect(-400, -400, W + 800, 1800);
+  ctx.globalAlpha = .4; for (let x = -400; x < W + 400; x += 100) line(x, -400, x, 1400, '#c7ecee', 6); ctx.globalAlpha = 1;
+  ctx.fillStyle = '#95afc0'; ctx.fillRect(-400, 1400, W + 800, 900);
+}
+function washMachine(x, y, s, g, o = {}) {
+  ctx.save(); ctx.translate(x + (o.shake ? Math.sin(g * 50) * 6 : 0), y); ctx.scale(s, s);
+  rr(-260, -620, 520, 620, 30, '#fdfdfd'); rr(-230, -590, 460, 90, 14, '#dfe6e9', 4); ell(-160, -545, 24, 24, '#636e72', 4); txt(o.label || '40°', 120, -543, 50, '#e74c3c', 'Anton');
+  ell(0, -270, 190, 190, '#b2bec3'); ell(0, -270, 150, 150, o.open ? '#2d3436' : '#74b9ff', 6);
+  if (!o.open && o.spin) { ctx.save(); ctx.beginPath(); ctx.arc(0, -270, 150, 0, 7); ctx.clip(); for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.arc(0, -270, 40 + i * 40, g * 8 + i, g * 8 + i + 2.5); shape(null, 10, 'rgba(255,255,255,.7)'); } ctx.restore(); }
+  ctx.restore();
+}
+function cityStreet(g) {
+  sky(); clouds(g); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1450, W + 800, 1000);
+  const cols = ['#fab1a0', '#ffeaa7', '#81ecec', '#a29bfe'];
+  for (let i = 0; i < 4; i++) { const x = i * 280 - 40; rr(x, 700, 260, 760, 6, cols[i]); rr(x + 40, 800, 70, 90, 4, '#fff', 4); rr(x + 150, 800, 70, 90, 4, '#fff', 4); }
+  rr(300, 1100, 480, 350, 8, '#0984e3'); txt('LAVERIE', 540, 1150, 60, '#fff', 'Anton');
+  for (let i = 0; i < 3; i++) { rr(330 + i * 150, 1210, 130, 200, 10, '#fff'); ell(395 + i * 150, 1310, 46, 46, '#74b9ff', 4); }
+}
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    // royaume souterrain : armée de chaussettes qui marche
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 4; i++) { ctx.save(); ctx.globalAlpha = .15; ctx.translate(200 + i * 230, -100); poly([[0, 0], [-200, 1900], [200, 1900]], '#ffeaa7', 0); ctx.restore(); }
+    ctx.fillStyle = '#596275'; ctx.fillRect(-400, 1300, W + 800, 1000);
+    const R = rnd(3), cols = [['#ff7675', '#fff'], ['#74b9ff', '#0984e3'], ['#55efc4', '#fff'], ['#fdcb6e', '#e17055'], ['#a29bfe', '#fff']];
+    const am = lw(/armée/i, 'hook');
+    const n = lt > am ? 18 : 6;
+    for (let row = 0; row < 3; row++) for (let i = 0; i < 6; i++) { const k = row * 6 + i; if (k >= n) continue; const c = cols[Math.floor(R() * 5)]; sock(110 + i * 175 + (row % 2) * 60 - ((g * 40) % 175) * 0, 1450 + row * 190, .42 + row * .08, g + k * .3, { c1: c[0], c2: c[1], march: true, sword: true, angry: true }); }
+    popText('?', 540, 400, 260, '#fff', 0.1, lt, 0, am - .1);
+    popText('UNE ARMÉE', 540, 400, 190, '#ff3838', am, lt, -.05);
+  },
+  laundry(lt, d, g) {
+    laundryRoom();
+    const st = lw(/secours/i, 'laundry');
+    washMachine(560, 1600, 1.2, g, { spin: lt > lw(/lances/i, 'laundry'), shake: lt > lw(/essorage/i, 'laundry'), label: lt > lw(/quarante/i, 'laundry') ? '40°' : '--' });
+    human(150, 1990, .85, g, { expr: lt > st ? 'shock' : 'neutral' });
+    bubble(700, 640, 440, 150, 'AU SECOURS !', 70, -60, st - .2, lt);
+    popText('ESSORAGE', 540, 330, 170, '#0984e3', lw(/essorage/i, 'laundry'), lt, -.05, st - .3);
+  },
+  porthole(lt, d, g) {
+    laundryRoom();
+    // gros plan sur le hublot ouvert
+    ell(540, 1000, 470, 470, '#b2bec3'); ell(540, 1000, 400, 400, '#2d3436', 8);
+    const j = lw(/saute/i, 'porthole');
+    ell(540, 1260, 90, 50, '#000', 0); // le trou
+    if (lt < j) sock(540, 1250, .9, g, { c1: '#ff7675', c2: '#fff', smug: lt > lw(/regarde/i, 'porthole') });
+    else { const k = clamp((lt - j) / .7); ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, 1270); ctx.clip(); sock(540, 1250 + k * 600 - Math.sin(k * Math.PI) * 300, .9 * (1 - k * .4), g, { c1: '#ff7675', c2: '#fff', shock: true, noShadow: true }); ctx.restore(); }
+    // la porte du hublot
+    ctx.save(); ctx.translate(980, 1000); ctx.scale(.25, 1); ell(0, 0, 400, 400, '#dfe6e9', 8); ctx.restore();
+    popText('LE TROU', 540, 300, 180, '#ffd32a', lw(/trou/i, 'porthole'), lt, -.05);
+  },
+  tube(lt, d, g) {
+    const at = lw(/atterris/i, 'tube') + .3;
+    if (lt < at) {
+      ctx.fillStyle = '#636e72'; ctx.fillRect(-400, -400, W + 800, H + 800);
+      // tuyau vu de l'intérieur (cercles qui défilent)
+      for (let i = 0; i < 8; i++) { const k = ((i / 8) + g * .6) % 1; ell(540, 1000, 80 + k * 900, 80 + k * 900, null, 10 + k * 20); }
+      ctx.save(); ctx.translate(540, 1100); ctx.rotate(Math.sin(g * 4) * .1); human(0, 900, .9, g, { expr: 'shock', armL: -2.6, armR: 2.6 }); ctx.restore();
+      popText('LE TUYAU', 540, 300, 180, '#fff', lw(/rampes/i, 'tube'), lt, -.05);
+    } else {
+      ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+      // château en boîtes de lessive
+      for (let i = 0; i < 5; i++) { const h = [500, 700, 900, 700, 500][i]; rr(80 + i * 190, 1300 - h, 170, h, 6, ['#e17055', '#0984e3', '#fdcb6e', '#0984e3', '#e17055'][i]); txt('LESSIVE', 165 + i * 190, 1300 - h + 80, 34, '#fff', 'Anton'); }
+      poly([[440, 400], [540, 250], [640, 400]], '#d63031');
+      ctx.fillStyle = '#596275'; ctx.fillRect(-400, 1300, W + 800, 1000);
+      human(540, 1950, .9, g, { expr: 'shock' });
+      popText('BOUM', 540, 1500, 150, '#ff9f43', 0, lt - at, .06, .8);
+      popText('UN ROYAUME', 540, 200, 170, '#ffd32a', lw(/royaume/i, 'tube'), lt, -.05);
+    }
+  },
+  army(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#596275'; ctx.fillRect(-400, 1200, W + 800, 1000);
+    const R = rnd(8), cols = [['#ff7675', '#fff'], ['#74b9ff', '#0984e3'], ['#55efc4', '#fff'], ['#fdcb6e', '#e17055'], ['#a29bfe', '#fff']];
+    const sw = lw(/épées/i, 'army');
+    for (let row = 0; row < 4; row++) for (let i = 0; i < 7; i++) { const c = cols[Math.floor(R() * 5)]; const x = ((i * 170 + (row % 2) * 85 + g * 80) % 1250) - 90; sock(x, 1300 + row * 170, .3 + row * .06, g + i + row, { c1: c[0], c2: c[1], march: true, sword: lt > sw - .2, angry: true }); }
+    popText('MILLIERS', 540, 300, 190, '#fff', lw(/milliers/i, 'army'), lt, -.05, sw - .1);
+    popText('ÉPÉES…', 540, 300, 190, '#ffd32a', sw, lt, .05, lw(/dents/i, 'army') - .1);
+    popText('EN CURE-DENTS', 540, 300, 150, '#ff3838', lw(/dents/i, 'army'), lt, -.04);
+  },
+  chief(lt, d, g) {
+    ctx.fillStyle = '#3d3d3d'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    // trône en pinces à linge
+    rr(300, 900, 480, 900, 30, '#e1b12c'); rr(340, 940, 400, 400, 20, '#d63031');
+    sock(540, 1820, 1.25, g, { old: true, crown: true });
+    stink(540, 1220, g, 5);
+    const mo = lw(/mouches/i, 'chief');
+    for (let i = 0; i < 6; i++) { const dead = lt > mo + i * .15; const x = 300 + i * 90 + (dead ? 0 : Math.sin(g * 6 + i) * 60), y = dead ? Math.min(1880, 900 + (lt - mo - i * .15) * 1500) : 900 + Math.cos(g * 5 + i) * 60; fly(x, y, 1.6, g, dead); }
+    popText('1998', 540, 300, 220, '#ffd32a', lw(/1998/i, 'chief'), lt, -.06, lw(/lavée/i, 'chief') - .1);
+    popText('JAMAIS LAVÉE', 540, 300, 150, '#6ab04c', lw(/lavée/i, 'chief'), lt, .05, mo - .1);
+    popText('K.O.', 540, 300, 220, '#ff3838', mo + .4, lt, -.05);
+  },
+  revenge(lt, d, g) {
+    ctx.fillStyle = '#5a0b0b'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    ctx.save(); ctx.translate(540, 1000); ctx.rotate(g * .3); for (let i = 0; i < 16; i++) { ctx.rotate(Math.PI / 8); poly([[0, 0], [-120, -1600], [120, -1600]], i % 2 ? '#8e1111' : '#b71c1c', 0); } ctx.restore();
+    sock(540, 2150, 2.2, g, { old: true, crown: true, angry: lt > lw(/vengeance/i, 'revenge') - .5, talk: true, noShadow: true });
+    stink(500, 1050, g, 4);
+    const ju = lw(/jumelles/i, 'revenge');
+    if (lt > ju) { const k = easeOutBack((lt - ju) / .3); ctx.save(); ctx.translate(540, 560); ctx.scale(k, k); sock(-140, 150, .35, g, { c1: '#74b9ff', c2: '#fff', noShadow: true }); txt('💔', 0, 40, 120, '#000', 'serif'); sock(140, 150, .35, g, { c1: '#74b9ff', c2: '#fff', flip: true, noShadow: true }); ctx.restore(); }
+    popText('VENGEANCE', 540, 300, 190, '#ff3838', lw(/vengeance/i, 'revenge'), lt, -.05);
+  },
+  attack(lt, d, g) {
+    cityStreet(g);
+    const so = lw(/sort/i, 'attack');
+    const R = rnd(5);
+    const n = Math.floor(clamp((lt - so) / 2.5) * 16);
+    for (let i = 0; i < n; i++) { const x = 300 + R() * 500 + (lt - so) * (R() - .5) * 300, y = 1500 + R() * 380; sock(x, y, .3, g + i, { c1: ['#ff7675', '#74b9ff', '#55efc4', '#fdcb6e'][i % 4], march: true, sword: true, angry: true }); }
+    // passants qui se font attaquer les pieds
+    const pa = lw(/pieds/i, 'attack');
+    for (let i = 0; i < 2; i++) { const x = [130, 950][i]; human(x, 1960, .7, g + i, { shirt: ['#00b894', '#e17055'][i], expr: lt > pa ? 'shock' : 'neutral', pose: lt > pa ? 'shock' : 'stand' }); if (lt > pa) sock(x + 40, 1960, .28, g, { c1: '#a29bfe', sword: true, angry: true }); }
+    popText('ATTAQUE !', 540, 330, 200, '#ff3838', lw(/attaque/i, 'attack'), lt, -.05);
+  },
+  panic(lt, d, g) {
+    cityStreet(g);
+    for (let i = 0; i < 4; i++) { const x = ((g * 300 * (i % 2 ? 1 : -1) + i * 300) % 1400 + 1400) % 1400 - 150; human(x, 1960, .62, g + i, { pose: 'run', expr: 'shock', shirt: ['#00b894', '#e17055', '#6c5ce7', '#fdcb6e'][i], flip: i % 2 === 0 }); }
+    const po = lw(/pompiers/i, 'panic');
+    if (lt > po - .3) {
+      const k = clamp((lt - po + .3) / 1.2); const tx = lerp(1300, 760, k);
+      rr(tx - 280, 1300, 560, 280, 30, '#d63031'); rr(tx - 280, 1220, 220, 120, 20, '#d63031'); rr(tx - 260, 1240, 170, 80, 10, '#9fd8ff'); rr(tx - 40, 1270, 300, 30, 8, '#b2bec3');
+      ell(tx - 180, 1590, 60, 60, '#222'); ell(tx + 180, 1590, 60, 60, '#222');
+      rr(tx - 220, 1180, 50, 40, 8, Math.sin(g * 12) > 0 ? '#0984e3' : '#2d3436');
+    }
+    const tg = lw(/tongs/i, 'panic');
+    if (lt > tg) { human(360, 1960, .8, g, { cap: '#f9ca24', shirt: '#2d3436', pants: '#2d3436', expr: 'neutral' }); rr(270, 1930, 100, 26, 12, '#fd79a8', 4); rr(370, 1930, 100, 26, 12, '#fd79a8', 4); }
+    popText('PIEDS NUS', 540, 330, 170, '#fff', lw(/pieds/i, 'panic'), lt, -.05, po - .1);
+    popText('EN TONGS', 540, 330, 190, '#fd79a8', tg, lt, .05);
+  },
+  dryer(lt, d, g) {
+    laundryRoom();
+    const se = lw(/sèche/i, 'dryer'), ch = lw(/chaud/i, 'dryer');
+    washMachine(620, 1650, 1.1, g, { spin: lt > se, label: lt > ch ? '🔥🔥' : 'SEC', shake: lt > ch });
+    if (lt > ch) { ctx.save(); ctx.globalAlpha = .5; for (let i = 0; i < 4; i++) { const k = (g * 1.5 + i / 4) % 1; ell(620, 1350, 160 + k * 500, 160 + k * 500, null, 14, 0); } ctx.restore(); }
+    human(170, 1990, .9, g, { expr: 'angry', armR: 1.4 });
+    popText('ARME SECRÈTE', 540, 300, 150, '#ffd32a', lw(/secrète/i, 'dryer'), lt, -.04, se - .1);
+    popText('SÈCHE-LINGE', 540, 300, 170, '#fff', se, lt, .05, ch - .1);
+    popText('TRÈS CHAUD', 540, 300, 190, '#ff3838', ch, lt, -.05);
+  },
+  shrink(lt, d, g) {
+    const ha = lw(/hamsters/i, 'shrink');
+    if (lt < ha - .3) {
+      ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#596275'; ctx.fillRect(-400, 1300, W + 800, 1000);
+      const r = lw(/rétrécissent/i, 'shrink'); const k = lt > r ? 1 - .75 * ease((lt - r) / .8) : 1;
+      for (let i = 0; i < 5; i++) sock(160 + i * 190, 1700, .55 * k, g + i, { c1: ['#ff7675', '#74b9ff', '#55efc4', '#fdcb6e', '#a29bfe'][i], shock: lt > r });
+      popText('RÉTRÉCIES', 540, 330, 190, '#ff3838', r, lt, -.05);
+    } else {
+      // des hamsters avec des chaussettes
+      ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#d1a679'; ctx.fillRect(-400, 1400, W + 800, 900);
+      for (let i = 0; i < 3; i++) { const x = 220 + i * 320, y = 1700 + Math.sin(g * 4 + i) * 10; ctx.save(); ctx.translate(x, y); ell(0, -120, 150, 120, '#e1a95f'); ell(-90, -230, 34, 30, '#e1a95f'); ell(90, -230, 34, 30, '#e1a95f'); ell(0, -90, 90, 70, '#fff3e0', 0); ell(-50, -160, 12, 14, '#111', 0); ell(50, -160, 12, 14, '#111', 0); ell(0, -130, 12, 8, '#ff7675', 0);
+        for (const fx of [-70, 70]) sock(fx, 20, .12, g, { c1: ['#ff7675', '#74b9ff', '#55efc4'][i], noShadow: true }); ctx.restore(); }
+      popText('HAMSTERS', 540, 330, 200, '#ffd32a', 0, lt - ha, -.05);
+    }
+  },
+  president(lt, d, g) {
+    sky('#a5d8ff', '#e7f5ff'); ctx.fillStyle = '#95a5a6'; ctx.fillRect(-400, 1450, W + 800, 900);
+    rr(340, 1250, 400, 300, 10, '#0055a4'); txt('★', 540, 1400, 100, '#fff', 'serif');
+    sock(540, 1260, .8, g, { old: true, sash: true, talk: true, smug: true });
+    stink(530, 830, g, 5);
+    // gens au loin avec pince sur le nez
+    for (const [x, f] of [[110, 0], [970, 1]]) { human(x, 1990, .6, g + x, { shirt: '#636e72', expr: 'neutral', flip: !!f }); rr(x - 18, 1990 - .6 * 790 + 10, 36, 20, 6, '#f9ca24', 3); }
+    popText('PRÉSIDENTE', 540, 330, 180, '#0055a4', lw(/présidente/i, 'president'), lt, -.05, lw(/odeur/i, 'president') - .1);
+    popText('L\'ODEUR…', 540, 330, 190, '#6ab04c', lw(/odeur/i, 'president'), lt, .05);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    sock(400, 1950, 1.3, g, { c1: '#ff7675', c2: '#fff', smug: true });
+    ctx.save(); ctx.globalAlpha = .3; ctx.setLineDash([20, 16]); ctx.beginPath(); ctx.moveTo(760, 1950); ctx.lineTo(760, 1350); ctx.lineTo(1000, 1350); shape(null, 8, '#fff'); ctx.restore(); ctx.setLineDash([]);
+    txt('?', 840, 1650, 200, '#fff', 'Anton', 'center', 14);
+    const p = easeOutBack((lt - .1) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 330); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+};
+</script></body></html>
