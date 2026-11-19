@@ -1,0 +1,207 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size, tailX = 0, t0 = 0, lt = 1, until = 1e9) {
+  if (lt < t0 || lt > until) return; const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+  rr(-w / 2, -h / 2, w, h, 40, '#fff'); poly([[tailX - 24, h / 2 - 4], [tailX + 24, h / 2 - 4], [tailX - 4, h / 2 + 56]], '#fff'); line(tailX - 20, h / 2 - 2, tailX + 20, h / 2 - 2, '#fff', 10);
+  txt(s, 0, 4, size, OUT, 'Anton'); ctx.restore();
+}
+function snow(g, n = 50, dark) { for (let i = 0; i < n; i++) { const R = rnd(i + 7); const y = (g * (80 + R() * 80) + R() * H) % H; ell(R() * W + Math.sin(g + i) * 20, y, 5 + R() * 5, 5 + R() * 5, dark ? '#dfe6e9' : '#fff', 0); } }
+
+// ------------------------------------------------------------ LE PINGOUIN (personnage principal)
+// o: {flip, suitcase, shades, sweat, slide, party, rod, dance, talk, smug, blink, noShadow, noTux, undershirt}
+function penguin(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (o.slide) { ctx.rotate(-Math.PI / 2); }
+  if (!o.noShadow && !o.slide) shadow(0, 0, 130);
+  const dance = o.dance ? Math.sin(t * 10) : 0;
+  ctx.rotate(dance * .12);
+  // pieds
+  ell(-50, -8, 46, 18, '#f39c12'); ell(50, -8, 46, 18, '#f39c12');
+  const body = o.noTux ? '#2d3436' : '#1e272e';
+  // ailes
+  for (const sx of [-1, 1]) { ctx.save(); ctx.translate(sx * 120, -330); ctx.rotate(sx * (o.wave && sx > 0 ? -1.4 + Math.sin(t * 10) * .3 : .3 + dance * .5)); ell(sx * 20, 90, 34, 110, body); ctx.restore(); }
+  ell(0, -260, 150, 250, body);
+  ell(0, -220, 105, 190, '#fdfdfd', 0);
+  if (o.undershirt) { ell(0, -220, 105, 190, '#fdfdfd', 0); }
+  // noeud papillon
+  if (!o.noBow) { poly([[0, -390], [-40, -414], [-40, -366]], '#e74c3c', 4); poly([[0, -390], [40, -414], [40, -366]], '#e74c3c', 4); ell(0, -390, 10, 10, '#e74c3c', 3); }
+  // tête
+  const ey = -440;
+  ell(0, -440, 120, 100, body, 0);
+  ell(-40, ey + 6, 40, 34, '#fdfdfd', 0); ell(40, ey + 6, 40, 34, '#fdfdfd', 0);
+  if (o.blink) { line(-58, ey + 6, -24, ey + 6, OUT, 6); line(24, ey + 6, 58, ey + 6, OUT, 6); }
+  else { ell(-38, ey + 8, 14, 16, '#111', 0); ell(42, ey + 8, 14, 16, '#111', 0); ell(-33, ey + 3, 5, 5, '#fff', 0); ell(47, ey + 3, 5, 5, '#fff', 0);
+    if (o.smug) for (const sx of [-40, 40]) { ctx.save(); ctx.beginPath(); ctx.ellipse(sx, ey + 6, 41, 35, 0, Math.PI, 0); shape(body, 0); ctx.restore(); } }
+  if (o.shades) { rr(-86, ey - 16, 76, 44, 14, '#111', 4); rr(10, ey - 16, 76, 44, 14, '#111', 4); line(-10, ey, 10, ey, '#111', 6); }
+  const bo = o.talk && Math.sin(t * 16) > 0 ? 14 : 0;
+  poly([[-30, ey + 40], [30, ey + 40], [0, ey + 86 + bo]], '#f39c12', 4);
+  if (bo) poly([[-24, ey + 50], [24, ey + 50], [0, ey + 60]], '#7a2b2b', 0);
+  if (o.sweat) for (const sx of [-1, 1]) { const k = (t * 1.6 + (sx > 0 ? .5 : 0)) % 1; ell(sx * 100, ey + k * 120, 12, 18, '#74b9ff', 3); }
+  if (o.party) { poly([[-40, ey - 80], [0, ey - 210], [40, ey - 80]], ['#e84393', '#00b894', '#fdcb6e', '#0984e3'][Math.floor(Math.abs(o.party)) % 4], 4); ell(0, ey - 212, 14, 14, '#fff', 3); }
+  if (o.rod) { ctx.save(); ctx.translate(140, -300); ctx.rotate(-.6); rr(-6, -300, 12, 320, 4, '#8d6e63', 3); ctx.restore(); }
+  ctx.restore();
+  if (o.suitcase) { ctx.save(); ctx.translate(x + (o.flip ? -1 : 1) * 190 * s, y); ctx.scale(s, s); rr(-90, -180, 180, 180, 16, '#0984e3'); rr(-40, -210, 80, 36, 10, null); line(-90, -100, 90, -100, OUT, 5); txt('❄', 0, -50, 60, '#fff', 'serif'); ctx.restore(); }
+}
+function polarBear(x, y, s, t) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 200);
+  const B = '#f5f6fa';
+  rr(-140, -160, 80, 160, 40, B); rr(60, -160, 80, 160, 40, B);
+  ell(0, -360, 200, 240, B); ctx.save(); ctx.translate(0, -640); ell(-110, -110, 50, 50, B); ell(110, -110, 50, 50, B); ell(0, 0, 160, 140, B); ell(0, 60, 70, 50, '#dfe6e9'); ell(0, 36, 24, 16, '#111', 0); ell(-60, -20, 14, 16, '#111', 0); ell(60, -20, 14, 16, '#111', 0); ctx.beginPath(); ctx.arc(0, 50, 34, Math.PI * .2, Math.PI * .8); shape(null, 6); ctx.restore();
+  ctx.restore();
+}
+// ------------------------------------------------------------ décors
+function apartment(frozen = 0) {
+  ctx.fillStyle = frozen ? '#c7ecee' : '#ffeaa7'; ctx.fillRect(-400, -400, W + 800, 1800);
+  rr(640, 260, 320, 260, 10, '#6d4c41'); rr(660, 280, 280, 220, 4, frozen ? '#dff9fb' : '#74b9ff', 0);
+  ctx.fillStyle = frozen ? '#dff9fb' : '#b5835a'; ctx.fillRect(-400, 1400, W + 800, 900);
+  if (frozen) { ctx.globalAlpha = .6; for (let i = 0; i < 8; i++) line(-100 + i * 180, 1420, 100 + i * 160, 1900, '#fff', 6); ctx.globalAlpha = 1;
+    for (let x = 0; x < W; x += 70) { poly([[x, 0], [x + 30, 0], [x + 15, 60 + (x * 7) % 60]], '#dff9fb', 3); } }
+}
+function door(x, y, open) { rr(x - 190, y - 980, 380, 980, 10, '#6d4c41'); if (open) { rr(x - 170, y - 960, 340, 960, 4, '#2d3436', 0); } else ell(x + 130, y - 480, 18, 18, '#f1c40f', 4); }
+function plant(x, y, frozen) { rr(x - 50, y - 100, 100, 100, 10, '#e17055'); for (let i = -2; i <= 2; i++) { ctx.save(); ctx.translate(x, y - 100); ctx.rotate(i * .35); ell(0, -80, 24, 70, frozen ? '#c7ecee' : '#6ab04c', frozen ? 5 : 4); ctx.restore(); } if (frozen) { ctx.save(); ctx.globalAlpha = .4; rr(x - 120, y - 300, 240, 320, 20, '#dff9fb', 6); ctx.restore(); } }
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    apartment();
+    const so = lw(/sonné/i, 'hook');
+    door(700, 1420, lt > so + .3);
+    if (lt > so + .3) penguin(700, 1430, .85, g, { suitcase: true, smug: true, talk: lt > lw(/dit/i, 'hook') });
+    human(200, 2150, .95, g, { expr: lt > so + .4 ? 'shock' : 'neutral' });
+    popText('DING DONG', 540, 300, 160, '#fff', so, lt, -.05, lw(/coloc/i, 'hook') - .1);
+    popText('TON COLOC ?!', 540, 300, 170, '#ffd32a', lw(/coloc/i, 'hook'), lt, .05);
+  },
+  enter(lt, d, g) {
+    const v = lw(/vingt/i, 'enter');
+    apartment(lt > v ? .5 : 0);
+    // clim
+    rr(160, 300, 380, 140, 20, '#fdfdfd'); line(200, 410, 500, 410, '#b2bec3', 6); rr(380, 330, 130, 60, 10, '#2d3436'); txt(lt > v ? '-20°' : '22°', 445, 362, 44, lt > v ? '#74b9ff' : '#55efc4', 'Anton');
+    if (lt > v) { ctx.save(); ctx.globalAlpha = .7; for (let i = 0; i < 6; i++) { const k = (g * 1.5 + i / 6) % 1; line(200 + i * 55, 450 + k * 300, 190 + i * 55, 500 + k * 300, '#dff9fb', 8); } ctx.restore(); snow(g, 30); }
+    penguin(720, 1950, .95, g, { suitcase: lt > lw(/pose/i, 'enter') ? false : true, smug: true, wave: lt > v - .5 });
+    if (lt > lw(/pose/i, 'enter')) { rr(920, 1770, 180, 180, 16, '#0984e3'); }
+    human(220, 2160, .95, g, { expr: lt > v ? 'shock' : 'neutral' });
+    popText('-20°', 540, 600, 220, '#74b9ff', v, lt, -.06);
+  },
+  ice(lt, d, g) {
+    apartment(1); snow(g, 20);
+    const gl = lw(/glaçons/i, 'ice'), pa = lw(/patin/i, 'ice');
+    plant(180, 1500, lt > gl); plant(900, 1500, lt > gl);
+    penguin(540 + Math.sin(g * 1.5) * 260, 1920, .7, g, { flip: Math.cos(g * 1.5) < 0, smug: true });
+    if (lt > pa) { const k = (lt - pa) / 2.5; human(lerp(-150, 1250, clamp(k)), 2120, .75, g, { shirt: '#fd79a8', pants: '#fd79a8', longHair: true, hair: '#8e6e53', expr: 'shock', armL: -1.4, armR: 1.4 }); }
+    popText('PATINOIRE', 540, 300, 190, '#0984e3', lw(/patinoire/i, 'ice'), lt, -.05, gl - .1);
+    popText('GLAÇONS', 540, 300, 200, '#74b9ff', gl, lt, .05, pa - .1);
+    popText('EN PYJAMA', 540, 300, 170, '#fd79a8', lw(/pyjama/i, 'ice'), lt, -.05);
+  },
+  fishing(lt, d, g) {
+    apartment(1);
+    // baignoire gelée avec un trou
+    rr(160, 1500, 760, 260, 80, '#fdfdfd'); ell(540, 1520, 340, 50, '#dff9fb', 5); ell(600, 1520, 70, 18, '#0984e3', 3);
+    penguin(300, 1500, .8, g, { rod: true, smug: true });
+    ctx.save(); ctx.setLineDash([10, 10]); line(470, 1050, 600, 1520, '#2d3436', 3); ctx.restore();
+    const at = lw(/attrape/i, 'fishing');
+    if (lt > at) { const k = easeOutBack((lt - at) / .5); ctx.save(); ctx.translate(600, lerp(1520, 1000, k)); ctx.rotate(Math.sin(g * 8) * .2); ell(0, 0, 70, 52, '#f9ca24'); ell(46, -50, 40, 36, '#f9ca24'); poly([[76, -50], [116, -40], [76, -30]], '#e67e22', 4); ell(54, -58, 7, 8, '#111', 0); ctx.restore(); }
+    popText('LA PÊCHE', 540, 300, 190, '#fff', lw(/pêche/i, 'fishing'), lt, -.05, at - .1);
+    popText('TON CANARD ?!', 540, 300, 170, '#f9ca24', lw(/plastique/i, 'fishing') - .3, lt, .05);
+  },
+  freezer(lt, d, g) {
+    apartment(1);
+    rr(160, 300, 520, 1300, 30, '#f5f6fa'); rr(190, 700, 460, 860, 10, '#dff9fb', 0); line(160, 680, 680, 680, '#b2bec3', 8);
+    const n = Math.max(0, 6 - Math.floor(clamp((lt - lw(/poisson/i, 'freezer')) / 2.5) * 6));
+    for (let i = 0; i < n; i++) rr(220 + (i % 2) * 210, 760 + Math.floor(i / 2) * 200, 190, 140, 10, '#f9ca24', 4);
+    penguin(820, 1960, .95, g, { talk: true, smug: true });
+    // bâtonnet dans le bec
+    if (lt > lw(/poisson/i, 'freezer')) { ctx.save(); ctx.translate(820, 1960 - 380 * .95); ctx.rotate(.4 + Math.sin(g * 10) * .1); rr(-80, -14, 160, 28, 10, '#e1a95f', 4); ctx.restore(); }
+    const y19 = lw(/2019/i, 'freezer');
+    if (lt > y19) { const k = easeOutBack((lt - y19) / .3); ctx.save(); ctx.translate(420, 1250); ctx.scale(k, k); ctx.rotate(-.1); rr(-200, -100, 400, 200, 14, '#dfe6e9', 6); txt('2019', 0, -20, 100, '#b2bec3', 'Anton'); ctx.globalAlpha = .6; for (let i = 0; i < 4; i++) line(-180 + i * 110, 90, -150 + i * 110, 60, '#fff', 6); ctx.restore(); }
+    popText('MIAM', 540, 300, 190, '#fff', lw(/mange/i, 'freezer'), lt, -.05, y19 - .1);
+    popText('MÊME 2019', 540, 300, 180, '#ff3838', y19, lt, .05);
+  },
+  stairs(lt, d, g) {
+    ctx.fillStyle = '#f3d9b1'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 8; i++) rr(-60 + i * 140, 700 + i * 150, 1400, 150, 0, i % 2 ? '#a1887f' : '#8d6e63', 4);
+    const gl = lw(/glisse/i, 'stairs'), pe = lw(/percute/i, 'stairs'), ev = lw(/envole/i, 'stairs');
+    const k = clamp((lt - gl) / (pe - gl + .2));
+    ctx.save(); ctx.translate(lerp(150, 700, k), lerp(800, 1800, k) - 140); ctx.rotate(.6); penguin(0, 0, .55, g, { slide: true, shades: true, noShadow: true }); ctx.restore();
+    // la gardienne
+    if (lt < ev) human(820, 1960, .75, g, { hair: '#dfe6e9', bun: true, glasses: true, shirt: '#e17055', skirt: '#2d3436', expr: lt > pe ? 'shock' : 'neutral' });
+    else { const k2 = clamp((lt - ev) / 1.2); ctx.save(); ctx.translate(lerp(820, 1300, k2), lerp(1960, 500, k2) - Math.sin(k2 * Math.PI) * 300); ctx.rotate(k2 * 8); human(0, 0, .6, g, { hair: '#dfe6e9', bun: true, glasses: true, shirt: '#e17055', skirt: '#2d3436', expr: 'shock' }); ctx.restore(); }
+    popText('SUR LE VENTRE', 540, 300, 150, '#fff', lw(/ventre/i, 'stairs'), lt, -.05, pe - .1);
+    popText('BOUM', 540, 300, 220, '#ff3838', pe, lt, .06, ev - .1);
+    popText('ELLE S\'ENVOLE', 540, 300, 150, '#ffd32a', ev, lt, -.05);
+  },
+  party(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 4; i++) { ctx.save(); ctx.globalAlpha = .22; ctx.translate(540, -100); ctx.rotate(Math.sin(g * 2 + i * 1.7) * .6); poly([[0, 0], [-170, 2200], [170, 2200]], ['#ff4757', '#2ed573', '#1e90ff', '#ffa502'][i], 0); ctx.restore(); }
+    ell(540, -40, 80, 80, '#ccc'); ctx.fillStyle = '#2c2c54'; ctx.fillRect(-400, 1450, W + 800, 900);
+    const n = lt > lw(/pingouins/i, 'party') ? 18 : 3; const R = rnd(5);
+    const da = lw(/dansent/i, 'party');
+    for (let row = 0; row < 3; row++) for (let i = 0; i < 6; i++) { const kk = row * 6 + i; if (kk >= n) continue; penguin(100 + i * 176 + (row % 2) * 80, 1560 + row * 160, .32 + row * .07, lt > da ? g : g + R() * 6, { dance: true, party: kk + 1, smug: true }); }
+    popText('300 PINGOUINS', 540, 330, 150, '#fff', lw(/pingouins/i, 'party'), lt, -.05, da - .1);
+    popText('TOUS PAREIL', 540, 330, 180, '#ffd32a', da, lt, .05);
+  },
+  heater(lt, d, g) {
+    apartment();
+    rr(160, 1100, 500, 360, 30, '#dfe6e9'); for (let i = 0; i < 6; i++) rr(190 + i * 76, 1130, 50, 300, 20, '#b2bec3', 3);
+    const ch = lw(/chauffage/i, 'heater');
+    if (lt > ch) { ctx.save(); ctx.globalAlpha = .6; for (let i = 0; i < 5; i++) { ctx.beginPath(); const xx = 220 + i * 90; ctx.moveTo(xx, 1090); for (let j = 0; j < 6; j++) ctx.quadraticCurveTo(xx + (j % 2 ? 30 : -30), 1060 - j * 50 + Math.sin(g * 6 + i) * 10, xx, 1030 - j * 50); shape(null, 10, '#ff7675'); } ctx.restore(); }
+    // thermomètre
+    rr(820, 300, 80, 600, 40, '#fff', 6); const lvl = lt > lw(/quarante/i, 'heater') ? 1 : lt > ch ? .5 : .2; rr(840, 860 - 520 * lvl, 40, 520 * lvl + 20, 20, '#ff3838', 0); ell(860, 900, 60, 60, '#ff3838');
+    human(400, 2280, .95, g, { expr: 'angry', armR: 1.2 });
+    popText('CHAUFFAGE À FOND', 540, 200, 120, '#ff3838', ch, lt, -.04, lw(/quarante/i, 'heater') - .1);
+    popText('40°', 540, 200, 220, '#ff3838', lw(/quarante/i, 'heater'), lt, .06);
+  },
+  tuxedo(lt, d, g) {
+    apartment();
+    ctx.save(); ctx.globalAlpha = .2; ctx.fillStyle = '#ff7675'; ctx.fillRect(0, 0, W, H); ctx.restore();
+    const sm = lw(/smokings/i, 'tuxedo', 0), au = lw(/autres/i, 'tuxedo');
+    for (let i = 0; i < 3; i++) { const x = 200 + i * 340; penguin(x, 1960, .75, g + i, { sweat: true, smug: lt > au, noBow: false }); }
+    // smokings enlevés qui volent
+    if (lt > sm) for (let i = 0; i < 3; i++) { const k = clamp((lt - sm - i * .15) / 1.2); if (k <= 0) continue; ctx.save(); ctx.translate(200 + i * 340 + k * 200, 1500 - Math.sin(k * Math.PI) * 600 + k * 500); ctx.rotate(k * 6); ell(0, 0, 90, 140, '#1e272e', 4); ell(0, 20, 50, 100, '#fdfdfd', 0); ctx.restore(); }
+    popText('ILS TRANSPIRENT', 540, 300, 140, '#fff', lw(/transpirent/i, 'tuxedo'), lt, -.05, sm - .1);
+    popText('…D\'AUTRES SMOKINGS', 540, 300, 110, '#ffd32a', au, lt, .04);
+  },
+  banquise(lt, d, g) {
+    sky('#a5d8ff', '#e7f5ff'); snow(g, 40, true);
+    ctx.fillStyle = '#0984e3'; ctx.fillRect(-400, 1300, W + 800, 900);
+    poly([[60, 1350], [1020, 1350], [960, 1650], [120, 1650]], '#fdfdfd');
+    const ph = lw(/phoque/i, 'banquise');
+    human(300, 1650, .55, g, { expr: lt > ph ? 'sad' : 'shock', shirt: '#e17055', cap: '#e17055' });
+    for (let i = 0; i < 4; i++) penguin(520 + i * 120, 1620, .3, g + i, { smug: true });
+    if (lt > ph - .3) { ctx.save(); ctx.translate(820, 1560); ell(0, 0, 160, 70, '#636e72'); ell(130, -50, 60, 50, '#636e72'); ell(150, -60, 8, 8, '#111', 0); line(170, -40, 220, -50, '#2d3436', 3); line(170, -34, 220, -30, '#2d3436', 3); ctx.restore(); for (let i = 0; i < 3; i++) { const z = (g * .8 + i * .33) % 1; ctx.globalAlpha = 1 - z; txt('Z', 960 + z * 60, 1450 - z * 180, 50 + z * 30, '#2d3436', 'Anton'); ctx.globalAlpha = 1; } }
+    popText('LA BANQUISE', 540, 300, 180, '#0984e3', lw(/banquise/i, 'banquise'), lt, -.05, ph - .1);
+    popText('UN PHOQUE QUI RONFLE', 540, 300, 110, '#636e72', ph, lt, .04);
+  },
+  bear(lt, d, g) {
+    apartment();
+    polarBear(540, 2180, 1.0, g);
+    const sg = lw(/surgelés/i, 'bear') - .3;
+    if (lt > sg) { const k = easeOutBack((lt - sg) / .4); ctx.save(); ctx.translate(860, 1500); ctx.scale(k, k); ctx.rotate(.1); rr(-130, -90, 260, 180, 14, '#dfe6e9', 6); txt('LOYER', 0, -40, 50, '#2d3436', 'Anton'); for (let i = 0; i < 3; i++) { ell(-70 + i * 70, 30, 30, 14, '#74b9ff', 3); } ctx.restore(); }
+    popText('OURS POLAIRE', 540, 300, 170, '#fff', lw(/ours/i, 'bear'), lt, -.05);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    door(540, 1920, false);
+    // ombre d'un pingouin sous la porte + œil dans le judas
+    ell(540, 1150, 26, 26, '#2d3436', 5); ell(540, 1150, 12, 12, '#111', 0);
+    const so = lw(/sonne/i, 'outro') + .3;
+    if (lt > so) popText('DING DONG', 540, 700, 170, '#ffd32a', so, lt, -.05);
+    const p = easeOutBack((lt - .1) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 330); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+};
+</script></body></html>

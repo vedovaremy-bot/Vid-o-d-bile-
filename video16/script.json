@@ -1,0 +1,270 @@
+{
+ "title": "Ton nouveau coloc est un pingouin",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Un *pingouin* a sonné chez toi. Il a une valise. Et il dit qu'il est ton nouveau *coloc*."
+  },
+  {
+   "scene": "enter",
+   "text": "Tu n'as jamais posté d'annonce. Il s'en fiche. Il entre, il pose sa valise... et il met la clim à *moins vingt*."
+  },
+  {
+   "scene": "ice",
+   "text": "Le lendemain, ton appartement est une *patinoire*. Tes plantes sont devenues des *glaçons*. Ta voisine fait du *patin* dans le couloir. En pyjama."
+  },
+  {
+   "scene": "fishing",
+   "text": "Il pêche dans ta *baignoire*. Il a fait un trou dans la glace. Et il attrape... ton canard en *plastique*."
+  },
+  {
+   "scene": "freezer",
+   "text": "Il mange tous tes bâtonnets de *poisson*. Même ceux de *2019*, tout au fond du congélateur."
+  },
+  {
+   "scene": "stairs",
+   "text": "Pour descendre l'escalier, il glisse sur le *ventre*. Il percute la *gardienne*. Elle s'envole."
+  },
+  {
+   "scene": "party",
+   "text": "Le week-end, il invite des potes. Trois cents *pingouins*. Ils font une soirée dans ton salon. Et ils dansent tous *pareil*."
+  },
+  {
+   "scene": "heater",
+   "text": "Tu craques. Tu allumes le *chauffage* à fond. Le thermomètre affiche *quarante* degrés."
+  },
+  {
+   "scene": "tuxedo",
+   "text": "Les pingouins transpirent. Ils enlèvent leurs *smokings*. Et en dessous... ils ont *d'autres* smokings."
+  },
+  {
+   "scene": "banquise",
+   "text": "Finalement, ils partent. Mais ils t'emmènent avec eux. Tu vis maintenant sur la *banquise*. Ton nouveau voisin, c'est un *phoque*. Il ronfle toute la nuit."
+  },
+  {
+   "scene": "bear",
+   "text": "Et ton appartement ? Il est loué à un *ours polaire*. Il paye le loyer... en *poissons surgelés*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et ne réponds *jamais* quand on sonne."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "sonné",
+   "type": "ding",
+   "gain": 0.9
+  },
+  {
+   "word": "valise",
+   "in": "hook",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "entre",
+   "type": "footsteps",
+   "dur": 1.0,
+   "gain": 0.5
+  },
+  {
+   "word": "pose",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "vingt",
+   "type": "wind",
+   "dur": 4.0,
+   "gain": 0.7
+  },
+  {
+   "word": "vingt",
+   "type": "pop",
+   "offset": -0.4,
+   "gain": 0.6
+  },
+  {
+   "word": "patinoire",
+   "type": "crack",
+   "gain": 0.9
+  },
+  {
+   "word": "patinoire",
+   "type": "whoosh",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "glaçons",
+   "type": "glass",
+   "gain": 0.6
+  },
+  {
+   "word": "trou",
+   "type": "crack",
+   "gain": 0.8
+  },
+  {
+   "word": "attrape",
+   "type": "splash",
+   "gain": 0.8
+  },
+  {
+   "word": "plastique",
+   "type": "boing",
+   "offset": 0.2,
+   "gain": 0.7
+  },
+  {
+   "word": "poisson",
+   "in": "freezer",
+   "type": "crunch",
+   "gain": 0.8
+  },
+  {
+   "word": "2019",
+   "type": "door_slam",
+   "offset": -0.6,
+   "gain": 0.5
+  },
+  {
+   "word": "congélateur",
+   "type": "gulp",
+   "offset": 0.3,
+   "gain": 0.9
+  },
+  {
+   "word": "glisse",
+   "type": "whoosh",
+   "gain": 0.9
+  },
+  {
+   "word": "ventre",
+   "type": "fall_whistle",
+   "dur": 1.0,
+   "gain": 0.5
+  },
+  {
+   "word": "percute",
+   "type": "punch",
+   "gain": 0.9
+  },
+  {
+   "word": "envole",
+   "type": "jump",
+   "gain": 0.8
+  },
+  {
+   "word": "envole",
+   "type": "land",
+   "offset": 0.7,
+   "gain": 0.7
+  },
+  {
+   "word": "potes",
+   "type": "ding",
+   "gain": 0.6,
+   "repeat": 3,
+   "gap": 0.2
+  },
+  {
+   "word": "pingouins",
+   "in": "party",
+   "type": "crowd",
+   "dur": 4.0,
+   "gain": 0.6
+  },
+  {
+   "word": "soirée",
+   "type": "drumroll",
+   "dur": 0.8,
+   "gain": 0.6
+  },
+  {
+   "word": "dansent",
+   "type": "footsteps",
+   "dur": 2.5,
+   "gain": 0.8
+  },
+  {
+   "word": "craques",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "chauffage",
+   "type": "washer",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "transpirent",
+   "type": "bubbles",
+   "dur": 1.5,
+   "gain": 0.4
+  },
+  {
+   "word": "smokings",
+   "n": 0,
+   "type": "zip",
+   "gain": 0.8,
+   "repeat": 3,
+   "gap": 0.15
+  },
+  {
+   "word": "autres",
+   "type": "sad_trombone",
+   "offset": 0.6,
+   "gain": 0.6
+  },
+  {
+   "word": "partent",
+   "type": "footsteps",
+   "dur": 1.8,
+   "gain": 0.6
+  },
+  {
+   "word": "banquise",
+   "type": "wind",
+   "dur": 3.5,
+   "gain": 0.7
+  },
+  {
+   "word": "ours",
+   "type": "thud",
+   "gain": 0.8
+  },
+  {
+   "word": "surgelés",
+   "type": "cash",
+   "gain": 0.7
+  },
+  {
+   "word": "sonne",
+   "in": "outro",
+   "type": "ding",
+   "offset": 0.3,
+   "gain": 0.9
+  },
+  {
+   "word": "patin",
+   "type": "whoosh",
+   "gain": 0.6,
+   "repeat": 2,
+   "gap": 0.4
+  },
+  {
+   "word": "quarante",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "phoque",
+   "type": "snore",
+   "dur": 2.5,
+   "gain": 0.7
+  }
+ ]
+}

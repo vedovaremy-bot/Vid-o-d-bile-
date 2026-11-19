@@ -67,3 +67,6 @@ Fichier final : `video14_armee_chaussettes.mp4` — voix ElevenLabs, sans musiqu
 ## Vidéo 15 — « Un chevalier est sorti du micro-ondes » (69 s)
 Fichier final : `video15_chevalier_micro_ondes.mp4` — voix ElevenLabs, sans musique, ~40 bruitages,
 like réclamé par Sire Gontran juste avant la chute (~37-46 s).
+
+## Vidéo 16 — « Ton nouveau coloc est un pingouin » (72 s)
+Fichier final : `video16_pingouin_coloc.mp4` — voix ElevenLabs, sans musique, ~37 bruitages, pas de demande de like.
