@@ -70,3 +70,7 @@ like réclamé par Sire Gontran juste avant la chute (~37-46 s).
 
 ## Vidéo 16 — « Ton nouveau coloc est un pingouin » (72 s)
 Fichier final : `video16_pingouin_coloc.mp4` — voix ElevenLabs, sans musique, ~37 bruitages, pas de demande de like.
+
+## Vidéo 17 — « Ta brosse à dents a démissionné » (70 s)
+Fichier final : `video17_brosse_a_dents.mp4` — voix ElevenLabs, sans musique, ~35 bruitages,
+like réclamé par la brosse à dents dès le début (~3-9 s, « c'est mon indemnité de départ »).

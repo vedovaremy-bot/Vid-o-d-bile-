@@ -1,0 +1,240 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size, tailX = 0, t0 = 0, lt = 1, until = 1e9) {
+  if (lt < t0 || lt > until) return; const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+  rr(-w / 2, -h / 2, w, h, 40, '#fff'); poly([[tailX - 24, h / 2 - 4], [tailX + 24, h / 2 - 4], [tailX - 4, h / 2 + 56]], '#fff'); line(tailX - 20, h / 2 - 2, tailX + 20, h / 2 - 2, '#fff', 10);
+  txt(s, 0, 4, size, OUT, 'Anton'); ctx.restore();
+}
+function heart(x, y, r, fill, lw2 = 8) {
+  ctx.beginPath(); ctx.moveTo(x, y + r * .9);
+  ctx.bezierCurveTo(x - r * 1.6, y - r * .1, x - r * .9, y - r * 1.3, x, y - r * .45);
+  ctx.bezierCurveTo(x + r * .9, y - r * 1.3, x + r * 1.6, y - r * .1, x, y + r * .9); shape(fill, lw2);
+}
+function hearts(g, x, y, n = 5) { for (let i = 0; i < n; i++) { const k = (g * .7 + i / n) % 1; ctx.globalAlpha = 1 - k; txt('♥', x + Math.sin(i * 2 + g * 2) * 80, y - k * 400, 60 + (i % 3) * 20, '#ff4757', 'serif', 'center', 6); } ctx.globalAlpha = 1; }
+function stink(x, y, g, n = 4, col = '#6ab04c') { ctx.save(); ctx.globalAlpha = .8; for (let i = 0; i < n; i++) { ctx.beginPath(); const xx = x - (n - 1) * 30 + i * 60; ctx.moveTo(xx, y); for (let j = 0; j < 6; j++) ctx.quadraticCurveTo(xx + (j % 2 ? 34 : -34), y - 30 - j * 50 + Math.sin(g * 4 + i) * 10, xx, y - 60 - j * 50); shape(null, 10, col); } ctx.restore(); }
+
+// ------------------------------------------------------------ LA BROSSE À DENTS (personnage principal)
+// o: {talk, angry, smug, shades, suitcase, flip, run, blink, arms, noShadow, happy}
+function brush(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (!o.noShadow) shadow(0, 0, 100);
+  const a = o.run ? Math.sin(t * 20) * .6 : 0;
+  for (const [lx, sg] of [[-30, 1], [30, -1]]) { ctx.save(); ctx.translate(lx, -60); ctx.rotate(a * sg); line(0, 0, 0, 56, OUT, 12); rr(-8, 48, 42, 18, 9, '#fff', 4); ctx.restore(); }
+  const bob = o.run ? -Math.abs(Math.sin(t * 20)) * 14 : Math.sin(t * 4) * 4;
+  ctx.translate(0, bob);
+  const [al, ar] = o.arms || [.6, -.6];
+  for (const [side, ang] of [[-1, al], [1, ar]]) { ctx.save(); ctx.translate(side * 70, -330); ctx.rotate(ang * side); line(0, 0, side * 90, 0, OUT, 12); ell(side * 96, 0, 16, 16, '#fff', 4); ctx.restore(); }
+  // manche
+  rr(-70, -620, 140, 560, 70, '#00cec9', 7);
+  ctx.globalAlpha = .3; rr(-45, -580, 26, 420, 13, '#fff', 0); ctx.globalAlpha = 1;
+  rr(-60, -360, 120, 120, 40, '#81ecec', 0);
+  // tête + poils
+  rr(-80, -820, 160, 210, 40, '#00cec9', 7);
+  for (let i = 0; i < 6; i++) { rr(-74 + i * 25, -940, 20, 130, 8, i % 2 ? '#74b9ff' : '#fff', 4); }
+  // visage
+  const ey = -500;
+  if (o.blink) { line(-50, ey, -16, ey, OUT, 6); line(16, ey, 50, ey, OUT, 6); }
+  else { ell(-30, ey, 22, 26, '#fff', 5); ell(30, ey, 22, 26, '#fff', 5); ell(-28, ey + 4, 9, 11, '#111', 0); ell(33, ey + 4, 9, 11, '#111', 0);
+    if (o.smug) for (const sx of [-30, 30]) { ctx.save(); ctx.beginPath(); ctx.ellipse(sx, ey, 23, 27, 0, Math.PI, 0); shape('#00cec9', 5); ctx.restore(); } }
+  if (o.angry) { line(-58, ey - 44, -12, ey - 28, OUT, 8); line(58, ey - 44, 12, ey - 28, OUT, 8); }
+  if (o.shades) { rr(-64, ey - 22, 58, 40, 12, '#111', 4); rr(6, ey - 22, 58, 40, 12, '#111', 4); line(-6, ey - 6, 6, ey - 6, '#111', 6); }
+  const my = ey + 70;
+  if (o.talk && Math.sin(t * 16) > 0) ell(0, my, 20, 15, '#7a2b2b', 5);
+  else if (o.angry) { ctx.beginPath(); ctx.arc(0, my + 18, 22, Math.PI * 1.15, Math.PI * 1.85); shape(null, 6); }
+  else { ctx.beginPath(); ctx.arc(0, my - 14, 26, Math.PI * .15, Math.PI * .85); shape(null, 6); }
+  ctx.restore();
+  if (o.suitcase) { ctx.save(); ctx.translate(x + 150 * s, y); ctx.scale(s, s); rr(-80, -170, 160, 170, 14, '#e17055'); rr(-36, -200, 72, 34, 10, null); line(-80, -90, 80, -90, OUT, 5); ctx.restore(); }
+}
+function floss(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 80);
+  line(-25, -50, -25, 0, OUT, 10); line(25, -50, 25, 0, OUT, 10);
+  ctx.translate(0, Math.sin(t * 4 + 1) * 4);
+  rr(-90, -260, 180, 210, 50, '#fdfdfd', 7); ctx.beginPath(); ctx.arc(0, -260, 50, Math.PI, 0); shape(null, 8, '#55efc4');
+  ell(-30, -170, 16, 18, '#fff', 4); ell(30, -170, 16, 18, '#fff', 4); ell(-28, -167, 7, 8, '#111', 0); ell(32, -167, 7, 8, '#111', 0);
+  line(-50, -190, -20, -196, OUT, 4); line(20, -196, 50, -190, OUT, 4);
+  ctx.beginPath(); ctx.arc(0, -125, 18, Math.PI * .15, Math.PI * .85); shape(null, 5);
+  ctx.restore();
+}
+function paste(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 100);
+  ctx.translate(0, Math.sin(t * 3) * 3);
+  const sq = o.squeeze ? 1 - Math.abs(Math.sin(t * 8)) * .15 : 1;
+  ctx.save(); ctx.scale(sq, 1);
+  ctx.beginPath(); ctx.moveTo(-110, -40); ctx.lineTo(-90, -560); ctx.lineTo(90, -560); ctx.lineTo(110, -40); ctx.closePath(); shape('#fdfdfd');
+  rr(-90, -470, 180, 120, 10, '#e74c3c', 0); txt('DENTI', 0, -410, 44, '#fff', 'Anton');
+  ctx.restore();
+  rr(-50, -40, 100, 60, 10, '#0984e3');
+  const ey = -290;
+  ell(-36, ey, 20, 24, '#fff', 5); ell(36, ey, 20, 24, '#fff', 5); ell(-34, ey + 4, 8, 10, '#111', 0); ell(38, ey + 4, 8, 10, '#111', 0);
+  line(-62, ey - 40, -14, ey - 26, OUT, 8); line(62, ey - 40, 14, ey - 26, OUT, 8);
+  ctx.beginPath(); ctx.arc(0, ey + 86, 26, Math.PI * 1.15, Math.PI * 1.85); shape(null, 6);
+  if (o.sign) { line(150, -200, 150, -600, '#8d6e63', 14); rr(40, -760, 300, 180, 10, '#fff', 6); txt('EN GRÈVE', 190, -670, 56, '#e74c3c', 'Anton'); }
+  ctx.restore();
+}
+function croco(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 300);
+  ell(0, -120, 280, 120, '#27ae60');
+  for (const lx of [-180, -60, 80, 200]) rr(lx - 25, -60, 50, 70, 20, '#27ae60', 5);
+  ctx.beginPath(); ctx.moveTo(-260, -120); ctx.quadraticCurveTo(-420, -80, -520, -60); ctx.lineTo(-460, -140); shape('#27ae60');
+  // tête + mâchoires
+  const open = o.open ? .35 + Math.abs(Math.sin(t * 3)) * .1 : .05;
+  ctx.save(); ctx.translate(220, -170);
+  ctx.save(); ctx.rotate(-open); rr(0, -60, 340, 90, 40, '#2ecc71'); for (let i = 0; i < 7; i++) poly([[40 + i * 42, 30], [60 + i * 42, 30], [50 + i * 42, 58]], '#fff', 3); ell(60, -60, 30, 30, '#2ecc71'); ell(60, -66, 16, 16, '#f9ca24', 4); ell(64, -66, 6, 12, '#111', 0); ctx.restore();
+  ctx.save(); ctx.rotate(open * .6); rr(0, 10, 320, 70, 30, '#2ecc71'); for (let i = 0; i < 7; i++) poly([[40 + i * 40, 10], [60 + i * 40, 10], [50 + i * 40, -16]], '#fff', 3); ctx.restore();
+  ctx.restore(); ctx.restore();
+}
+function bathroom() {
+  ctx.fillStyle = '#c7ecee'; ctx.fillRect(-400, -400, W + 800, 1800);
+  ctx.globalAlpha = .5; for (let x = -400; x < W + 400; x += 110) line(x, -400, x, 1400, '#fff', 4); for (let y = -400; y < 1400; y += 110) line(-400, y, W + 400, y, '#fff', 4); ctx.globalAlpha = 1;
+  ctx.fillStyle = '#535c68'; ctx.fillRect(-400, 1400, W + 800, 900);
+}
+function mirror(x, y, w, h) { rr(x, y, w, h, 20, '#dff9fb', 10); ctx.globalAlpha = .5; line(x + 40, y + 60, x + 120, y + 20, '#fff', 10); ctx.globalAlpha = 1; }
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    bathroom(); mirror(560, 200, 420, 520);
+    // le verre à dents vide + lettre de démission
+    rr(140, 1180, 140, 200, 20, '#81ecec', 6);
+    brush(540, 1940, 1.0, g, { angry: true, arms: [.4, -1.6] });
+    const de = lw(/démissionné/i, 'hook');
+    if (lt > de - .3) { const k = easeOutBack((lt - de + .3) / .35); ctx.save(); ctx.translate(800, 900); ctx.scale(k, k); ctx.rotate(.1); rr(-150, -190, 300, 380, 10, '#fffdf3', 6); txt('DÉMISSION', 0, -130, 52, '#e74c3c', 'Anton'); ctx.globalAlpha = .5; for (let i = 0; i < 5; i++) line(-110, -60 + i * 45, 110 - (i % 2) * 40, -60 + i * 45, '#636e72', 8); ctx.restore(); }
+    popText('DÉMISSION', 540, 300, 190, '#ff3838', de, lt, -.06);
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#81ecec'); gr.addColorStop(1, '#0652dd'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const tk = lw(/dit/i, 'like');
+    brush(540, 2300, 1.9, g, { talk: lt > tk && lt < d - .2, smug: lt > lw(/indemnité/i, 'like'), arms: lt > tk ? [.4, 2.2] : [.4, -.4], noShadow: true, suitcase: false });
+    const lk = lw(/like/i, 'like');
+    if (lt > lk - .3) {
+      const k = easeOutBack((lt - lk + .3) / .35), beat = 1 + Math.max(0, Math.sin(g * 9)) * .08;
+      ctx.save(); ctx.translate(540, 300); ctx.scale(k * beat * .85, k * beat * .85); ell(0, 0, 200, 200, '#fff', 10); heart(0, 10, 110, '#ff3838', 10); ctx.restore();
+      const tap = Math.abs(Math.sin(g * 6)) * 30; ctx.save(); ctx.translate(760 + tap * .5, 450 + tap); ctx.rotate(-.6); rr(-36, 0, 72, 260, 36, '#f3c9a4'); rr(-22, 8, 44, 46, 14, '#fbe3d2', 4); ctx.restore();
+      popText('LÂCHEZ-MOI UN LIKE', 540, 580, 100, '#ffd32a', lk, lt, -.03, lw(/indemnité/i, 'like') - .1);
+    }
+    const ind = lw(/indemnité/i, 'like');
+    if (lt > ind) { const k = easeOutBack((lt - ind) / .3); ctx.save(); ctx.translate(540, 600); ctx.scale(k, k); ctx.rotate(-.05); rr(-330, -80, 660, 160, 20, '#00b894', 6); txt('💰 INDEMNITÉ DE DÉPART', 0, 6, 60, '#fff', 'Anton'); ctx.restore(); }
+  },
+  rant(lt, d, g) {
+    bathroom(); mirror(560, 200, 420, 520);
+    brush(300, 1960, .95, g, { talk: true, angry: true, arms: [.4, 1.8 + Math.sin(g * 6) * .3] });
+    human(830, 2200, .95, g, { expr: 'sad', flip: true });
+    const ma = lw(/matin/i, 'rant'), ke = lw(/kebab/i, 'rant'), fi = lw(/fini/i, 'rant');
+    if (lt > ma) stink(830, 1300, g, 3);
+    popText('12 ANS', 540, 300, 200, '#fff', lw(/douze/i, 'rant'), lt, -.05, ma - .1);
+    popText('TON HALEINE', 540, 300, 170, '#6ab04c', ma, lt, .05, ke - .1);
+    if (lt > ke && lt < fi) { const k = easeOutBack((lt - ke) / .3); ctx.save(); ctx.translate(540, 360); ctx.scale(k, k); rr(-30, -150, 60, 300, 20, '#8d5524'); for (let i = 0; i < 4; i++) ell(0, -110 + i * 70, 70, 34, ['#c0392b', '#e1a95f', '#6ab04c', '#c0392b'][i], 4); txt('2H DU MAT', 0, 220, 70, '#fff', 'Anton', 'center', 10); ctx.restore(); }
+    popText('C\'EST FINI', 540, 300, 200, '#ff3838', fi, lt, -.05);
+  },
+  leave(lt, d, g) {
+    bathroom(); mirror(560, 200, 420, 520);
+    const fd = lw(/dentaire/i, 'leave'), ch = lw(/cherche/i, 'leave') - .8;
+    const go = lt > lw(/amoureux/i, 'leave') + 1.2 ? (lt - lw(/amoureux/i, 'leave') - 1.2) * 300 : 0;
+    brush(380 + go, 1960, .85, g, { suitcase: true, smug: true, run: go > 0 });
+    if (lt > fd - .3) floss(700 + go, 1960, .9, g);
+    if (lt > lw(/amoureux/i, 'leave')) hearts(g, 540 + go, 1000, 6);
+    if (lt > ch) { ctx.save(); ctx.translate(770, 460); ctx.rotate(-.06); txt('NE NOUS', 0, -50, 70, '#e84393', 'Anton'); txt('CHERCHE PAS', 0, 40, 70, '#e84393', 'Anton'); txt('♥', 0, 130, 70, '#e84393', 'serif'); ctx.restore(); }
+    popText('LE FIL DENTAIRE', 540, 300, 140, '#55efc4', fd, lt, -.05, lw(/amoureux/i, 'leave') - .1);
+    popText('AMOUREUX', 540, 300, 190, '#ff4757', lw(/amoureux/i, 'leave'), lt, .05, ch);
+  },
+  paste(lt, d, g) {
+    bathroom(); mirror(560, 200, 420, 520);
+    const ap = lw(/appuies/i, 'paste');
+    paste(540, 1960, 1.4, g, { sign: lt > lw(/grève/i, 'paste') - .3, squeeze: lt > ap });
+    if (lt > ap) { ctx.save(); ctx.translate(540, 1300); for (const sx of [-1, 1]) { rr(sx * 170 - 40, -60, 80, 120, 40, '#f3c9a4', 5); } ctx.restore(); }
+    popText('GRÈVE', 540, 300, 220, '#e74c3c', lw(/grève/i, 'paste'), lt, -.06, lw(/rien/i, 'paste') - .1);
+    popText('RIEN', 540, 300, 230, '#fff', lw(/rien/i, 'paste'), lt, .05);
+  },
+  protest(lt, d, g) {
+    bathroom();
+    const items = [['SAVON', '#fd79a8'], ['PEIGNE', '#fdcb6e'], ['RASOIR', '#74b9ff'], ['DENTIFRICE', '#fff']];
+    const pc = lw(/pancartes/i, 'protest');
+    items.forEach(([n, c], i) => {
+      const x = 140 + i * 270, y = 1880 - Math.abs(Math.sin(g * 6 + i)) * 20;
+      ctx.save(); ctx.translate(x, y);
+      if (i === 0) { rr(-90, -170, 180, 130, 50, c); } else if (i === 1) { rr(-30, -330, 60, 290, 20, c); for (let j = 0; j < 8; j++) line(30, -320 + j * 34, 80, -320 + j * 34, OUT, 5); } else if (i === 2) { rr(-24, -330, 48, 290, 20, c); rr(-80, -380, 160, 60, 14, '#636e72'); } else { paste(0, 0, .45, g, {}); }
+      const ey = i === 0 ? -110 : -220;
+      if (i !== 3) { ell(-18, ey, 10, 12, '#fff', 3); ell(18, ey, 10, 12, '#fff', 3); ell(-17, ey + 2, 4, 5, '#111', 0); ell(19, ey + 2, 4, 5, '#111', 0); line(-30, ey - 18, -8, ey - 12, OUT, 4); line(30, ey - 18, 8, ey - 12, OUT, 4); }
+      line(0, ey - 40, 0, -600, '#8d6e63', 10);
+      if (lt > pc - .3) { rr(-120, -760, 240, 170, 10, '#fff', 5); txt(['HALEINE', 'NON AU', 'ON VEUT', 'GRÈVE'][i], 0, -710, 40, '#e74c3c', 'Anton'); txt(['= DANGER', 'KEBAB', 'DES VACANCES', 'TOTALE'][i], 0, -640, 38, '#2d3436', 'Anton'); }
+      ctx.restore();
+    });
+    popText('MANIFESTATION', 540, 300, 150, '#ff3838', lw(/manifeste/i, 'protest'), lt, -.05);
+  },
+  fork(lt, d, g) {
+    bathroom(); mirror(380, 200, 420, 520);
+    human(540, 2150, 1.0, g, { expr: 'shock', armR: 2.6 });
+    // fourchette dans la bouche
+    ctx.save(); ctx.translate(560, 1370); ctx.rotate(-1.4 + Math.sin(g * 20) * .15); rr(-10, -10, 20, 240, 8, '#b2bec3', 4); for (let i = -1; i <= 1; i++) rr(i * 16 - 4, -70, 8, 64, 4, '#b2bec3', 3); ctx.restore();
+    const et = lw(/étincelles/i, 'fork');
+    if (lt > et) for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28 + g * 3, r = 60 + ((g * 300 + i * 40) % 140); line(560 + Math.cos(a) * r, 1250 + Math.sin(a) * r, 560 + Math.cos(a) * (r + 30), 1250 + Math.sin(a) * (r + 30), i % 2 ? '#f9ca24' : '#ff9f43', 8); }
+    popText('LA FOURCHETTE', 540, 300, 150, '#fff', lw(/fourchette/i, 'fork'), lt, -.05, et - .1);
+    popText('ÉTINCELLES', 540, 300, 180, '#f9ca24', et, lt, .05);
+  },
+  sponge(lt, d, g) {
+    bathroom(); mirror(380, 200, 420, 520);
+    human(540, 2150, 1.0, g, { expr: 'sad', armR: 2.6 });
+    ctx.save(); ctx.translate(600, 1360); ctx.rotate(-.3); rr(-90, -50, 180, 100, 16, '#f9ca24'); rr(-90, -50, 180, 34, 12, '#2ecc71', 0); ctx.restore();
+    const bu = lw(/bulles/i, 'sponge');
+    if (lt > bu) for (let i = 0; i < 10; i++) { const k = (g * .9 + i / 10) % 1; ell(540 + Math.sin(i * 3 + g * 2) * 90, 1200 - k * 600, 16 + (i % 3) * 10, 16 + (i % 3) * 10, 'rgba(255,255,255,.7)', 4); }
+    popText('BULLES PAR LE NEZ', 540, 300, 120, '#fff', bu, lt, -.04);
+  },
+  croco(lt, d, g) {
+    sky('#55efc4', '#dff9fb'); ctx.fillStyle = '#16a085'; ctx.fillRect(-400, 1400, W + 800, 900);
+    for (let i = 0; i < 5; i++) { ctx.save(); ctx.translate(80 + i * 240, 1400); for (let j = 0; j < 3; j++) { ctx.save(); ctx.rotate(-.5 + j * .5); ell(0, -120, 30, 120, '#27ae60'); ctx.restore(); } ctx.restore(); }
+    const cr = lw(/crocodile/i, 'croco');
+    croco(400, 1760, 1.1, g, { open: lt > cr && lt < lw(/menthe/i, 'croco') + 1 });
+    if (lt > cr) { const sx = 760 + Math.sin(g * 10) * 60; brush(sx, 1560, .6, g, { happy: true, smug: true, arms: [.4, -1.8], noShadow: true }); }
+    if (lt > lw(/menthe/i, 'croco') - .2) { ctx.save(); ctx.globalAlpha = .7; for (let i = 0; i < 6; i++) { const k = (g + i / 6) % 1; txt('✦', 700 + Math.cos(i * 1.3) * 150 * k, 1500 - k * 300, 50, '#81ecec', 'serif'); } ctx.restore(); }
+    popText('NOUVEAU JOB', 540, 300, 170, '#fff', lw(/travail/i, 'croco'), lt, -.05, cr - .1);
+    popText('UN CROCODILE', 540, 300, 170, '#27ae60', cr, lt, .05, lw(/merci/i, 'croco') - .1);
+    popText('« MERCI »', 540, 300, 190, '#ffd32a', lw(/merci/i, 'croco'), lt, -.05);
+  },
+  dentist(lt, d, g) {
+    ctx.fillStyle = '#dff9fb'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900);
+    // fauteuil + lampe
+    rr(100, 1300, 600, 120, 40, '#0984e3'); rr(100, 1050, 120, 300, 40, '#0984e3'); line(400, 1420, 400, 1700, '#636e72', 24);
+    line(800, 300, 600, 700, '#636e72', 12); ell(590, 720, 90, 50, '#f9ca24');
+    ctx.save(); ctx.translate(560, 1260); ctx.rotate(-Math.PI / 2); human(0, 0, .55, g, { expr: 'shock' }); ctx.restore();
+    const ev = lw(/évanouit/i, 'dentist');
+    if (lt < ev) { human(820, 1960, .9, g, { shirt: '#fff', pants: '#81ecec', cap: '#81ecec', glasses: true, expr: 'neutral', armL: -1.4 }); stink(260, 1080, g, 3); }
+    else { ctx.save(); ctx.translate(560, 1880); ctx.rotate(Math.PI / 2); human(0, 0, .8, g, { shirt: '#fff', pants: '#81ecec', cap: '#81ecec', glasses: true, expr: 'sleep' }); ctx.restore(); stink(260, 1080, g, 5); }
+    popText('K.O.', 540, 300, 230, '#ff3838', ev, lt, -.06, lw(/pompiers/i, 'dentist') - .1);
+    popText('🚒 POMPIERS', 540, 300, 160, '#e74c3c', lw(/pompiers/i, 'dentist'), lt, .05);
+  },
+  weapon(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const ar = lw(/arme/i, 'weapon');
+    // panneau danger
+    if (lt > ar - .2) { const k = easeOutBack((lt - ar + .2) / .4); ctx.save(); ctx.translate(540, 600); ctx.scale(k, k); poly([[0, -280], [300, 240], [-300, 240]], '#f9ca24', 14); txt('☣', 0, 60, 260, '#111', 'serif'); ctx.restore(); }
+    human(540, 2200, 1.0, g, { expr: lt > lw(/embaucher/i, 'weapon') ? 'neutral' : 'shock' });
+    stink(540, 1300, g, 5);
+    const em = lw(/embaucher/i, 'weapon');
+    if (lt > lw(/armée/i, 'weapon')) for (const x of [150, 930]) human(x, 2100, .75, g, { shirt: '#4b6584', pants: '#4b6584', cap: '#4b6584', expr: lt > em ? 'neutral' : 'angry', flip: x > 540, armR: lt > em ? 1.6 : -.1 });
+    popText('ARME CHIMIQUE', 540, 1050, 140, '#f9ca24', ar, lt, -.04, lw(/armée/i, 'weapon') - .1);
+    popText('EMBAUCHÉ', 540, 1050, 190, '#2ed573', em, lt, .05);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    brush(540, 2150, 1.4, g, { smug: true, shades: true, arms: [.4, -1.8] });
+    const p = easeOutBack((lt - .1) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 330); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+    popText('DIS MERCI 🪥', 540, 620, 130, '#ffd32a', lw(/merci/i, 'outro'), lt, .04);
+  },
+};
+</script></body></html>

@@ -1,0 +1,250 @@
+{
+ "title": "Ta brosse à dents a démissionné",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ce matin, ta *brosse à dents* a démissionné."
+  },
+  {
+   "scene": "like",
+   "text": "Elle regarde la caméra et elle dit : avant de partir... lâchez-moi un *like*. C'est mon indemnité de *départ*."
+  },
+  {
+   "scene": "rant",
+   "text": "Puis elle t'explique : douze ans à frotter tes dents. Ton haleine du *matin*. Le *kebab* de deux heures du matin. C'est *fini*."
+  },
+  {
+   "scene": "leave",
+   "text": "Elle fait sa valise. Et elle part avec le *fil dentaire*. Ils sont amoureux depuis *trois ans*. Sur le miroir, ils ont laissé un mot : ne nous *cherche* pas."
+  },
+  {
+   "scene": "paste",
+   "text": "Le dentifrice, lui, reste. Mais il fait *grève*. Tu appuies dessus de toutes tes forces... *rien* ne sort."
+  },
+  {
+   "scene": "protest",
+   "text": "Toute la salle de bain *manifeste*. Le savon, le peigne, le rasoir. Ils ont même des *pancartes*."
+  },
+  {
+   "scene": "fork",
+   "text": "Tu essaies de te brosser les dents avec une *fourchette*. Ça fait des *étincelles*."
+  },
+  {
+   "scene": "sponge",
+   "text": "Avec une éponge. Tu as des *bulles* qui sortent du nez."
+  },
+  {
+   "scene": "croco",
+   "text": "Pendant ce temps, ta brosse à dents a trouvé un nouveau travail. Elle brosse les dents d'un *crocodile*. Lui, il dit *merci*. Et il sent la menthe."
+  },
+  {
+   "scene": "dentist",
+   "text": "Un mois plus tard, tu vas chez le *dentiste*. Il ouvre ta bouche... et il s'*évanouit*. Son assistante appelle les *pompiers*."
+  },
+  {
+   "scene": "weapon",
+   "text": "Ton haleine est devenue tellement forte... qu'elle a été classée *arme chimique*. L'armée vient te chercher. Pas pour t'arrêter... pour t'*embaucher*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et ce soir, dis *merci* à ta brosse à dents."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "démissionné",
+   "type": "door_slam",
+   "gain": 0.8
+  },
+  {
+   "word": "regarde",
+   "in": "like",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "like",
+   "in": "like",
+   "type": "ding",
+   "gain": 0.8
+  },
+  {
+   "word": "départ",
+   "type": "cash",
+   "gain": 0.8
+  },
+  {
+   "word": "matin",
+   "in": "rant",
+   "n": 0,
+   "type": "buzz",
+   "dur": 1.6,
+   "gain": 0.6
+  },
+  {
+   "word": "kebab",
+   "type": "fart",
+   "gain": 0.6
+  },
+  {
+   "word": "fini",
+   "type": "thud",
+   "gain": 0.8
+  },
+  {
+   "word": "valise",
+   "type": "zip",
+   "gain": 0.8
+  },
+  {
+   "word": "dentaire",
+   "type": "magic",
+   "gain": 0.6
+  },
+  {
+   "word": "amoureux",
+   "type": "pop",
+   "gain": 0.6,
+   "repeat": 3,
+   "gap": 0.15
+  },
+  {
+   "word": "grève",
+   "type": "thud",
+   "gain": 0.7
+  },
+  {
+   "word": "forces",
+   "type": "creak",
+   "dur": 0.8,
+   "gain": 0.6
+  },
+  {
+   "word": "rien",
+   "type": "fart",
+   "gain": 0.5
+  },
+  {
+   "word": "rien",
+   "type": "sad_trombone",
+   "offset": 0.4,
+   "gain": 0.5
+  },
+  {
+   "word": "manifeste",
+   "type": "crowd",
+   "dur": 4.5,
+   "gain": 0.7
+  },
+  {
+   "word": "manifeste",
+   "type": "footsteps",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "pancartes",
+   "type": "drumroll",
+   "dur": 1.0,
+   "gain": 0.5
+  },
+  {
+   "word": "fourchette",
+   "type": "clank",
+   "offset": 0.3,
+   "gain": 0.8,
+   "repeat": 3,
+   "gap": 0.2
+  },
+  {
+   "word": "étincelles",
+   "type": "crack",
+   "gain": 0.9,
+   "repeat": 2,
+   "gap": 0.2
+  },
+  {
+   "word": "éponge",
+   "type": "splash",
+   "gain": 0.5
+  },
+  {
+   "word": "bulles",
+   "type": "bubbles",
+   "dur": 2.0,
+   "gain": 0.8
+  },
+  {
+   "word": "travail",
+   "in": "croco",
+   "type": "ding",
+   "gain": 0.5
+  },
+  {
+   "word": "crocodile",
+   "type": "punch",
+   "offset": 0.3,
+   "gain": 0.7,
+   "repeat": 2,
+   "gap": 0.3
+  },
+  {
+   "word": "merci",
+   "in": "croco",
+   "type": "magic",
+   "gain": 0.5
+  },
+  {
+   "word": "dentiste",
+   "type": "creak",
+   "gain": 0.6
+  },
+  {
+   "word": "évanouit",
+   "type": "land",
+   "gain": 1.0
+  },
+  {
+   "word": "évanouit",
+   "type": "buzz",
+   "offset": -0.8,
+   "dur": 1.2,
+   "gain": 0.5
+  },
+  {
+   "word": "arme",
+   "type": "siren",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "chimique",
+   "type": "explosion",
+   "gain": 0.6
+  },
+  {
+   "word": "merci",
+   "in": "outro",
+   "type": "ding",
+   "offset": 0.2,
+   "gain": 0.7
+  },
+  {
+   "word": "cherche",
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "word": "pompiers",
+   "type": "siren",
+   "dur": 2.0,
+   "gain": 0.5
+  },
+  {
+   "word": "embaucher",
+   "type": "applause",
+   "dur": 1.8,
+   "gain": 0.6
+  }
+ ]
+}
