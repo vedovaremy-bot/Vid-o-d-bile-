@@ -1,0 +1,248 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script>
+const lw = (re, scene, n = 0) => wordTime(re, n, scene) - sceneStart(scene);
+function popText(s, x, y, size, col, t0, lt, rot = -.06, until = 1e9) {
+  if (lt < t0 || lt > until) return;
+  const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k); ctx.rotate(rot); txt(s, 0, 0, size, col, 'Anton', 'center', size * .13); ctx.restore();
+}
+function bubble(x, y, w, h, s, size, tailX = 0, t0 = 0, lt = 1, until = 1e9) {
+  if (lt < t0 || lt > until) return; const k = easeOutBack((lt - t0) / .3);
+  ctx.save(); ctx.translate(x, y); ctx.scale(k, k);
+  rr(-w / 2, -h / 2, w, h, 40, '#fff'); poly([[tailX - 24, h / 2 - 4], [tailX + 24, h / 2 - 4], [tailX - 4, h / 2 + 56]], '#fff'); line(tailX - 20, h / 2 - 2, tailX + 20, h / 2 - 2, '#fff', 10);
+  txt(s, 0, 4, size, OUT, 'Anton'); ctx.restore();
+}
+function heart(x, y, r, fill, lw2 = 8) {
+  ctx.beginPath(); ctx.moveTo(x, y + r * .9);
+  ctx.bezierCurveTo(x - r * 1.6, y - r * .1, x - r * .9, y - r * 1.3, x, y - r * .45);
+  ctx.bezierCurveTo(x + r * .9, y - r * 1.3, x + r * 1.6, y - r * .1, x, y + r * .9); shape(fill, lw2);
+}
+function stink(x, y, g, n = 3, col = '#f6e58d') { ctx.save(); ctx.globalAlpha = .8; for (let i = 0; i < n; i++) { ctx.beginPath(); const xx = x - (n - 1) * 30 + i * 60; ctx.moveTo(xx, y); for (let j = 0; j < 5; j++) ctx.quadraticCurveTo(xx + (j % 2 ? 30 : -30), y - 30 - j * 46 + Math.sin(g * 4 + i) * 10, xx, y - 56 - j * 46); shape(null, 10, col); } ctx.restore(); }
+
+// ------------------------------------------------------------ SIRE GONTRAN (personnage principal)
+// o: {expr, shaved, swordUp, sword, flip, armL, armR, crown, pose, talk}
+function knight(x, y, s, t, o = {}) {
+  const talkExpr = o.talk && Math.sin(t * 16) > 0 ? 'shock' : (o.expr || 'neutral');
+  human(x, y, s, t, { shirt: '#95a5a6', pants: '#7f8c8d', hair: '#8e6e53', mustache: !o.shaved, expr: talkExpr, flip: o.flip, armL: o.armL, armR: o.armR, pose: o.pose });
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  // cotte de mailles : croix rouge sur le torse
+  rr(-14, -600, 28, 220, 6, '#c0392b', 0); rr(-70, -520, 140, 28, 6, '#c0392b', 0);
+  // casque ouvert + nasal + plumet
+  ctx.save(); ctx.translate(0, -790);
+  ctx.beginPath(); ctx.ellipse(0, -30, 118, 112, 0, Math.PI, 0); ctx.lineTo(118, -10); ctx.lineTo(-118, -10); ctx.closePath(); shape('#b2bec3');
+  rr(-10, -20, 20, 70, 6, '#b2bec3', 4);
+  ctx.globalAlpha = .4; ell(-40, -100, 30, 14, '#fff', 0); ctx.globalAlpha = 1;
+  if (o.crown) poly([[-90, -120], [-100, -210], [-50, -160], [0, -230], [50, -160], [100, -210], [90, -120]], '#f9ca24', 6);
+  else { const w = Math.sin(t * 5) * .15; ctx.save(); ctx.translate(0, -140); ctx.rotate(w); ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(80, -120, 170, -60); ctx.quadraticCurveTo(80, -60, 20, 20); shape('#e74c3c'); ctx.restore(); }
+  ctx.restore();
+  // épée
+  if (o.swordUp) { ctx.save(); ctx.translate(120, -900); ctx.rotate(.5 + Math.sin(t * 10) * .25); rr(-12, -360, 24, 380, 8, '#dfe6e9'); rr(-60, 10, 120, 24, 8, '#e1b12c'); rr(-12, 30, 24, 80, 8, '#6d4c41'); ctx.restore(); }
+  else if (o.sword !== false) { ctx.save(); ctx.translate(190, -340); rr(-10, -20, 20, 360, 8, '#dfe6e9'); rr(-50, -40, 100, 22, 8, '#e1b12c'); rr(-10, -110, 20, 70, 8, '#6d4c41'); ctx.restore(); }
+  ctx.restore();
+}
+function jester(x, y, s, t, o = {}) {
+  human(x, y, s, t, { shirt: '#e84393', pants: '#f9ca24', expr: o.expr || 'sad', armL: o.armL, armR: o.armR });
+  ctx.save(); ctx.translate(x, y - 790 * s); ctx.scale(s, s);
+  for (const [a, c] of [[-1, '#e84393'], [0, '#f9ca24'], [1, '#0984e3']]) { ctx.beginPath(); ctx.moveTo(-90 + a * 40, -60); ctx.quadraticCurveTo(a * 160, -200, a * 200, -120); ctx.lineTo(a * 40 + 40, -60); ctx.closePath(); shape(c); ell(a * 205, -118, 20, 20, '#f1c40f', 4); }
+  ctx.restore();
+}
+// ------------------------------------------------------------ objets
+function microwave(x, y, s, g, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  rr(-300, -380, 600, 380, 24, '#dfe6e9'); rr(-270, -350, 400, 320, 14, o.portal ? '#6c5ce7' : (o.on ? '#ffeaa7' : '#2d3436'), 6);
+  if (o.portal) { ctx.save(); ctx.beginPath(); ctx.roundRect(-270, -350, 400, 320, 14); ctx.clip(); for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.arc(-70, -190, 30 + i * 30, g * 5 + i, g * 5 + i + 4); shape(null, 10, i % 2 ? '#a29bfe' : '#fd79a8'); } ctx.restore(); }
+  rr(150, -350, 120, 80, 10, '#2d3436'); txt(o.time || '0:00', 210, -308, 40, '#55efc4', 'Anton');
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) rr(165 + j * 50, -250 + i * 50, 36, 36, 8, '#b2bec3', 3);
+  ctx.restore();
+}
+function vacuum(x, y, s, g, o = {}) {
+  ctx.save(); ctx.translate(x + (o.shake ? Math.sin(g * 40) * 6 : 0), y); ctx.scale(s, s);
+  rr(-200, -220, 400, 220, 90, '#e74c3c'); ell(-130, 0, 50, 50, '#2d3436'); ell(130, 0, 50, 50, '#2d3436');
+  // tuyau = cou de dragon
+  ctx.beginPath(); ctx.moveTo(180, -150); ctx.bezierCurveTo(400, -260, 260, -600, 420, -680); shape(null, 50, '#2d3436'); ctx.beginPath(); ctx.moveTo(180, -150); ctx.bezierCurveTo(400, -260, 260, -600, 420, -680); shape(null, 32, '#636e72');
+  ctx.save(); ctx.translate(430, -690); ctx.rotate(-.3); rr(-40, -60, 140, 90, 20, '#2d3436');
+  if (o.eyes) { ell(10, -40, 18, 18, '#f9ca24', 4); ell(14, -40, 6, 12, '#111', 0); line(-10, -64, 34, -54, OUT, 7); }
+  ctx.restore();
+  if (o.eyes) { ell(-60, -130, 34, 34, '#fff', 5); ell(60, -130, 34, 34, '#fff', 5); ell(-54, -126, 14, 16, '#111', 0); ell(66, -126, 14, 16, '#111', 0); line(-100, -180, -30, -160, OUT, 9); line(100, -180, 30, -160, OUT, 9); ctx.beginPath(); ctx.arc(0, -40, 50, Math.PI * 1.15, Math.PI * 1.85); shape(null, 8); }
+  ctx.restore();
+}
+function kitchen() {
+  ctx.fillStyle = '#fbe9c6'; ctx.fillRect(-400, -400, W + 800, 1800);
+  ctx.globalAlpha = .35; for (let x = -400; x < W + 400; x += 90) line(x, 700, x, 1300, '#d4b483', 3); for (let y = 700; y < 1300; y += 90) line(-400, y, W + 400, y, '#d4b483', 3); ctx.globalAlpha = 1;
+  rr(-60, 1180, W + 120, 60, 6, '#8d6e63'); rr(-60, 1240, W + 120, 400, 0, '#a1887f');
+  ctx.fillStyle = '#d7ccc8'; ctx.fillRect(-400, 1640, W + 800, 800);
+}
+function livingRoom() {
+  ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, 1800);
+  rr(640, 260, 300, 220, 10, '#6d4c41'); rr(660, 280, 260, 180, 4, '#81ecec', 0);
+  ctx.fillStyle = '#a0785a'; ctx.fillRect(-400, 1400, W + 800, 900);
+  ell(540, 1720, 520, 160, '#0984e3', 0);
+}
+function castle() {
+  sky('#fdcb6e', '#ffeaa7');
+  ctx.fillStyle = '#8395a7'; ctx.fillRect(-400, 300, W + 800, 1200);
+  for (let x = -100; x < W + 100; x += 120) rr(x, 240, 80, 80, 4, '#8395a7', 0);
+  ctx.globalAlpha = .25; for (let y = 300; y < 1500; y += 70) for (let x = (y / 70 % 2) * 60; x < W; x += 120) rr(x, y, 116, 66, 3, '#576574', 0); ctx.globalAlpha = 1;
+  for (const x of [180, 900]) { rr(x - 60, 420, 120, 240, 10, '#c0392b'); txt('⚜', x, 540, 70, '#f9ca24', 'serif'); }
+  ctx.fillStyle = '#a0522d'; ctx.fillRect(-400, 1500, W + 800, 900);
+  poly([[380, 1500], [700, 1500], [800, 2000], [280, 2000]], '#c0392b', 0);
+}
+
+window.HANDLE = '@histoires.debiles';
+window.SCENES = {
+  hook(lt, d, g) {
+    kitchen();
+    const dg = lw(/ding/i, 'hook'), ch = lw(/chevalier/i, 'hook');
+    microwave(540, 1180, 1.25, g, { on: lt < dg, portal: lt > dg - .1 && lt < ch + 1.2, time: lt < dg ? '0:0' + Math.max(0, 3 - Math.floor(lt)) : '0:00' });
+    if (lt > ch - .3) { const k = easeOutBack((lt - ch + .3) / .6); knight(lerp(470, 540, k), 1960, lerp(.3, 1.0, k), g, { swordUp: true, expr: 'angry' }); }
+    popText('DING !', 540, 300, 200, '#ffd32a', dg, lt, -.06, ch - .2);
+    popText('UN CHEVALIER', 540, 300, 160, '#ff3838', ch, lt, .05);
+  },
+  intro(lt, d, g) {
+    castle();
+    knight(540, 1960, 1.15, g, { expr: 'neutral', armR: lt > lw(/épée/i, 'intro') ? 2.6 : -.15, swordUp: lt > lw(/épée/i, 'intro') });
+    const fr = lw(/fromage/i, 'intro');
+    if (lt > fr) stink(540, 1200, g, 4);
+    rr(60, 260, 560, 130, 20, '#2d3436', 0); txt('SIRE GONTRAN', 340, 326, 80, '#f9ca24', 'Anton');
+    popText('🧀 ODEUR DE FROMAGE', 540, 560, 100, '#f6e58d', fr, lt, -.04);
+  },
+  vacuum(lt, d, g) {
+    livingRoom();
+    const dr = lw(/dragon/i, 'vacuum');
+    vacuum(640, 1800, 1.0, g, { eyes: lt > dr - .2 });
+    if (lt > dr) { ctx.save(); ctx.globalAlpha = .5; for (let i = 0; i < 4; i++) { const k = (g * 2 + i / 4) % 1; ell(1060 - k * 200, 1100 + Math.sin(i) * 40, 50 * (1 - k) + 10, 50 * (1 - k) + 10, '#ff9f43', 0); } ctx.restore(); }
+    const at = lw(/attaque/i, 'vacuum');
+    knight(lt > at ? 250 + (lt - at) * 80 : 200, 2180, .85, g, { expr: lt > dr ? 'angry' : 'shock', swordUp: lt > at, pose: lt > at ? 'run' : 'stand' });
+    popText('UN DRAGON !', 540, 330, 180, '#ff3838', dr, lt, -.05);
+  },
+  fight(lt, d, g) {
+    livingRoom();
+    const mo = lw(/moustache/i, 'fight');
+    vacuum(700, 1800, 1.0, g, { eyes: true, shake: lt < mo + .3 });
+    knight(300 + Math.sin(g * 14) * 20 * (lt < mo ? 1 : 0), 2180, .85, g, { expr: lt > mo ? 'sad' : 'angry', shaved: lt > mo, swordUp: lt < mo });
+    if (lt < mo + .3) for (let i = 0; i < 3; i++) { const a = g * 6 + i * 2; popText(['CLANG', 'SCHLING', 'VRRR'][i], 540 + Math.cos(a) * 250, 900 + Math.sin(a) * 200, 90, '#fff', i * .3, lt, Math.sin(a) * .3, mo); }
+    if (lt > mo) { const k = clamp((lt - mo) / .6); ctx.save(); ctx.translate(lerp(300, 1100, k), lerp(1300, 1100, k)); ctx.rotate(k * 8); ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-40, -16, -70, 12); ctx.quadraticCurveTo(-40, 0, 0, 10); ctx.quadraticCurveTo(40, 0, 70, 12); ctx.quadraticCurveTo(40, -16, 0, 0); shape('#8e6e53', 4); ctx.restore(); }
+    popText('COMBAT ÉPIQUE', 540, 330, 150, '#ffd32a', 0.1, lt, -.05, mo - .1);
+    popText('PLUS DE MOUSTACHE', 540, 330, 120, '#ff3838', mo, lt, .04);
+  },
+  tv(lt, d, g) {
+    livingRoom();
+    const ep = lw(/épée/i, 'tv') + .2;
+    // télé
+    rr(420, 900, 560, 380, 20, '#2d3436'); rr(445, 925, 510, 330, 8, lt > ep ? '#111' : '#74b9ff', 0);
+    if (lt < ep) { ctx.save(); ctx.beginPath(); ctx.rect(445, 925, 510, 330); ctx.clip(); human(700, 1650, .5, g, { shirt: '#2d3436', bowtie: '#c0392b', expr: 'neutral' }); ctx.restore(); }
+    else { line(500, 950, 900, 1230, '#dfe6e9', 6); line(560, 1240, 900, 960, '#dfe6e9', 6); line(700, 930, 650, 1250, '#dfe6e9', 5); }
+    rr(640, 1280, 120, 120, 10, '#2d3436');
+    knight(240, 2180, .85, g, { expr: lt > ep ? 'shock' : 'angry', swordUp: lt > lw(/libérer/i, 'tv') - .3 });
+    popText('LA TÉLÉ', 540, 330, 180, '#fff', lw(/télé/i, 'tv'), lt, -.05, lw(/coincé/i, 'tv'));
+    popText('« JE VOUS LIBÈRE ! »', 540, 330, 110, '#ffd32a', lw(/libérer/i, 'tv') - .4, lt, .04, ep - .1);
+    popText('CRAAAC', 540, 330, 200, '#ff3838', ep, lt, -.06);
+  },
+  eat(lt, d, g) {
+    kitchen();
+    knight(540, 1960, 1.1, g, { expr: 'shock', armL: -1.5, armR: 1.5, sword: false, talk: true });
+    const items = [['pizza', lw(/pizza/i, 'eat')], ['carton', lw(/carton/i, 'eat')], ['fourchette', lw(/fourchette/i, 'eat')]];
+    const cur = items.filter(([, t0]) => lt > t0 - .3).pop();
+    if (cur) {
+      ctx.save(); ctx.translate(540, 1100);
+      if (cur[0] === 'pizza') { ctx.beginPath(); ctx.moveTo(0, 60); ctx.lineTo(-110, -120); ctx.quadraticCurveTo(0, -170, 110, -120); ctx.closePath(); shape('#f6b93b'); ell(-30, -80, 18, 18, '#e55039', 0); ell(30, -60, 16, 16, '#e55039', 0); }
+      if (cur[0] === 'carton') { rr(-160, -120, 320, 200, 10, '#c8a165'); txt('PIZZA', 0, -20, 60, '#c0392b', 'Anton'); }
+      if (cur[0] === 'fourchette') { ctx.rotate(.5); rr(-12, -200, 24, 260, 8, '#b2bec3'); for (let i = -1; i <= 1; i++) rr(i * 18 - 5, -260, 10, 70, 4, '#b2bec3'); }
+      ctx.restore();
+    }
+    popText('MIAM', 540, 300, 190, '#fff', items[0][1], lt, -.05, items[1][1] - .1);
+    popText('LE CARTON ?!', 540, 300, 170, '#ffd32a', items[1][1], lt, .05, items[2][1] - .1);
+    popText('LA FOURCHETTE ?!', 540, 300, 140, '#ff3838', items[2][1], lt, -.05);
+  },
+  duel(lt, d, g) {
+    livingRoom();
+    // Gontran sur la trottinette
+    line(780, 1900, 1000, 1900, OUT, 16); line(960, 1900, 990, 1450, OUT, 14); line(940, 1450, 1040, 1450, OUT, 14); ell(800, 1930, 34, 34, '#222'); ell(980, 1930, 34, 34, '#222');
+    knight(880, 1890, .6, g, { expr: 'angry', flip: true, swordUp: true });
+    // toi sur la chaise de bureau
+    rr(120, 1600, 260, 60, 20, '#2d3436'); rr(130, 1300, 60, 320, 20, '#2d3436'); line(250, 1660, 250, 1850, '#636e72', 16); line(130, 1880, 370, 1880, '#636e72', 12); ell(140, 1900, 22, 22, '#111'); ell(360, 1900, 22, 22, '#111');
+    human(260, 1880, .6, g, { expr: 'shock', armL: .9, armR: -1.6 });
+    // ta "lance" : un balai à serpillière
+    ctx.save(); ctx.translate(420, 1350); ctx.rotate(-.15); rr(-8, 0, 16, 300, 6, '#a0522d'); for (let i = -3; i <= 3; i++) line(i * 8, 300, i * 14, 380, '#dfe6e9', 8); ctx.restore();
+    popText('DUEL', 540, 330, 230, '#ff3838', lw(/duel/i, 'duel'), lt, -.06);
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#ffeaa7'); gr.addColorStop(1, '#6c5ce7'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const tk = lw(/dit/i, 'like');
+    knight(540, 2750, 2.2, g, { talk: lt > tk && lt < d - .3, expr: lt > lw(/sinon/i, 'like') ? 'angry' : 'neutral', swordUp: true, armR: 2.5 });
+    const lk = lw(/like/i, 'like');
+    if (lt > lk - .3) {
+      const k = easeOutBack((lt - lk + .3) / .35), beat = 1 + Math.max(0, Math.sin(g * 9)) * .08;
+      ctx.save(); ctx.translate(540, 300); ctx.scale(k * beat * .85, k * beat * .85); ell(0, 0, 200, 200, '#fff', 10); heart(0, 10, 110, '#ff3838', 10); ctx.restore();
+      const tap = Math.abs(Math.sin(g * 6)) * 30; ctx.save(); ctx.translate(760 + tap * .5, 450 + tap); ctx.rotate(-.6); rr(-36, 0, 72, 260, 36, '#f3c9a4'); rr(-22, 8, 44, 46, 14, '#fbe3d2', 4); ctx.restore();
+      popText('OCTROYEZ-MOI UN LIKE', 540, 580, 90, '#ffd32a', lk, lt, -.03, lw(/crapaud/i, 'like') - .1);
+    }
+    const cr = lw(/crapaud/i, 'like');
+    if (lt > cr) { const k = easeOutBack((lt - cr) / .3); ctx.save(); ctx.translate(840, 620); ctx.scale(k * .8, k * .8); ell(0, 0, 150, 100, '#6ab04c'); ell(-70, -80, 40, 40, '#6ab04c'); ell(70, -80, 40, 40, '#6ab04c'); ell(-70, -84, 18, 18, '#fff', 4); ell(70, -84, 18, 18, '#fff', 4); ell(-70, -82, 8, 8, '#111', 0); ell(70, -82, 8, 8, '#111', 0); ctx.beginPath(); ctx.arc(0, 0, 80, Math.PI * .2, Math.PI * .8); shape(null, 7); ctx.restore(); }
+    popText('GENTES DAMES…', 540, 580, 100, '#fff', tk + .2, lt, .03, lk - .3);
+  },
+  crash(lt, d, g) {
+    kitchen();
+    const fr = lw(/frigo/i, 'crash');
+    // frigo
+    rr(380, 300, 340, 1300, 30, '#f5f6fa'); line(380, 760, 720, 760, '#b2bec3', 8);
+    if (lt < fr) {
+      const k = clamp(lt / fr);
+      knight(lerp(1100, 620, k), 1960, .7, g, { swordUp: true, expr: 'angry', pose: 'run', flip: true });
+      human(lerp(-100, 470, k), 1960, .7, g, { pose: 'run', expr: 'shock' });
+    } else {
+      rr(380, 760, 340, 840, 10, '#dfe6e9');
+      // deux paires de jambes qui dépassent du frigo
+      for (const [x, c] of [[470, '#2f5aa8'], [620, '#7f8c8d']]) { rr(x - 30, 1420, 50, 220, 20, c); rr(x - 40, 1620, 80, 34, 14, '#222'); }
+      for (let i = 0; i < 6; i++) { const k2 = clamp((lt - fr) / .8); ctx.save(); ctx.translate(550 + Math.cos(i) * 300 * k2, 900 - Math.sin(i + 1) * 300 * k2 + k2 * k2 * 300); ctx.rotate(k2 * 5 + i); if (i % 2) rr(-30, -40, 60, 80, 10, '#fff', 4); else ell(0, 0, 30, 30, '#fdcb6e', 4); ctx.restore(); }
+      popText('BOUM', 540, 330, 230, '#ff3838', fr, lt, -.06);
+    }
+  },
+  leave(lt, d, g) {
+    kitchen();
+    const dg = lw(/ding/i, 'leave');
+    microwave(540, 1180, 1.25, g, { on: lt < dg, portal: lt > lw(/remonte/i, 'leave') - .2 && lt < dg + .4, time: lt > lw(/trente/i, 'leave') && lt < dg ? '0:30' : '0:00' });
+    const rm = lw(/remonte/i, 'leave');
+    if (lt < rm + .6) { const k = clamp((lt - rm) / .6); knight(lerp(300, 470, k), lerp(2180, 1000, k), lerp(.85, .15, k), g, { expr: 'angry' }); }
+    human(880, 2180, .85, g, { expr: lt > dg ? 'shock' : 'sad', flip: true });
+    popText('30 SECONDES', 540, 300, 150, '#fff', lw(/trente/i, 'leave'), lt, -.05, dg - .1);
+    popText('PARTI', 540, 300, 210, '#a29bfe', lw(/parti/i, 'leave'), lt, .05);
+  },
+  follow(lt, d, g) {
+    kitchen();
+    const dg = lw(/ding/i, 'follow');
+    microwave(540, 1180, 1.25, g, { on: true, portal: true, time: '0:00' });
+    const rt = lw(/rentres/i, 'follow');
+    if (lt < rt) human(540, 1960, .9, g, { expr: 'neutral' });
+    else if (lt < dg + .2) { const k = clamp((lt - rt) / .8); human(lerp(540, 470, k), lerp(1960, 1000, k), lerp(.9, .15, k), g, { expr: 'shock' }); }
+    if (lt > dg) { ctx.save(); ctx.globalAlpha = clamp(1 - (lt - dg) / .6); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H); ctx.restore(); popText('DING', 540, 300, 230, '#a29bfe', dg, lt, -.06); }
+  },
+  jester(lt, d, g) {
+    castle();
+    // trône
+    rr(380, 900, 320, 700, 30, '#e1b12c'); rr(410, 940, 260, 300, 20, '#c0392b');
+    knight(540, 1700, .85, g, { crown: true, expr: 'neutral', sword: false });
+    jester(200, 2180, .85, g, { expr: 'sad', armL: -2.6, armR: 2.6 });
+    // balles de jonglage
+    for (let i = 0; i < 3; i++) { const a = g * 5 + i * 2.1; ell(200 + Math.cos(a) * 90, 1240 + Math.sin(a) * 60 - 60, 22, 22, ['#e84393', '#f9ca24', '#0984e3'][i], 4); }
+    popText('BOUFFON', 540, 300, 200, '#e84393', lw(/bouffon/i, 'jester'), lt, -.05, lw(/gontran/i, 'jester') - .1);
+    popText('LE ROI GONTRAN', 540, 300, 150, '#f9ca24', lw(/gontran/i, 'jester'), lt, .04);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    microwave(540, 1500, 1.5, g, { portal: true, time: '0:00' });
+    // yeux qui brillent dans le micro-ondes
+    ell(420, 1180, 24, 24, '#ff3838', 0); ell(500, 1180, 24, 24, '#ff3838', 0);
+    const p = easeOutBack((lt - .1) / .4);
+    if (p > 0) { ctx.save(); ctx.translate(540, 330); ctx.scale(p, p); rr(-300, -80, 600, 160, 80, '#ff3838', 0); txt("S'ABONNER", 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+};
+</script></body></html>
