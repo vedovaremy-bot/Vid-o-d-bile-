@@ -315,6 +315,24 @@ def shrink(dur=0.9):
     return _norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * _env(len(t), .01, .1), .6)
 
 
+def squeak(dur=0.25):
+    """couinement de hamster / souris"""
+    t = _t(dur); f = 2600 + 900 * np.sin(np.pi * t / dur)
+    return _norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * np.sin(np.pi * t / dur) ** 2, .5)
+
+
+def thunder(dur=2.5):
+    """coup de tonnerre : craquement puis grondement"""
+    t = _t(dur); crackle = _hp(_noise(dur), 1500) * np.exp(-t * 18)
+    rumble = _lp(_noise(dur), 160) * (np.exp(-t * 1.4) * (0.6 + 0.4 * np.sin(2 * np.pi * 3 * t)))
+    return _norm(crackle * .8 + rumble * 6, .9)
+
+
+def slurp(dur=0.6):
+    """aspiration / avalé"""
+    t = _t(dur); return _norm(np.sin(2 * np.pi * np.cumsum(np.geomspace(900, 120, len(t))) / SR) * _env(len(t), .02, .1) + _lp(_noise(dur), 1200) * .3 * _env(len(t), .02, .1), .7)
+
+
 SFX = {k: v for k, v in globals().items() if callable(v) and not k.startswith("_") and k not in ("np",)}
 SFX["zip"] = zip_
 LONG = {"alarm", "alarm_muffled", "phone_ring", "siren", "footsteps", "run", "applause", "snore", "tick", "rain", "wind",

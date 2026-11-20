@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ LE NUAGE (personnage principal)
+// o: {rain (0..1), cry, angry, happy, smug, blink, dark, lightning, rainbow}
+function cloud(x, y, s, t, o = {}) {
+  // pluie sous le nuage
+  const rain = o.rain ?? 1;
+  if (rain > 0) { ctx.save(); ctx.globalAlpha = .85; const n = Math.floor(45 * rain * (o.cry ? 1.8 : 1)); for (let i = 0; i < n; i++) { const h1 = Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1, h2 = Math.abs(Math.sin(i * 78.233) * 12543.123) % 1; const xx = x + (h1 - .5) * 400 * s, len = o.rainLen || 700; const yy = y + 40 * s + ((t * 1100 + h2 * len) % len); line(xx, yy, xx - 8, yy + 70, '#0984e3', 9); } ctx.restore(); }
+  if (o.lightning) { ctx.save(); ctx.translate(o.lightning[0], o.lightning[1]); poly([[0, 0], [-60, 260], [10, 250], [-50, 520], [100, 200], [20, 210], [80, 0]], '#f9ca24', 6); ctx.restore(); }
+  if (o.rainbow) { ctx.save(); ctx.translate(x, y + 40 * s); const cols = ['#ff4757', '#ffa502', '#f9ca24', '#2ed573', '#1e90ff', '#8e44ad']; cols.forEach((c, i) => { ctx.beginPath(); ctx.arc(0, 0, (360 - i * 26) * s, Math.PI, 0); ctx.lineWidth = 26 * s; ctx.strokeStyle = c; ctx.stroke(); }); ctx.restore(); }
+  ctx.save(); ctx.translate(x, y + Math.sin(t * 2) * 8); ctx.scale(s, s);
+  const c = o.dark ? '#636e72' : '#fdfdfd';
+  ctx.beginPath(); ctx.arc(-120, 0, 90, Math.PI * .5, Math.PI * 1.5); ctx.arc(-40, -80, 100, Math.PI, Math.PI * 1.8); ctx.arc(80, -70, 110, Math.PI * 1.2, Math.PI * 2); ctx.arc(160, 10, 80, Math.PI * 1.5, Math.PI * .5); ctx.closePath(); shape(c, 7);
+  const ey = -40;
+  if (o.blink) { line(-70, ey, -30, ey, OUT, 7); line(30, ey, 70, ey, OUT, 7); }
+  else { ell(-50, ey, 20, 24, '#fff', 5); ell(50, ey, 20, 24, '#fff', 5); ell(-48, ey + 4, 9, 11, '#111', 0); ell(52, ey + 4, 9, 11, '#111', 0); }
+  if (o.angry) { line(-80, ey - 44, -24, ey - 28, OUT, 8); line(80, ey - 44, 24, ey - 28, OUT, 8); }
+  if (o.cry) { line(-80, ey - 26, -24, ey - 40, OUT, 7); line(80, ey - 26, 24, ey - 40, OUT, 7); }
+  ell(-90, ey + 40, 20, 12, '#ffb8b8', 0); ell(90, ey + 40, 20, 12, '#ffb8b8', 0);
+  if (o.cry) { ell(0, ey + 50, 22, 18, '#7a2b2b', 5); }
+  else if (o.angry) { ctx.beginPath(); ctx.arc(0, ey + 64, 22, Math.PI * 1.15, Math.PI * 1.85); shape(null, 6); }
+  else { ctx.beginPath(); ctx.arc(0, ey + 22, 26, Math.PI * .15, Math.PI * .85); shape(null, 6); }
+  ctx.restore();
+}
+function puddle(x, y, w) { ell(x, y, w, w * .18, 'rgba(116,185,255,.6)', 0); }
+function street(g, sunny = true) {
+  sky(sunny ? '#74b9ff' : '#b2bec3', '#dff9fb'); if (sunny) { ell(880, 220, 110, 110, '#feca57', 0); for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28 + g * .3; line(880 + Math.cos(a) * 140, 220 + Math.sin(a) * 140, 880 + Math.cos(a) * 190, 220 + Math.sin(a) * 190, '#feca57', 10); } }
+  ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900);
+  const cols = ['#fab1a0', '#ffeaa7', '#81ecec', '#a29bfe'];
+  for (let i = 0; i < 4; i++) { const x = i * 280 - 40; rr(x, 800, 260, 700, 6, cols[i]); rr(x + 40, 900, 70, 90, 4, '#fff', 4); rr(x + 150, 900, 70, 90, 4, '#fff', 4); }
+}
+const WET = { hair: '#2d3436' };
+
+window.SCENES = {
+  hook(lt, d, g) {
+    street(g);
+    human(540, 2150, 1.0, g, { expr: lt > lw(/suit/i, 'hook') ? 'sad' : 'shock', ...WET });
+    cloud(540, 660, 1.1, g, { rain: lt > lw(/suit/i, 'hook') ? 1 : .3, smug: true, rainLen: 800 });
+    puddle(540, 2160, 320);
+    popText('IL TE SUIT', 540, 300, 180, '#fff', lw(/suit/i, 'hook'), lt, -.05);
+  },
+  rain(lt, d, g) {
+    street(g);
+    // les autres en short, au soleil
+    for (const [x, c] of [[130, '#00b894'], [950, '#e17055']]) human(x, 2050, .7, g + x, { shirt: c, pants: '#fdcb6e', expr: 'neutral', armR: 2.6 });
+    const pl = lw(/pluie/i, 'rain'), re = lw(/refuse/i, 'rain');
+    human(540, 2150, .95, g, { expr: 'sad', ...WET });
+    cloud(540, 800, .9, g, { rain: lt > pl - .3 ? 1 : .4, rainLen: 700 });
+    puddle(540, 2160, 300);
+    if (lt > re) { const k = clamp((lt - re) / 1.5); ctx.save(); ctx.translate(lerp(600, 1100, k), lerp(1300, 300, k)); ctx.rotate(k * 6); ctx.beginPath(); ctx.arc(0, 0, 160, Math.PI, 0); ctx.closePath(); shape('#e84393'); line(0, 0, 0, 200, OUT, 10); ctx.restore(); }
+    popText('JUSTE TOI', 540, 300, 190, '#74b9ff', lw(/juste/i, 'rain'), lt, -.05, re - .1);
+    popText('BYE LE PARAPLUIE', 540, 300, 140, '#e84393', re, lt, .04);
+  },
+  work(lt, d, g) {
+    ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1600, W + 800, 900);
+    rr(80, 1550, 920, 50, 10, '#a0785a');
+    rr(300, 1180, 480, 330, 16, '#2d3436'); rr(320, 1200, 440, 290, 8, lt > lw(/bulles/i, 'work') ? '#0984e3' : '#74b9ff', 0);
+    if (lt > lw(/bulles/i, 'work')) for (let i = 0; i < 8; i++) { const k = (g * .8 + i / 8) % 1; ell(400 + (i * 47) % 300, 1450 - k * 400, 14 + (i % 3) * 6, 14 + (i % 3) * 6, 'rgba(255,255,255,.7)', 4); }
+    rr(330, 1520, 420, 40, 8, '#636e72');
+    cloud(540, 640, .8, g, { rain: 1, rainLen: 900 });
+    puddle(540, 1555, 230);
+    const bo = lw(/patron/i, 'work');
+    if (lt > bo - .3) human(940, 2250, .9, g, { bald: true, mustache: true, shirt: '#2c3e50', bowtie: '#e74c3c', expr: 'neutral', flip: true });
+    const mm = lw(/météo/i, 'work');
+    if (lt > mm) { const k = easeOutBack((lt - mm) / .35); ctx.save(); ctx.translate(250, 1000); ctx.scale(k, k); ctx.rotate(-.08); rr(-200, -70, 400, 140, 20, '#0984e3', 6); txt('M. MÉTÉO ☔', 0, 6, 56, '#fff', 'Anton'); ctx.restore(); }
+    popText('TON CLAVIER', 540, 300, 170, '#fff', lw(/clavier/i, 'work'), lt, -.05, lw(/bulles/i, 'work') - .1);
+    popText('BLOUB BLOUB', 540, 300, 170, '#74b9ff', lw(/bulles/i, 'work'), lt, .05);
+  },
+  date(lt, d, g) {
+    ctx.fillStyle = '#7b2d26'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#5d3a1a'; ctx.fillRect(-400, 1500, W + 800, 900);
+    for (const x of [200, 880]) { line(x, -400, x, 120, '#2d3436', 4); poly([[x - 70, 200], [x + 70, 200], [x + 40, 120], [x - 40, 120]], '#f6e58d'); }
+    const pa = lw(/parapluie/i, 'date');
+    human(300, 2200, .9, g, { expr: 'sad', ...WET });
+    if (lt < pa + .5) human(800, 2200, .9, g, { longHair: true, hair: '#e1b12c', shirt: '#fd79a8', expr: lt > lw(/soupe/i, 'date') ? 'shock' : 'neutral', flip: true });
+    else { const k = clamp((lt - pa - .5) / 1.5); human(lerp(800, 1300, k), 2200, .9, g, { longHair: true, hair: '#e1b12c', shirt: '#fd79a8', expr: 'angry', pose: 'run' }); ctx.save(); ctx.translate(lerp(840, 1340, k), 1300); ctx.beginPath(); ctx.arc(0, 0, 150, Math.PI, 0); ctx.closePath(); shape('#2d3436'); ctx.restore(); }
+    // table + soupe
+    rr(150, 1560, 780, 60, 10, '#fff'); ell(320, 1555, 110, 30, '#e17055', 5);
+    cloud(300, 820, .7, g, { rain: 1, rainLen: 700 });
+    if (lt > lw(/soupe/i, 'date')) for (let i = 0; i < 6; i++) { const k = (g * 2 + i / 6) % 1; ell(320 + Math.cos(i) * 90 * k, 1540 - k * 80, 8, 8, '#e17055', 0); }
+    const se = lw(/serpillière/i, 'date');
+    if (lt > se) { human(1000, 2100, .7, g, { shirt: '#fff', bowtie: '#2d3436', expr: 'neutral', flip: true, armR: 1.2 }); ctx.save(); ctx.translate(820, 1300); ctx.rotate(-.2); rr(-8, 0, 16, 400, 6, '#a0522d'); for (let i = -3; i <= 3; i++) line(i * 8, 400, i * 14, 470, '#dfe6e9', 8); ctx.restore(); }
+    popText('DANS TA SOUPE', 540, 300, 150, '#fff', lw(/soupe/i, 'date'), lt, -.05, pa - .1);
+    popText('PARTIE…', 540, 300, 200, '#fd79a8', pa, lt, .05, se - .1);
+    popText('UNE SERPILLIÈRE', 540, 300, 140, '#ffd32a', se, lt, -.04);
+  },
+  talk(lt, d, g) {
+    street(g, false);
+    const pl = lw(/pleurer/i, 'talk'), de = lw(/déluge/i, 'talk');
+    human(540, 2150, .95, g, { expr: lt < pl ? 'angry' : 'shock', armL: lt < pl ? -2.6 : -.2, armR: lt < pl ? 2.6 : .2, ...WET });
+    cloud(540, 760, lt > pl ? 1.1 : .9, g, { rain: lt > pl ? 1 : .6, cry: lt > pl, dark: lt > de, rainLen: 900 });
+    if (lt > de) { ctx.save(); ctx.globalAlpha = .45; ctx.fillStyle = '#0984e3'; ctx.fillRect(0, 1750 - Math.min(400, (lt - de) * 300), W, 800); ctx.restore(); }
+    bubble(380, 1150, 420, 150, 'ARRÊTE !!!', 80, 40, lw(/cries/i, 'talk'), lt, pl);
+    popText('IL PLEURE', 540, 300, 190, '#74b9ff', pl, lt, -.05, de - .1);
+    popText('DÉLUGE', 540, 300, 220, '#0984e3', de, lt, .05);
+  },
+  friend(lt, d, g) {
+    street(g);
+    const ca = lw(/câlin/i, 'friend'), ar = lw(/arc/i, 'friend');
+    cloud(540, ca < lt ? 1060 : 800, .9, g, { rain: lt > ar ? 0 : .5, blink: lt > ca, rainbow: lt > ar });
+    human(540, 2150, .95, g, { expr: lt > ar ? 'neutral' : 'sad', armL: lt > ca ? -2.3 : .1, armR: lt > ca ? 2.3 : -.1, ...WET });
+    if (lt > ca) hearts(g, 540, 1000, 5);
+    popText('CÂLIN', 540, 300, 210, '#ff4757', ca, lt, -.05, lw(/humide/i, 'friend'));
+    popText('C\'EST HUMIDE', 540, 300, 170, '#74b9ff', lw(/humide/i, 'friend'), lt, .05, ar - .1);
+    popText('ARC-EN-CIEL', 540, 300, 180, '#f9ca24', ar, lt, -.05);
+  },
+  boss(lt, d, g) {
+    ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1600, W + 800, 900);
+    const ec = lw(/éclair/i, 'boss'), fu = lw(/fume/i, 'boss'), gp = lw(/pain/i, 'boss');
+    human(250, 2200, .9, g, { expr: 'shock', ...WET });
+    cloud(250, 820, .7, g, { rain: .6, angry: lt > lw(/fâche/i, 'boss'), dark: lt > lw(/fâche/i, 'boss'), lightning: lt > ec && lt < ec + .6 ? [700, 900] : null });
+    if (lt > ec && lt < ec + .15) { ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.fillRect(0, 0, W, H); }
+    const burnt = lt > ec;
+    human(780, 2200, 1.0, g, { bald: true, mustache: !burnt, shirt: burnt ? '#2d3436' : '#2c3e50', bowtie: '#e74c3c', expr: burnt ? 'shock' : 'angry', flip: true, armR: burnt ? -.1 : 1.6 });
+    if (burnt) { ctx.save(); ctx.globalAlpha = .7; for (let i = 0; i < 3; i++) { ctx.beginPath(); const xx = 740 + i * 40; ctx.moveTo(xx, 1300); for (let j = 0; j < 5; j++) ctx.quadraticCurveTo(xx + (j % 2 ? 26 : -26), 1270 - j * 40 + Math.sin(g * 4 + i) * 8, xx, 1240 - j * 40); shape(null, 8, '#636e72'); } ctx.restore(); }
+    bubble(760, 640, 440, 150, 'T\'ES VIRÉ !', 80, 60, lw(/crie/i, 'boss'), lt, ec);
+    popText('ZAP !', 540, 300, 230, '#f9ca24', ec, lt, -.06, gp - .1);
+    popText('UN GRILLE-PAIN', 540, 300, 150, '#fff', gp, lt, .05);
+  },
+  farmer(lt, d, g) {
+    sky(); ctx.fillStyle = '#6ab04c'; ctx.fillRect(-400, 1300, W + 800, 1000);
+    for (let r = 0; r < 4; r++) for (let i = 0; i < 9; i++) { const x = i * 130 + (r % 2) * 60, y = 1380 + r * 140; line(x, y, x, y - 60 - Math.sin(g * 2 + i) * 6, '#27ae60', 8); ell(x, y - 70, 14, 20, '#f9ca24', 3); }
+    const pa = lw(/payent/i, 'farmer'), st = lw(/statue/i, 'farmer');
+    human(540, 2150, .9, g, { expr: 'neutral', cap: '#e1b12c', ...WET });
+    cloud(540, 800, .9, g, { rain: 1, smug: true, rainLen: 900 });
+    if (lt > pa) human(160, 2050, .75, g, { cap: '#27ae60', shirt: '#0984e3', pants: '#0984e3', mustache: true, expr: 'neutral', armR: 1.4 });
+    if (lt > pa) for (let i = 0; i < 5; i++) { const k = (g * .5 + i / 5) % 1; txt('€', 200 + i * 40, 1300 - k * 200, 60, '#00b894', 'Anton', 'center', 6); }
+    if (lt > st) { ctx.save(); ctx.translate(900, 1900); rr(-110, -40, 220, 60, 10, '#95a5a6'); human(0, -40, .45, g, { shirt: '#95a5a6', pants: '#95a5a6', hair: '#95a5a6', expr: 'neutral' }); ctx.restore(); cloud(900, 1250, .35, g, { rain: 1, rainLen: 300 }); }
+    popText('RICHE', 540, 300, 210, '#2ed573', lw(/riche/i, 'farmer'), lt, -.05, st - .1);
+    popText('UNE STATUE (MOUILLÉE)', 540, 300, 110, '#fff', st, lt, .04);
+  },
+  end(lt, d, g) {
+    ctx.fillStyle = '#c7ecee'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    ctx.globalAlpha = .5; for (let x = -400; x < W + 400; x += 110) line(x, -400, x, 1400, '#fff', 4); ctx.globalAlpha = 1;
+    ctx.fillStyle = '#535c68'; ctx.fillRect(-400, 1400, W + 800, 900);
+    human(540, 2150, .95, g, { expr: 'sad', armL: -1.4, armR: 1.4, ...WET });
+    cloud(540, 760, .9, g, { rain: 1, rainLen: 900 });
+    // thermomètre froid
+    rr(860, 400, 70, 420, 35, '#fff', 6); rr(878, 760, 34, 60, 17, '#74b9ff', 0); ell(895, 840, 50, 50, '#74b9ff');
+    const ja = lw(/jamais/i, 'end');
+    if (lt > ja) { line(80, 1050, 420, 1050, '#2d3436', 4); for (let i = 0; i < 3; i++) { ctx.save(); ctx.translate(140 + i * 110, 1060); rr(-30, 0, 60, 140, 16, ['#ff7675', '#74b9ff', '#55efc4'][i], 4); const k = (g * 1.5 + i * .3) % 1; ell(0, 150 + k * 80, 6, 10, '#74b9ff', 0); ctx.restore(); } }
+    popText('PAS D\'EAU CHAUDE', 540, 300, 130, '#74b9ff', lw(/chaude/i, 'end'), lt, -.04, ja - .1);
+    popText('3 ANS', 540, 300, 210, '#fff', lw(/trois/i, 'end'), lt, .05, ja - .1);
+    popText('JAMAIS SÈCHES', 540, 300, 150, '#ff3838', ja, lt, -.05);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    human(540, 2200, .95, g, { expr: 'neutral' });
+    cloud(540, 1000, 1.0, g, { rain: lt > lw(/tête/i, 'outro') ? 1 : .2, smug: true, rainLen: 700 });
+    subscribe(lt);
+  },
+};
+</script></body></html>

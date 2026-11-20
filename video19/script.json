@@ -1,0 +1,229 @@
+{
+ "title": "Ton canapé t'a avalé",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ton *canapé* t'a avalé. Et à l'intérieur... il y a tout un *royaume*."
+  },
+  {
+   "scene": "remote",
+   "text": "Ça commence quand ta *télécommande* tombe entre les coussins. Tu mets la main pour la chercher. Puis le bras. Puis la *tête*."
+  },
+  {
+   "scene": "fall",
+   "text": "Et le canapé fait *gloups*. Tu tombes. Longtemps. Très longtemps. Tu croises une pièce de deux euros. Un *bonbon* de la Saint-Valentin. Et une chaussette *orpheline*."
+  },
+  {
+   "scene": "world",
+   "text": "Tu atterris dans un monde *gigantesque*. Il y a des montagnes de *miettes*. Des rivières de *soda*. Et des pièces de un centime partout."
+  },
+  {
+   "scene": "people",
+   "text": "Les habitants, ce sont des *chips*. Des vieilles chips de *2015*. Elles ne sont plus croustillantes. Elles sont *tristes*."
+  },
+  {
+   "scene": "king",
+   "text": "Leur roi, c'est une croûte de *pizza*. Il a une couronne en *capsule de bière*. Il te dit : bienvenue, *étranger*. Toute la cour s'incline. Les *miettes* applaudissent."
+  },
+  {
+   "scene": "lost",
+   "text": "Tu retrouves aussi tout ce que tu avais perdu. Ta télécommande. Tes *clés*. Et ton *chat*, disparu depuis trois ans. Il est devenu *ministre*."
+  },
+  {
+   "scene": "escape",
+   "text": "Tu veux rentrer. Le roi accepte. Mais à une condition. Il faut d'abord payer le *péage*."
+  },
+  {
+   "scene": "like",
+   "text": "Il regarde la caméra et il dit : toi, sur ton canapé, en train de regarder ça... lâche un *like*. Sinon, ce soir, c'est *toi* qu'il avale."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et lève-toi de ce *canapé*. Doucement."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "avalé",
+   "in": "hook",
+   "type": "slurp",
+   "gain": 0.9
+  },
+  {
+   "word": "royaume",
+   "in": "hook",
+   "type": "magic",
+   "gain": 0.7
+  },
+  {
+   "word": "tombe",
+   "in": "remote",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "main",
+   "type": "creak",
+   "gain": 0.4
+  },
+  {
+   "word": "tête",
+   "type": "slurp",
+   "gain": 0.6
+  },
+  {
+   "word": "gloups",
+   "type": "gulp",
+   "gain": 1.0
+  },
+  {
+   "word": "gloups",
+   "type": "slurp",
+   "offset": 0.1,
+   "gain": 0.7
+  },
+  {
+   "word": "tombes",
+   "type": "fall_whistle",
+   "dur": 2.4,
+   "gain": 0.7
+  },
+  {
+   "word": "atterris",
+   "type": "land",
+   "offset": 0.2,
+   "gain": 1.0
+  },
+  {
+   "word": "gigantesque",
+   "type": "magic",
+   "gain": 0.5
+  },
+  {
+   "word": "miettes",
+   "type": "crunch",
+   "gain": 0.6
+  },
+  {
+   "word": "soda",
+   "type": "bubbles",
+   "dur": 1.5,
+   "gain": 0.6
+  },
+  {
+   "word": "centime",
+   "type": "cash",
+   "gain": 0.6
+  },
+  {
+   "word": "chips",
+   "in": "people",
+   "n": 0,
+   "type": "crunch",
+   "gain": 0.7
+  },
+  {
+   "word": "tristes",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "pizza",
+   "type": "drumroll",
+   "offset": -0.6,
+   "dur": 0.7,
+   "gain": 0.5
+  },
+  {
+   "word": "bière",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "étranger",
+   "type": "applause",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "télécommande",
+   "in": "lost",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "clés",
+   "type": "clank",
+   "gain": 0.6
+  },
+  {
+   "word": "chat",
+   "in": "lost",
+   "type": "squeak",
+   "gain": 0.5
+  },
+  {
+   "word": "ministre",
+   "type": "applause",
+   "dur": 1.8,
+   "gain": 0.6
+  },
+  {
+   "word": "condition",
+   "type": "drumroll",
+   "dur": 1.0,
+   "gain": 0.6
+  },
+  {
+   "word": "regarde",
+   "in": "like",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "like",
+   "in": "like",
+   "type": "ding",
+   "gain": 0.8
+  },
+  {
+   "word": "toi",
+   "in": "like",
+   "n": 1,
+   "type": "gulp",
+   "offset": 0.3,
+   "gain": 0.8
+  },
+  {
+   "word": "canapé",
+   "in": "outro",
+   "type": "creak",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "bonbon",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "orpheline",
+   "type": "sad_trombone",
+   "offset": 0.2,
+   "gain": 0.4
+  },
+  {
+   "word": "miettes",
+   "in": "king",
+   "type": "applause",
+   "dur": 1.5,
+   "gain": 0.6
+  },
+  {
+   "word": "péage",
+   "type": "cash",
+   "gain": 0.6
+  }
+ ]
+}

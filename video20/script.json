@@ -1,0 +1,234 @@
+{
+ "title": "Un nuage te suit partout",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Un petit *nuage* s'est installé au-dessus de ta tête. Et il te *suit* partout."
+  },
+  {
+   "scene": "rain",
+   "text": "Il fait grand soleil. Tout le monde est en short. Et toi, tu es sous la *pluie*. Juste toi. Même ton parapluie *refuse* de t'aider."
+  },
+  {
+   "scene": "work",
+   "text": "Au travail, il pleut sur ton *clavier*. Ton ordinateur fait des *bulles*. Ton patron te regarde bizarrement. Tes collègues t'appellent *monsieur Météo*."
+  },
+  {
+   "scene": "date",
+   "text": "Le soir, tu as un rendez-vous amoureux. Au restaurant, il pleut dans ta *soupe*. Ta *date* s'en va... avec un parapluie. Le serveur t'apporte une *serpillière*."
+  },
+  {
+   "scene": "talk",
+   "text": "Tu craques. Tu cries sur le nuage. Et là... il se met à *pleurer*. Encore plus fort. C'est le *déluge*."
+  },
+  {
+   "scene": "friend",
+   "text": "Tu le consoles. Tu lui fais un *câlin*. C'est humide. Mais il se calme. Et il fait un petit *arc-en-ciel*."
+  },
+  {
+   "scene": "boss",
+   "text": "Le lendemain, ton patron te crie dessus. Ton nuage se fâche... et il lui envoie un *éclair*. Sa moustache *fume*. Il ressemble à un *grille-pain*."
+  },
+  {
+   "scene": "farmer",
+   "text": "Maintenant, vous êtes inséparables. Les agriculteurs vous *payent* pour arroser leurs champs. Tu es *riche*. Un village t'a même construit une *statue*. Elle est mouillée."
+  },
+  {
+   "scene": "end",
+   "text": "Ton seul problème ? Tu n'as pas pris de douche *chaude* depuis trois ans. Et tes chaussettes ne sèchent *jamais*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et regarde bien au-dessus de ta tête."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "nuage",
+   "in": "hook",
+   "type": "magic",
+   "gain": 0.6
+  },
+  {
+   "word": "suit",
+   "type": "rain",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "soleil",
+   "type": "birds",
+   "dur": 2.5,
+   "gain": 0.5
+  },
+  {
+   "word": "pluie",
+   "type": "rain",
+   "dur": 3.0,
+   "gain": 0.8
+  },
+  {
+   "word": "toi",
+   "in": "rain",
+   "n": 1,
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.5
+  },
+  {
+   "word": "clavier",
+   "type": "rain",
+   "dur": 3.5,
+   "gain": 0.6
+  },
+  {
+   "word": "clavier",
+   "type": "knock",
+   "offset": -0.5,
+   "gain": 0.4,
+   "repeat": 3,
+   "gap": 0.12
+  },
+  {
+   "word": "bulles",
+   "type": "bubbles",
+   "dur": 1.8,
+   "gain": 0.7
+  },
+  {
+   "word": "soupe",
+   "type": "splash",
+   "gain": 0.7
+  },
+  {
+   "word": "soupe",
+   "type": "rain",
+   "dur": 3.0,
+   "gain": 0.5
+  },
+  {
+   "word": "parapluie",
+   "type": "footsteps",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "cries",
+   "type": "thud",
+   "gain": 0.5
+  },
+  {
+   "word": "pleurer",
+   "type": "rain",
+   "dur": 3.5,
+   "gain": 0.8
+  },
+  {
+   "word": "déluge",
+   "type": "thunder",
+   "gain": 0.8
+  },
+  {
+   "word": "déluge",
+   "type": "splash",
+   "offset": 0.3,
+   "gain": 0.7
+  },
+  {
+   "word": "câlin",
+   "type": "splash",
+   "gain": 0.4
+  },
+  {
+   "word": "arc",
+   "type": "magic",
+   "gain": 0.8
+  },
+  {
+   "word": "crie",
+   "in": "boss",
+   "type": "thud",
+   "gain": 0.5
+  },
+  {
+   "word": "fâche",
+   "type": "thunder",
+   "offset": 0.2,
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "éclair",
+   "type": "thunder",
+   "gain": 1.0
+  },
+  {
+   "word": "fume",
+   "type": "crack",
+   "gain": 0.7
+  },
+  {
+   "word": "payent",
+   "type": "cash",
+   "gain": 0.8
+  },
+  {
+   "word": "champs",
+   "type": "rain",
+   "dur": 2.5,
+   "gain": 0.5
+  },
+  {
+   "word": "riche",
+   "type": "cash",
+   "gain": 0.8
+  },
+  {
+   "word": "chaude",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.7
+  },
+  {
+   "word": "tête",
+   "in": "outro",
+   "type": "rain",
+   "dur": 2.0,
+   "gain": 0.6
+  },
+  {
+   "word": "météo",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "serpillière",
+   "type": "splash",
+   "gain": 0.5
+  },
+  {
+   "word": "statue",
+   "type": "applause",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "jamais",
+   "in": "end",
+   "type": "rain",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "pain",
+   "in": "boss",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "refuse",
+   "type": "whoosh",
+   "gain": 0.6
+  }
+ ]
+}

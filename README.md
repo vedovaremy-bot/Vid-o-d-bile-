@@ -74,3 +74,9 @@ Fichier final : `video16_pingouin_coloc.mp4` — voix ElevenLabs, sans musique, 
 ## Vidéo 17 — « Ta brosse à dents a démissionné » (70 s)
 Fichier final : `video17_brosse_a_dents.mp4` — voix ElevenLabs, sans musique, ~35 bruitages,
 like réclamé par la brosse à dents dès le début (~3-9 s, « c'est mon indemnité de départ »).
+
+## Retour à la voix 1 (Piper `fr_FR-tom-medium`) à partir de la vidéo 18
+## Vidéo 18 — « Un hamster a piraté ta carte bancaire » (81 s) — `video18_hamster_carte_bancaire.mp4`, pas de like
+## Vidéo 19 — « Ton canapé t'a avalé » (77 s) — `video19_canape_royaume.mp4`, like réclamé par le roi juste avant la fin
+## Vidéo 20 — « Un nuage te suit partout » (76 s) — `video20_nuage.mp4`, pas de like
+Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thunder, slurp.

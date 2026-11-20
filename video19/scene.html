@@ -1,0 +1,176 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ LE CANAPÉ (avec une bouche)
+function couch(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 420);
+  rr(-420, -460, 840, 300, 80, '#8e44ad'); rr(-470, -260, 940, 260, 70, '#9b59b6');
+  rr(-520, -360, 140, 360, 60, '#8e44ad'); rr(380, -360, 140, 360, 60, '#8e44ad');
+  // bouche entre les coussins
+  const op = o.open ? (o.open === true ? .5 + Math.abs(Math.sin(t * 5)) * .5 : o.open) : 0;
+  ctx.beginPath(); ctx.ellipse(0, -230, 330, 20 + op * 120, 0, 0, 7); shape('#2c0f3d', 6);
+  if (op > .2) { for (let i = -3; i <= 3; i++) poly([[i * 80 - 24, -250 - op * 110], [i * 80 + 24, -250 - op * 110], [i * 80, -200 - op * 110]], '#fff', 3); }
+  // yeux sur le dossier
+  const ey = -380;
+  ell(-140, ey, 50, 56, '#fff', 6); ell(140, ey, 50, 56, '#fff', 6); ell(-130, ey + 8, 20, 24, '#111', 0); ell(150, ey + 8, 20, 24, '#111', 0);
+  if (o.evil) { line(-210, ey - 70, -90, ey - 40, OUT, 10); line(210, ey - 70, 90, ey - 40, OUT, 10); }
+  ctx.restore();
+}
+// une chips (habitant)
+function chip(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y + Math.sin(t * 3 + x) * 4); ctx.scale(s, s); shadow(0, 0, 90);
+  line(-25, -40, -25, 0, OUT, 10); line(25, -40, 25, 0, OUT, 10);
+  ctx.beginPath(); for (let i = 0; i <= 20; i++) { const a = i / 20 * Math.PI * 2; const r = 120 + Math.sin(a * 5) * 12; ctx.lineTo(Math.cos(a) * r, -170 + Math.sin(a) * r * .9); } ctx.closePath(); shape(o.col || '#f6e58d', 6);
+  ctx.globalAlpha = .25; for (let i = 0; i < 4; i++) ell(-60 + i * 40, -200 + (i % 2) * 60, 10, 8, '#e1b12c', 0); ctx.globalAlpha = 1;
+  ell(-36, -190, 16, 18, '#fff', 4); ell(36, -190, 16, 18, '#fff', 4); ell(-34, -186, 7, 8, '#111', 0); ell(38, -186, 7, 8, '#111', 0);
+  if (o.sad !== false) { line(-56, -222, -20, -232, OUT, 5); line(56, -222, 20, -232, OUT, 5); ctx.beginPath(); ctx.arc(0, -110, 22, Math.PI * 1.15, Math.PI * 1.85); shape(null, 5); const k = (t * 1.4 + x * .01) % 1; ell(-40, -160 + k * 60, 6, 10, '#74b9ff', 0); }
+  else { ctx.beginPath(); ctx.arc(0, -150, 24, Math.PI * .15, Math.PI * .85); shape(null, 5); }
+  if (o.clap) { line(-110, -150, -150, -200 + Math.sin(t * 20) * 20, OUT, 9); line(110, -150, 150, -200 - Math.sin(t * 20) * 20, OUT, 9); }
+  ctx.restore();
+}
+// le roi croûte de pizza
+function crustKing(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 180);
+  line(-40, -60, -40, 0, OUT, 12); line(40, -60, 40, 0, OUT, 12);
+  ctx.translate(0, Math.sin(t * 3) * 4);
+  ctx.beginPath(); ctx.moveTo(-200, -80); ctx.quadraticCurveTo(-240, -380, 0, -420); ctx.quadraticCurveTo(240, -380, 200, -80); ctx.quadraticCurveTo(0, -40, -200, -80); shape('#e1a95f', 7);
+  ctx.globalAlpha = .3; for (let i = 0; i < 6; i++) ell(-120 + i * 50, -330 + (i % 2) * 40, 12, 8, '#a0622d', 0); ctx.globalAlpha = 1;
+  ell(-60, -110, 30, 20, '#e55039', 0); ell(80, -100, 24, 16, '#e55039', 0);
+  // couronne capsule
+  ctx.save(); ctx.translate(0, -430); for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI; poly([[Math.cos(Math.PI + a) * 90, Math.sin(Math.PI + a) * 30], [Math.cos(Math.PI + a + .1) * 100, Math.sin(Math.PI + a + .1) * 34 - 20], [Math.cos(Math.PI + a + .2) * 90, Math.sin(Math.PI + a + .2) * 30]], '#e1b12c', 3); } ell(0, -10, 100, 34, '#f9ca24', 5); ctx.restore();
+  const ey = -280;
+  ell(-60, ey, 30, 34, '#fff', 5); ell(60, ey, 30, 34, '#fff', 5); ell(-56, ey + 6, 12, 14, '#111', 0); ell(64, ey + 6, 12, 14, '#111', 0);
+  if (o.angry) { line(-100, ey - 50, -30, ey - 34, OUT, 8); line(100, ey - 50, 30, ey - 34, OUT, 8); }
+  ctx.beginPath(); ctx.moveTo(-60, -200); ctx.quadraticCurveTo(-30, -220, 0, -205); ctx.quadraticCurveTo(30, -220, 60, -200); shape(null, 6, '#6d4c41');
+  if (o.talk && Math.sin(t * 16) > 0) ell(0, -175, 26, 18, '#7a2b2b', 5); else { ctx.beginPath(); ctx.arc(0, -195, 30, Math.PI * .2, Math.PI * .8); shape(null, 6); }
+  if (o.arms) { const [al, ar] = o.arms; for (const [side, a] of [[-1, al], [1, ar]]) { ctx.save(); ctx.translate(side * 200, -220); ctx.rotate(a * side); line(0, 0, side * 110, 0, OUT, 12); ell(side * 116, 0, 18, 18, '#e1a95f', 4); ctx.restore(); } }
+  ctx.restore();
+}
+function catChar(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s); shadow(0, 0, 110);
+  ell(0, -150, 120, 140, '#636e72'); ell(0, -120, 70, 90, '#dfe6e9', 0);
+  if (o.sash) { ctx.save(); ctx.beginPath(); ctx.ellipse(0, -150, 120, 140, 0, 0, 7); ctx.clip(); ctx.translate(0, -150); ctx.rotate(.7); ['#0055a4', '#fff', '#ef4135'].forEach((c, i) => { ctx.fillStyle = c; ctx.fillRect(-200, -40 + i * 26, 400, 26); }); ctx.restore(); }
+  ctx.translate(0, -320); poly([[-100, -40], [-90, -150], [-30, -90]], '#636e72'); poly([[100, -40], [90, -150], [30, -90]], '#636e72');
+  ell(0, 0, 110, 95, '#636e72'); ell(-40, -10, 22, 24, '#c8e66b', 4); ell(40, -10, 22, 24, '#c8e66b', 4); ell(-40, -10, 6, 18, '#111', 0); ell(40, -10, 6, 18, '#111', 0);
+  poly([[-12, 22], [12, 22], [0, 34]], '#ff7aa2', 3); for (const sx of [-1, 1]) for (const dy of [-6, 10]) line(sx * 50, 36 + dy, sx * 130, 26 + dy * 2, OUT, 3);
+  if (o.glasses) { ell(-40, -10, 32, 30, 'rgba(255,255,255,.15)', 5); ell(40, -10, 32, 30, 'rgba(255,255,255,.15)', 5); }
+  ctx.restore();
+}
+function remote(x, y, s, rot = 0) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); rr(-40, -140, 80, 280, 30, '#2d3436', 5); ell(0, -100, 16, 16, '#e74c3c', 0); for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) ell(-16 + j * 32, -40 + i * 40, 10, 10, '#b2bec3', 0); ctx.restore(); }
+function kingdom() {
+  const gr = ctx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#2c0f3d'); gr.addColorStop(1, '#6c3483'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+  // fibres du tissu
+  ctx.globalAlpha = .12; for (let i = 0; i < 40; i++) line(i * 30 - 100, -100, i * 30 + 200, 1900, '#fff', 4); ctx.globalAlpha = 1;
+  // montagnes de miettes
+  for (let i = 0; i < 5; i++) { const x = i * 260 - 60, h = 300 + (i % 2) * 200; poly([[x - 200, 1450], [x, 1450 - h], [x + 200, 1450]], '#e1a95f'); const R = rnd(i + 2); for (let j = 0; j < 10; j++) ell(x + (R() - .5) * 200, 1450 - R() * h * .8, 14, 10, '#c8834a', 0); }
+  ctx.fillStyle = '#5b2c6f'; ctx.fillRect(-400, 1450, W + 800, 900);
+}
+
+window.SCENES = {
+  hook(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    const av = lw(/avalé/i, 'hook');
+    couch(540, 1850, 1.0, g, { open: lt < av + .6 && lt > av - .4 ? true : 0, evil: lt > av });
+    if (lt < av) human(540, 2350, .8, g, { expr: 'shock', armL: -2.6, armR: 2.6 });
+    popText('GLOUPS', 540, 330, 200, '#8e44ad', av, lt, -.06, lw(/royaume/i, 'hook') - .1);
+    popText('UN ROYAUME', 540, 330, 170, '#ffd32a', lw(/royaume/i, 'hook'), lt, .05);
+  },
+  remote(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    couch(540, 1900, 1.0, g, { open: lt > lw(/tête/i, 'remote') ? .4 : 0 });
+    const ma = lw(/main/i, 'remote'), br = lw(/bras/i, 'remote'), te = lw(/tête/i, 'remote');
+    if (lt < lw(/main/i, 'remote')) remote(540, 1600 + Math.min(1, lt / 1) * 100, .9, .4);
+    // toi qui plonge progressivement
+    const dive = lt > te ? 1 : lt > br ? .6 : lt > ma ? .3 : 0;
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, 1660); ctx.clip();
+    ctx.translate(540, lerp(1100, 1700, dive)); ctx.rotate(Math.PI * .95); human(0, 0, .8, g, { expr: 'neutral', armL: -2.7, armR: 2.7 }); ctx.restore();
+    popText('LA MAIN', 540, 330, 180, '#fff', ma, lt, -.05, br - .1);
+    popText('LE BRAS', 540, 330, 180, '#fff', br, lt, .05, te - .1);
+    popText('LA TÊTE ?!', 540, 330, 190, '#ff3838', te, lt, -.05);
+  },
+  fall(lt, d, g) {
+    const gr = ctx.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#2c0f3d'); gr.addColorStop(1, '#8e44ad'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 14; i++) { const R = rnd(i + 4); const x = R() * W, y = ((-g * 900 + R() * 2400) % 2400 + 2400) % 2400 - 200; line(x, y, x, y + 160, 'rgba(255,255,255,.25)', 6); }
+    ctx.save(); ctx.translate(540, 1500); ctx.rotate(Math.sin(g * 2) * .4); human(0, 300, .7, g, { expr: 'shock', armL: -2.6, armR: 2.6 }); ctx.restore();
+    // objets croisés pendant la chute
+    const objs = [[lw(/pièce/i, 'fall'), (x, y) => { ell(x, y, 70, 70, '#f9ca24', 6); txt('2€', x, y + 4, 50, '#7f5f00', 'Anton'); }], [lw(/bonbon/i, 'fall'), (x, y) => { ell(x, y, 60, 50, '#ff7675', 5); poly([[x - 60, y], [x - 110, y - 40], [x - 110, y + 40]], '#ff7675', 5); poly([[x + 60, y], [x + 110, y - 40], [x + 110, y + 40]], '#ff7675', 5); txt('♥', x, y + 4, 50, '#fff', 'serif'); }], [lw(/orpheline/i, 'fall'), (x, y) => { ctx.save(); ctx.translate(x, y); rr(-40, -120, 80, 160, 20, '#74b9ff', 5); rr(-40, 0, 140, 60, 26, '#74b9ff', 5); ctx.restore(); }]];
+    objs.forEach(([t0, draw], i) => { if (lt < t0 - .3 || lt > t0 + 2) return; const k = (lt - t0 + .3) / 2.3; draw([250, 820, 300][i], lerp(1900, -100, k)); });
+    popText('GLOUPS', 540, 330, 200, '#fff', lw(/gloups/i, 'fall'), lt, -.06, lw(/longtemps/i, 'fall') - .1);
+    popText('LONGTEMPS…', 540, 330, 170, '#a29bfe', lw(/longtemps/i, 'fall'), lt, .05, lw(/pièce/i, 'fall') - .3);
+  },
+  world(lt, d, g) {
+    kingdom();
+    // rivière de soda
+    ctx.save(); ctx.beginPath(); ctx.moveTo(-100, 1500); ctx.quadraticCurveTo(540, 1600, 1200, 1500); ctx.lineTo(1200, 1640); ctx.quadraticCurveTo(540, 1740, -100, 1640); ctx.closePath(); shape('#6d3b1a', 0); ctx.restore();
+    for (let i = 0; i < 8; i++) { const k = (g * .6 + i / 8) % 1; ell(k * 1200 - 60, 1570 + Math.sin(i) * 30, 10, 10, 'rgba(255,255,255,.6)', 0); }
+    const R = rnd(9); for (let i = 0; i < 9; i++) { ell(80 + R() * 920, 1720 + R() * 180, 34, 34, '#e17055', 4); }
+    human(540, 2100, .6, g, { expr: 'shock' });
+    popText('MIETTES', 280, 330, 140, '#e1a95f', lw(/miettes/i, 'world'), lt, -.06);
+    popText('SODA', 800, 480, 150, '#6d3b1a', lw(/soda/i, 'world'), lt, .06);
+    popText('1 CENTIME', 540, 680, 120, '#e17055', lw(/centime/i, 'world'), lt, -.04);
+  },
+  people(lt, d, g) {
+    kingdom();
+    const R = rnd(5);
+    for (let i = 0; i < 7; i++) chip(120 + i * 140, 1800 + (i % 2) * 60, .7 + R() * .2, g, {});
+    popText('2015', 540, 330, 220, '#ffd32a', lw(/2015/i, 'people'), lt, -.06, lw(/croustillantes/i, 'people') - .1);
+    popText('PLUS CROUSTILLANTES', 540, 330, 110, '#fff', lw(/croustillantes/i, 'people'), lt, .04, lw(/tristes/i, 'people') - .1);
+    popText('TRISTES', 540, 330, 200, '#74b9ff', lw(/tristes/i, 'people'), lt, -.05);
+  },
+  king(lt, d, g) {
+    kingdom();
+    // trône en capsules
+    rr(330, 900, 420, 800, 30, '#e1b12c'); rr(360, 940, 360, 360, 20, '#c0392b');
+    crustKing(540, 1700, 1.15, g, { talk: lt > lw(/dit/i, 'king') && lt < lw(/incline/i, 'king'), arms: [.4, -1.4] });
+    const ap = lw(/miettes/i, 'king');
+    for (let i = 0; i < 4; i++) chip([90, 210, 870, 990][i], 1900, .5, g, { sad: false, clap: lt > ap });
+    human(150, 2250, .7, g, { expr: 'shock' });
+    popText('LE ROI', 540, 330, 200, '#f9ca24', lw(/roi/i, 'king'), lt, -.05, lw(/couronne/i, 'king') - .1);
+    popText('COURONNE-CAPSULE', 540, 330, 120, '#fff', lw(/couronne/i, 'king'), lt, .04, lw(/bienvenue/i, 'king') - .2);
+    bubble(540, 560, 700, 170, 'BIENVENUE, ÉTRANGER', 60, 0, lw(/bienvenue/i, 'king') - .2, lt, lw(/incline/i, 'king'));
+  },
+  lost(lt, d, g) {
+    kingdom();
+    const tc = lw(/télécommande/i, 'lost'), cl = lw(/clés/i, 'lost'), ch = lw(/chat/i, 'lost'), mi = lw(/ministre/i, 'lost');
+    human(220, 2200, .85, g, { expr: lt > mi ? 'shock' : 'neutral' });
+    if (lt > tc) remote(420, 1700, .7, .3);
+    if (lt > cl) { ctx.save(); ctx.translate(560, 1760); ell(0, 0, 40, 40, null, 10, 0); ctx.beginPath(); ctx.arc(0, 0, 40, 0, 7); ctx.lineWidth = 10; ctx.strokeStyle = '#b2bec3'; ctx.stroke(); rr(30, -10, 120, 20, 6, '#e1b12c', 4); ctx.restore(); }
+    if (lt > ch - .2) catChar(820, 1960, .9, g, { sash: lt > mi, glasses: lt > mi });
+    popText('TES CLÉS', 540, 330, 180, '#fff', cl, lt, -.05, ch - .1);
+    popText('TON CHAT ?!', 540, 330, 180, '#ffd32a', ch, lt, .05, mi - .1);
+    popText('MINISTRE', 540, 330, 200, '#0055a4', mi, lt, -.05);
+  },
+  escape(lt, d, g) {
+    kingdom();
+    crustKing(540, 1800, 1.1, g, { talk: lt > lw(/condition/i, 'escape') - 1, arms: [.4, 1.6] });
+    human(170, 2250, .75, g, { expr: 'neutral' });
+    const pe = lw(/péage/i, 'escape');
+    if (lt > pe) { const k = easeOutBack((lt - pe) / .35); ctx.save(); ctx.translate(540, 560); ctx.scale(k, k); rr(-300, -100, 600, 200, 20, '#f9ca24', 8); txt('🚧 PÉAGE', 0, 6, 100, '#2d3436', 'Anton'); ctx.restore(); }
+    popText('UNE CONDITION', 540, 330, 160, '#fff', lw(/condition/i, 'escape'), lt, -.05);
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#ffeaa7'); gr.addColorStop(1, '#8e44ad'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const tk = lw(/dit/i, 'like');
+    crustKing(540, 2200, 2.2, g, { talk: lt > tk && lt < d - .3, angry: lt > lw(/sinon/i, 'like'), arms: lt > tk ? [.3, 2.2] : [.3, -.3] });
+    likeButton(lt, lw(/like/i, 'like'), g, 300);
+    popText('LÂCHE UN LIKE', 540, 620, 120, '#ffd32a', lw(/like/i, 'like'), lt, -.03, lw(/sinon/i, 'like') - .1);
+    popText('TOI, SUR TON CANAPÉ 👉', 540, 620, 90, '#fff', lw(/toi/i, 'like'), lt, .03, lw(/like/i, 'like') - .3);
+    const av = lw(/avale/i, 'like');
+    if (lt > av - .3) { const k = easeOutBack((lt - av + .3) / .35); ctx.save(); ctx.translate(540, 640); ctx.scale(k * .45, k * .45); couch(0, 300, 1, g, { open: true, evil: true }); ctx.restore(); }
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    couch(540, 1950, 1.0, g, { evil: true, open: lt > lw(/canapé/i, 'outro') ? true : .15 });
+    subscribe(lt);
+    popText('DOUCEMENT…', 540, 640, 140, '#ffd32a', lw(/doucement/i, 'outro'), lt, .04);
+  },
+};
+</script></body></html>

@@ -16,7 +16,7 @@ CFG = SynthesisConfig(
 )
 SR_OUT = 44100
 script = json.load(open("script.json", encoding="utf-8"))
-ENGINE = os.environ.get("ENGINE", script.get("engine", "elevenlabs"))   # défaut : ElevenLabs (voix validée) ; "piper" = ancienne voix 1
+ENGINE = os.environ.get("ENGINE", script.get("engine", "piper"))   # défaut : voix 1 Piper (retour demandé par l'utilisateur) ; "elevenlabs" possible
 EL_VOICE = os.environ.get("EL_VOICE", script.get("el_voice", "3Tp5mYhT9wrfnry9pzvV"))
 EL_MODEL = os.environ.get("EL_MODEL", "eleven_multilingual_v2")
 if ENGINE == "piper":

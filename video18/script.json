@@ -1,0 +1,250 @@
+{
+ "title": "Un hamster a piraté ta carte bancaire",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ton *hamster* a piraté ta carte bancaire. Et il a tout *dépensé*."
+  },
+  {
+   "scene": "night",
+   "text": "Tout a commencé une nuit. Tu entends des petits bruits. Clic. Clic. Clic. Il est sur ton *ordinateur*. Il porte des petites *lunettes*. Il tape avec ses deux pattes."
+  },
+  {
+   "scene": "shop",
+   "text": "Il commande quatre mille kilos de *graines de tournesol*. Une roue géante. Et une boule en plastique... avec *sièges chauffants*."
+  },
+  {
+   "scene": "bank",
+   "text": "Le lendemain, ta banque t'appelle. Tu es à *moins vingt mille* euros. Le conseiller *pleure*. Il a même pris un abonnement à une salle de sport. Pour *hamsters*."
+  },
+  {
+   "scene": "vegas",
+   "text": "Mais le hamster s'en fiche. Il prend un avion pour *Las Vegas*. Classe affaires. Dans ta *valise*."
+  },
+  {
+   "scene": "casino",
+   "text": "Au casino, il entre dans la *roulette*. Il court dans la roue. Elle tourne, elle tourne... et elle s'arrête sur le *jackpot*. Les croupiers n'ont *jamais* vu ça."
+  },
+  {
+   "scene": "rich",
+   "text": "Il gagne *dix millions*. Il s'achète des lunettes en or. Et une *limousine*... de quinze centimètres. Il embauche un garde du corps. C'est un *cochon d'Inde*."
+  },
+  {
+   "scene": "back",
+   "text": "Une semaine plus tard, il revient. Il a racheté ton *immeuble*. Ton appartement. Et ta *cage*."
+  },
+  {
+   "scene": "rent",
+   "text": "Il augmente ton loyer. Et chaque matin, il te regarde courir dans une *roue*... pour produire son *électricité*. Prix du loyer ? Trois cents *graines* par mois."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et cache bien ta carte bancaire ce soir."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "hamster",
+   "in": "hook",
+   "type": "squeak",
+   "gain": 0.8
+  },
+  {
+   "word": "dépensé",
+   "type": "cash",
+   "gain": 0.9
+  },
+  {
+   "word": "clic",
+   "type": "knock",
+   "gain": 0.5
+  },
+  {
+   "word": "ordinateur",
+   "type": "squeak",
+   "offset": 0.3,
+   "gain": 0.6,
+   "repeat": 2,
+   "gap": 0.2
+  },
+  {
+   "word": "kilos",
+   "type": "ding",
+   "gain": 0.5
+  },
+  {
+   "word": "tournesol",
+   "type": "crunch",
+   "gain": 0.6
+  },
+  {
+   "word": "géante",
+   "type": "ding",
+   "gain": 0.5
+  },
+  {
+   "word": "chauffants",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "appelle",
+   "type": "phone_ring",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "vingt",
+   "in": "bank",
+   "type": "sad_trombone",
+   "offset": 0.4,
+   "gain": 0.6
+  },
+  {
+   "word": "pleure",
+   "type": "bubbles",
+   "dur": 1.0,
+   "gain": 0.3
+  },
+  {
+   "word": "avion",
+   "type": "engine",
+   "dur": 2.5,
+   "gain": 0.6
+  },
+  {
+   "word": "avion",
+   "type": "whoosh",
+   "offset": 1.0,
+   "gain": 0.7
+  },
+  {
+   "word": "valise",
+   "type": "zip",
+   "gain": 0.7
+  },
+  {
+   "word": "roulette",
+   "type": "crowd",
+   "dur": 5.0,
+   "gain": 0.4
+  },
+  {
+   "word": "court",
+   "type": "run",
+   "dur": 2.0,
+   "gain": 0.5
+  },
+  {
+   "word": "tourne",
+   "n": 0,
+   "type": "drumroll",
+   "dur": 2.0,
+   "gain": 0.7
+  },
+  {
+   "word": "jackpot",
+   "type": "cash",
+   "gain": 1.0
+  },
+  {
+   "word": "jackpot",
+   "type": "applause",
+   "dur": 2.5,
+   "gain": 0.7
+  },
+  {
+   "word": "millions",
+   "type": "magic",
+   "gain": 0.7
+  },
+  {
+   "word": "or",
+   "in": "rich",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "limousine",
+   "type": "honk",
+   "gain": 0.5
+  },
+  {
+   "word": "centimètres",
+   "type": "squeak",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "revient",
+   "type": "footsteps",
+   "dur": 1.0,
+   "gain": 0.5
+  },
+  {
+   "word": "immeuble",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "cage",
+   "type": "clank",
+   "gain": 0.7
+  },
+  {
+   "word": "loyer",
+   "type": "cash",
+   "gain": 0.6
+  },
+  {
+   "word": "courir",
+   "type": "run",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "électricité",
+   "type": "sad_trombone",
+   "offset": 0.4,
+   "gain": 0.6
+  },
+  {
+   "word": "carte",
+   "in": "outro",
+   "type": "squeak",
+   "offset": 0.4,
+   "gain": 0.7
+  },
+  {
+   "word": "lunettes",
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "word": "hamsters",
+   "in": "bank",
+   "type": "squeak",
+   "gain": 0.6
+  },
+  {
+   "word": "jamais",
+   "in": "casino",
+   "type": "crowd",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "cochon",
+   "type": "squeak",
+   "gain": 0.6,
+   "repeat": 2,
+   "gap": 0.15
+  },
+  {
+   "word": "graines",
+   "in": "rent",
+   "type": "cash",
+   "gain": 0.6
+  }
+ ]
+}
