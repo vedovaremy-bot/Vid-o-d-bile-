@@ -80,3 +80,5 @@ like réclamé par la brosse à dents dès le début (~3-9 s, « c'est mon indem
 ## Vidéo 19 — « Ton canapé t'a avalé » (77 s) — `video19_canape_royaume.mp4`, like réclamé par le roi juste avant la fin
 ## Vidéo 20 — « Un nuage te suit partout » (76 s) — `video20_nuage.mp4`, pas de like
 Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thunder, slurp.
+## Vidéo 21 — « Ton grille-pain est devenu rappeur » (70 s) — `video21_grille_pain_rappeur.mp4`, voix 1, like en freestyle (~20-29 s)
+## Vidéo 22 — « Une mouette a volé ta vie » (68 s) — `video22_mouette.mp4`, voix 1, pas de like

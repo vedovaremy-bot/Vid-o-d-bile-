@@ -1,0 +1,249 @@
+{
+ "title": "Une mouette a volé ta vie",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Une *mouette* t'a volé ton sandwich. Puis ton portefeuille. Puis *toute ta vie*."
+  },
+  {
+   "scene": "beach",
+   "text": "Tout a commencé à la plage. Tu croques dans ton sandwich. Et en une seconde... *pfiou*. Il a disparu."
+  },
+  {
+   "scene": "wallet",
+   "text": "Tu lèves la tête. La mouette est sur le parasol. Elle mange ton sandwich... et elle tient ton *portefeuille*."
+  },
+  {
+   "scene": "car",
+   "text": "Elle s'envole. Tu la poursuis jusqu'au parking. Elle prend ta *voiture*. Elle *klaxonne*. Elle s'en va. Elle se gare sur *trois* places."
+  },
+  {
+   "scene": "job",
+   "text": "Le lendemain, tu arrives au bureau. Elle est assise à ta place. Avec ta *cravate*. Et ton patron dit : elle est *bien* plus efficace."
+  },
+  {
+   "scene": "home",
+   "text": "Le soir, tu rentres chez toi. Elle est dans ton *canapé*. Elle porte ton *pyjama*. Elle regarde ta série. Et elle a mangé tout le *frigo*."
+  },
+  {
+   "scene": "mom",
+   "text": "Tu appelles ta mère. C'est la mouette qui *répond*. Ta mère dit qu'elle l'a toujours *préférée*. Elle l'a même invitée à *Noël*."
+  },
+  {
+   "scene": "fight",
+   "text": "Tu craques. Tu essaies de l'attraper. Elle t'attaque avec trois cents *cousines*. Et ça finit en *bataille de frites*."
+  },
+  {
+   "scene": "end",
+   "text": "Aujourd'hui, c'est toi qui vis sur la plage. Tu cries sur les touristes. Et tu voles leurs *sandwichs*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et mange ton sandwich *vite*."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "mouette",
+   "in": "hook",
+   "type": "birds",
+   "dur": 1.5,
+   "gain": 0.8
+  },
+  {
+   "word": "sandwich",
+   "in": "hook",
+   "type": "whoosh",
+   "gain": 0.7
+  },
+  {
+   "word": "portefeuille",
+   "in": "hook",
+   "type": "cash",
+   "gain": 0.6
+  },
+  {
+   "word": "vie",
+   "in": "hook",
+   "type": "sad_trombone",
+   "offset": 0.2,
+   "gain": 0.6
+  },
+  {
+   "word": "plage",
+   "type": "wind",
+   "dur": 3.0,
+   "gain": 0.5
+  },
+  {
+   "word": "plage",
+   "type": "birds",
+   "dur": 2.0,
+   "gain": 0.4
+  },
+  {
+   "word": "croques",
+   "type": "crunch",
+   "gain": 0.8
+  },
+  {
+   "word": "pfiou",
+   "type": "whoosh",
+   "gain": 1.0
+  },
+  {
+   "word": "disparu",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "parasol",
+   "type": "birds",
+   "dur": 1.2,
+   "gain": 0.6
+  },
+  {
+   "word": "mange",
+   "in": "wallet",
+   "type": "gulp",
+   "gain": 0.8
+  },
+  {
+   "word": "portefeuille",
+   "in": "wallet",
+   "type": "cash",
+   "gain": 0.6
+  },
+  {
+   "word": "envole",
+   "type": "wind",
+   "dur": 1.5,
+   "gain": 0.6
+  },
+  {
+   "word": "poursuis",
+   "type": "run",
+   "dur": 1.8,
+   "gain": 0.6
+  },
+  {
+   "word": "voiture",
+   "type": "engine",
+   "dur": 2.5,
+   "gain": 0.6
+  },
+  {
+   "word": "klaxonne",
+   "type": "honk",
+   "gain": 0.9,
+   "repeat": 2,
+   "gap": 0.5
+  },
+  {
+   "word": "cravate",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "efficace",
+   "type": "applause",
+   "dur": 1.5,
+   "gain": 0.6
+  },
+  {
+   "word": "rentres",
+   "type": "creak",
+   "gain": 0.5
+  },
+  {
+   "word": "canapé",
+   "in": "home",
+   "type": "birds",
+   "dur": 1.0,
+   "gain": 0.5
+  },
+  {
+   "word": "frigo",
+   "type": "gulp",
+   "gain": 0.8
+  },
+  {
+   "word": "frigo",
+   "type": "sad_trombone",
+   "offset": 0.4,
+   "gain": 0.5
+  },
+  {
+   "word": "appelles",
+   "type": "phone_ring",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "répond",
+   "type": "birds",
+   "dur": 1.0,
+   "gain": 0.7
+  },
+  {
+   "word": "préférée",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "attraper",
+   "type": "run",
+   "dur": 1.2,
+   "gain": 0.6
+  },
+  {
+   "word": "cousines",
+   "type": "birds",
+   "dur": 3.0,
+   "gain": 0.9
+  },
+  {
+   "word": "cousines",
+   "type": "wind",
+   "dur": 2.5,
+   "gain": 0.6
+  },
+  {
+   "word": "frites",
+   "type": "punch",
+   "gain": 0.6,
+   "repeat": 4,
+   "gap": 0.18
+  },
+  {
+   "word": "cries",
+   "type": "birds",
+   "dur": 1.2,
+   "gain": 0.7
+  },
+  {
+   "word": "sandwichs",
+   "in": "end",
+   "type": "whoosh",
+   "gain": 0.7
+  },
+  {
+   "word": "vite",
+   "type": "birds",
+   "offset": 0.3,
+   "dur": 1.0,
+   "gain": 0.7
+  },
+  {
+   "word": "trois",
+   "in": "car",
+   "type": "honk",
+   "gain": 0.5
+  },
+  {
+   "word": "noël",
+   "type": "ding",
+   "gain": 0.7
+  }
+ ]
+}

@@ -1,0 +1,150 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ LA MOUETTE (personnage principal)
+// o: {flip, fly, talk, smug, angry, tie, pajama, wallet, sandwich, noShadow}
+function gull(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (!o.noShadow && !o.fly) shadow(0, 0, 130);
+  if (!o.fly) { line(-30, -70, -36, 0, '#f0a35e', 10); line(30, -70, 34, 0, '#f0a35e', 10); line(-60, 0, -14, 0, '#f0a35e', 8); line(12, 0, 58, 0, '#f0a35e', 8); }
+  ctx.translate(0, o.fly ? Math.sin(t * 6) * 20 : Math.sin(t * 4) * 4);
+  poly([[-100, -170], [-210, -140], [-200, -110], [-90, -120]], '#2d3436');
+  const body = o.pajama ? '#74b9ff' : '#fdfdfd';
+  ell(0, -170, 125, 100, body);
+  if (o.pajama) { ctx.save(); ctx.beginPath(); ctx.ellipse(0, -170, 125, 100, 0, 0, 7); ctx.clip(); for (let i = -4; i < 5; i++) line(i * 50, -300, i * 50 + 40, -40, '#fff', 10); ctx.restore(); ell(0, -170, 125, 100, null); }
+  // ailes
+  const wa = o.fly ? Math.sin(t * 14) * .9 : .1;
+  ctx.save(); ctx.translate(-20, -190); ctx.rotate(-wa); ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-140, -60, -220, -20); ctx.quadraticCurveTo(-120, 20, 0, 40); ctx.closePath(); shape('#b2bec3'); line(-200, -16, -140, 0, '#2d3436', 10); ctx.restore();
+  if (o.tie) poly([[90, -230], [110, -230], [118, -150], [100, -130], [82, -150]], '#c0392b', 4);
+  // tête
+  ctx.save(); ctx.translate(100, -270);
+  ell(0, 0, 72, 64, '#fdfdfd');
+  const ey = -14;
+  ell(20, ey, 16, 16, '#f9ca24', 4); ell(24, ey, 7, 7, '#111', 0);
+  if (o.smug) { ctx.save(); ctx.beginPath(); ctx.ellipse(20, ey, 17, 17, 0, Math.PI, 0); shape('#fdfdfd', 4); ctx.restore(); }
+  line(0, ey - 26, 44, ey - 18, OUT, o.angry ? 9 : 6);
+  const bo = o.talk && Math.sin(t * 16) > 0 ? 1 : 0;
+  poly([[56, -4], [150, 6 - bo * 8], [56, 18]], '#f9ca24', 5); if (bo) poly([[56, 22], [135, 30 + bo * 14], [56, 32]], '#f9ca24', 5);
+  ell(130, 14, 7, 7, '#e74c3c', 0);
+  if (o.sandwich) { ctx.save(); ctx.translate(140, 18); ctx.rotate(.2); rr(-50, -30, 100, 26, 10, '#e1a95f', 4); rr(-52, -6, 104, 14, 6, '#6ab04c', 0); rr(-50, 6, 100, 22, 10, '#e1a95f', 4); ctx.restore(); }
+  ctx.restore();
+  if (o.wallet) { ctx.save(); ctx.translate(40, -60); rr(-60, -40, 120, 80, 12, '#6d4c41', 5); rr(-50, -26, 40, 20, 4, '#55efc4', 0); ctx.restore(); }
+  ctx.restore();
+}
+function beach(g) {
+  sky('#48dbfb', '#c8f7ff'); ell(860, 260, 100, 100, '#feca57', 0); clouds(g);
+  ctx.fillStyle = '#0abde3'; ctx.fillRect(-400, 900, W + 800, 260);
+  for (let i = 0; i < 9; i++) { ctx.beginPath(); ctx.arc(i * 150 - ((g * 60) % 150), 905, 46, Math.PI, 0); ctx.fillStyle = '#48dbfb'; ctx.fill(); }
+  ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, 1150, W + 800, 1000);
+}
+function parasol(x, y) { line(x, y, x + 20, y - 600, '#6d4c41', 14); ctx.beginPath(); ctx.arc(x + 20, y - 600, 260, Math.PI * 1.05, Math.PI * 1.95); ctx.closePath(); shape('#ff6b6b'); for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(x + 20, y - 600); ctx.lineTo(x + 20 + Math.cos(Math.PI * (1.15 + i * .23)) * 255, y - 600 + Math.sin(Math.PI * (1.15 + i * .23)) * 255); shape(null, 5, '#fff'); } }
+function sandwichObj(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); rr(-90, -50, 180, 44, 18, '#e1a95f', 5); rr(-94, -10, 188, 22, 8, '#6ab04c', 0); rr(-92, 8, 184, 18, 6, '#e17055', 0); rr(-90, 24, 180, 40, 18, '#e1a95f', 5); ctx.restore(); }
+function office() { ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, 1800); rr(620, 220, 380, 420, 10, '#74b9ff'); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    beach(g);
+    gull(560, 1700, 1.2, g, { smug: true, sandwich: true, wallet: lt > lw(/portefeuille/i, 'hook') - .2, tie: lt > lw(/vie/i, 'hook') - .2 });
+    human(170, 2180, .9, g, { expr: 'shock', shirt: '#ffeaa7' });
+    popText('VOLEUSE', 540, 330, 200, '#ff3838', lw(/volé/i, 'hook'), lt, -.06, lw(/vie/i, 'hook') - .1);
+    popText('TOUTE TA VIE', 540, 330, 170, '#ffd32a', lw(/vie/i, 'hook'), lt, .05);
+  },
+  beach(lt, d, g) {
+    beach(g); parasol(200, 1700);
+    const pf = lw(/pfiou/i, 'beach');
+    human(560, 2150, 1.0, g, { expr: lt > pf ? 'shock' : 'neutral', armR: 2.5, shirt: '#ffeaa7' });
+    if (lt < pf) sandwichObj(650, 1290, 1.0);
+    else { const k = clamp((lt - pf) / .5); gull(lerp(1200, -300, k), lerp(900, 400, k), .6, g, { fly: true, sandwich: true, noShadow: true }); }
+    popText('CROC', 540, 330, 200, '#fff', lw(/croques/i, 'beach'), lt, -.05, pf - .1);
+    popText('PFIOU !', 540, 330, 220, '#0984e3', pf, lt, .06);
+  },
+  wallet(lt, d, g) {
+    beach(g); parasol(560, 1800);
+    gull(580, 1200, .7, g, { smug: true, sandwich: lt < lw(/mange/i, 'wallet') + .8, talk: lt > lw(/mange/i, 'wallet') && lt < lw(/mange/i, 'wallet') + .8, wallet: lt > lw(/portefeuille/i, 'wallet') - .2, noShadow: true });
+    human(220, 2180, .9, g, { expr: 'angry', shirt: '#ffeaa7', armR: 2.4 });
+    popText('MON PORTEFEUILLE ?!', 540, 330, 120, '#ff3838', lw(/portefeuille/i, 'wallet'), lt, -.04);
+  },
+  car(lt, d, g) {
+    sky(); clouds(g); ctx.fillStyle = '#636e72'; ctx.fillRect(-400, 1350, W + 800, 1000);
+    for (let i = 0; i < 4; i++) rr(i * 300 - 50, 1700, 20, 220, 4, '#fff', 0);
+    const vo = lw(/voiture/i, 'car'), kl = lw(/klaxonne/i, 'car'), tp = lw(/trois/i, 'car');
+    const go = lt > kl + 1.2 ? (lt - kl - 1.2) * 600 : 0;
+    const cx = 560 + go;
+    rr(cx - 300, 1500, 600, 200, 50, '#0984e3'); rr(cx - 200, 1380, 380, 150, 40, '#0984e3'); rr(cx - 180, 1400, 160, 100, 14, '#9fd8ff'); rr(cx + 10, 1400, 150, 100, 14, '#9fd8ff');
+    ell(cx - 180, 1710, 60, 60, '#222'); ell(cx + 180, 1710, 60, 60, '#222');
+    if (lt > vo - .3) { ctx.save(); ctx.beginPath(); ctx.rect(cx - 180, 1400, 160, 100); ctx.clip(); gull(cx - 120, 1560, .45, g, { smug: true, noShadow: true }); ctx.restore(); }
+    human(lt > lw(/poursuis/i, 'car') ? 160 : 100, 2180, .8, g, { pose: 'run', expr: 'angry', shirt: '#ffeaa7' });
+    if (lt > tp && go === 0) { ctx.save(); ctx.globalAlpha = .6; rr(cx - 400, 1480, 800, 250, 20, null, 8); ctx.restore(); }
+    popText('TUT TUT', 540, 330, 200, '#ffd32a', kl, lt, -.06, tp - .1);
+    popText('3 PLACES', 540, 330, 190, '#fff', tp, lt, .05);
+  },
+  job(lt, d, g) {
+    office();
+    rr(300, 1450, 560, 50, 10, '#a0785a'); rr(380, 1200, 280, 220, 12, '#2d3436'); rr(395, 1215, 250, 180, 6, '#74b9ff', 0);
+    gull(640, 1590, .75, g, { tie: lt > lw(/cravate/i, 'job') - .3, smug: true, noShadow: true });
+    rr(300, 1450, 560, 50, 10, '#a0785a');
+    human(140, 2180, .85, g, { expr: 'shock', shirt: '#ffeaa7' });
+    const ef = lw(/efficace/i, 'job');
+    human(940, 2200, .9, g, { bald: true, mustache: true, shirt: '#2c3e50', bowtie: '#e74c3c', expr: 'neutral', flip: true, armR: lt > ef - .5 ? 1.6 : -.1 });
+    bubble(760, 760, 560, 160, 'BIEN PLUS EFFICACE', 58, 120, lw(/patron/i, 'job') + .5, lt);
+    popText('TA CRAVATE', 540, 330, 180, '#c0392b', lw(/cravate/i, 'job'), lt, -.05);
+  },
+  home(lt, d, g) {
+    apartment();
+    rr(140, 1400, 800, 230, 60, '#8e44ad'); rr(100, 1520, 880, 200, 50, '#9b59b6');
+    gull(540, 1560, .75, g, { pajama: lt > lw(/pyjama/i, 'home') - .3, smug: true, noShadow: true, talk: lt > lw(/frigo/i, 'home') - .4 && lt < lw(/frigo/i, 'home') + .5 });
+    // télé au premier plan
+    rr(-40, 1780, 500, 200, 10, '#222'); ctx.globalAlpha = .25; ell(540, 1500, 360, 240, `hsl(${(g * 120) % 360},80%,70%)`, 0); ctx.globalAlpha = 1;
+    const fr = lw(/frigo/i, 'home');
+    if (lt > fr - .3) { const k = easeOutBack((lt - fr + .3) / .35); ctx.save(); ctx.translate(880, 1100); ctx.scale(k, k); rr(-130, -260, 260, 520, 20, '#f5f6fa', 6); rr(-110, -100, 220, 340, 10, '#dfe6e9', 0); txt('VIDE', 0, 70, 56, '#b2bec3', 'Anton'); ctx.restore(); }
+    popText('TON PYJAMA', 540, 330, 170, '#74b9ff', lw(/pyjama/i, 'home'), lt, -.05, fr - .1);
+    popText('LE FRIGO ?!', 540, 330, 180, '#ff3838', fr, lt, .05);
+  },
+  mom(lt, d, g) {
+    apartment();
+    human(250, 2180, .9, g, { phone: true, armR: 2.7, expr: lt > lw(/préférée/i, 'mom') ? 'sad' : 'neutral' });
+    rr(560, 380, 440, 520, 30, '#2d3436', 6); ctx.save(); ctx.beginPath(); ctx.roundRect(580, 400, 400, 480, 20); ctx.clip(); ctx.fillStyle = '#ffeaa7'; ctx.fillRect(580, 400, 400, 480);
+    if (lt > lw(/répond/i, 'mom') - .3) gull(780, 860, .55, g, { talk: true, smug: true, noShadow: true }); else human(780, 1250, .55, g, { longHair: true, hair: '#8e6e53', shirt: '#e17055', expr: 'neutral' });
+    ctx.restore(); txt('📞 Maman', 780, 940, 44, '#fff', 'Mont', 'center', 6, '#000');
+    const no = lw(/noël/i, 'mom');
+    if (lt > no) { const k = easeOutBack((lt - no) / .35); ctx.save(); ctx.translate(780, 1550); ctx.scale(k, k); poly([[0, -200], [140, 60], [-140, 60]], '#27ae60', 5); poly([[0, -330], [100, -150], [-100, -150]], '#27ae60', 5); rr(-24, 60, 48, 60, 6, '#6d4c41', 4); txt('★', 0, -330, 60, '#f9ca24', 'serif'); ctx.restore(); }
+    popText('ELLE L\'A PRÉFÉRÉE', 540, 1130, 120, '#ffd32a', lw(/préférée/i, 'mom'), lt, -.04, no - .1);
+    popText('INVITÉE À NOËL', 540, 1130, 130, '#27ae60', no, lt, .04);
+  },
+  fight(lt, d, g) {
+    beach(g);
+    const co = lw(/cousines/i, 'fight'), fr = lw(/frites/i, 'fight');
+    const n = lt > co ? 16 : 1; const R = rnd(7);
+    for (let i = 0; i < n; i++) { const x = (i * 211 + g * 60 * (i % 2 ? 1 : -1)) % 1300 - 100, y = 200 + (i * 97) % 700; gull(x, y, .35, g + i, { fly: true, angry: true, noShadow: true, flip: i % 2 === 0 }); }
+    human(540, 2180, 1.0, g, { expr: 'shock', shirt: '#ffeaa7', armL: -2.6, armR: 2.6 });
+    if (lt > fr) for (let i = 0; i < 14; i++) { const k = (g * 1.2 + i / 14) % 1; ctx.save(); ctx.translate(100 + (i * 73) % 880, lerp(600, 1900, k)); ctx.rotate(k * 8 + i); rr(-10, -45, 20, 90, 6, '#f9ca24', 3); ctx.restore(); }
+    popText('300 COUSINES', 540, 330, 160, '#fff', co, lt, -.05, fr - .1);
+    popText('BATAILLE DE FRITES', 540, 330, 120, '#f9ca24', fr, lt, .04);
+  },
+  end(lt, d, g) {
+    beach(g);
+    human(540, 2150, .95, g, { expr: 'angry', shirt: '#ffeaa7', armL: -2.4, armR: 2.4 });
+    // plumes sur la tête
+    ctx.save(); ctx.translate(540, 2150 - 790 * .95 - 100); for (let i = -1; i <= 1; i++) { ctx.save(); ctx.rotate(i * .4); ell(0, -50, 16, 50, '#fdfdfd', 4); ctx.restore(); } ctx.restore();
+    // touristes
+    for (const [x, f] of [[150, 0], [940, 1]]) human(x, 2100, .7, g + x, { shirt: '#e17055', cap: '#0984e3', expr: 'shock', flip: !!f });
+    if (lt > lw(/sandwichs/i, 'end') - .2) { const k = clamp((lt - lw(/sandwichs/i, 'end') + .2) / .8); sandwichObj(lerp(940, 560, k), lerp(1500, 1350, k), .7); }
+    popText('« CRRRÂ ! »', 540, 330, 170, '#fff', lw(/cries/i, 'end'), lt, -.05, lw(/sandwichs/i, 'end') - .2);
+    popText('LA BOUCLE EST BOUCLÉE', 540, 330, 100, '#ffd32a', lw(/sandwichs/i, 'end'), lt, .03);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    gull(500, 1850, 1.3, g, { smug: true, sandwich: true, tie: true });
+    subscribe(lt);
+    popText('MANGE VITE', 540, 640, 140, '#ffd32a', lw(/vite/i, 'outro'), lt, .04);
+  },
+};
+</script></body></html>

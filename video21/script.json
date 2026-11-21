@@ -1,0 +1,238 @@
+{
+ "title": "Ton grille-pain est devenu rappeur",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ce matin, ton *grille-pain* a éjecté tes tartines... et il s'est mis à *rapper*."
+  },
+  {
+   "scene": "rap",
+   "text": "Il fait des rimes horribles. Tartine, copine, *margarine*. Et à chaque refrain... il éjecte une *tartine*. Dans ta figure."
+  },
+  {
+   "scene": "toasts",
+   "text": "Ta cuisine est couverte de pain grillé. Le chat s'est pris *trois* tartines. Il a démissionné."
+  },
+  {
+   "scene": "like",
+   "text": "Et là, le grille-pain se tourne vers la caméra. Il fait un freestyle : toi qui regardes sans liker, t'es plus froid qu'un *pain surgelé*. Lâche un *like*... ou je te *grille*."
+  },
+  {
+   "scene": "battle",
+   "text": "Le soir, le mixeur le provoque en *battle*. Le mixeur fait *vrrr*. Le grille-pain fait *ding*. Le public est en *délire*."
+  },
+  {
+   "scene": "contract",
+   "text": "Un producteur l'appelle. Il signe un contrat en *or*. Son premier album s'appelle : *Pain perdu*."
+  },
+  {
+   "scene": "concert",
+   "text": "Il remplit des stades. Les fans lui jettent des *baguettes*. Il les grille toutes en direct. Même ta grand-mère porte son *t-shirt*."
+  },
+  {
+   "scene": "fire",
+   "text": "Mais un soir, il chauffe trop fort. Il met le feu à la *scène*. Les pompiers arrivent... et lui demandent un *autographe*."
+  },
+  {
+   "scene": "end",
+   "text": "Aujourd'hui, il vit dans une villa. Et toi ? Tu manges ton pain... *cru*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et débranche ton grille-pain ce soir."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "éjecté",
+   "type": "jump",
+   "gain": 0.9
+  },
+  {
+   "word": "éjecté",
+   "type": "pop",
+   "offset": 0.1,
+   "gain": 0.8,
+   "repeat": 2,
+   "gap": 0.15
+  },
+  {
+   "word": "rapper",
+   "type": "drumroll",
+   "dur": 0.8,
+   "gain": 0.6
+  },
+  {
+   "word": "horribles",
+   "type": "sad_trombone",
+   "gain": 0.4
+  },
+  {
+   "word": "margarine",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "tartine",
+   "in": "rap",
+   "n": 1,
+   "type": "jump",
+   "gain": 0.8
+  },
+  {
+   "word": "figure",
+   "type": "punch",
+   "gain": 0.9
+  },
+  {
+   "word": "couverte",
+   "type": "pop",
+   "gain": 0.6,
+   "repeat": 6,
+   "gap": 0.12
+  },
+  {
+   "word": "trois",
+   "in": "toasts",
+   "type": "punch",
+   "gain": 0.7,
+   "repeat": 3,
+   "gap": 0.2
+  },
+  {
+   "word": "démissionné",
+   "type": "door_slam",
+   "gain": 0.7
+  },
+  {
+   "word": "tourne",
+   "in": "like",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "freestyle",
+   "type": "drumroll",
+   "dur": 1.0,
+   "gain": 0.6
+  },
+  {
+   "word": "surgelé",
+   "type": "wind",
+   "dur": 1.2,
+   "gain": 0.5
+  },
+  {
+   "word": "like",
+   "in": "like",
+   "n": 1,
+   "type": "ding",
+   "gain": 0.8
+  },
+  {
+   "word": "grille",
+   "in": "like",
+   "type": "explosion",
+   "gain": 0.5
+  },
+  {
+   "word": "battle",
+   "type": "crowd",
+   "dur": 5.0,
+   "gain": 0.5
+  },
+  {
+   "word": "vrrr",
+   "type": "engine",
+   "dur": 1.5,
+   "gain": 0.8
+  },
+  {
+   "word": "ding",
+   "in": "battle",
+   "type": "ding",
+   "gain": 1.0
+  },
+  {
+   "word": "délire",
+   "type": "applause",
+   "dur": 2.5,
+   "gain": 0.8
+  },
+  {
+   "word": "appelle",
+   "in": "contract",
+   "type": "phone_ring",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "or",
+   "in": "contract",
+   "type": "cash",
+   "gain": 0.8
+  },
+  {
+   "word": "perdu",
+   "type": "magic",
+   "gain": 0.6
+  },
+  {
+   "word": "stades",
+   "type": "crowd",
+   "dur": 4.0,
+   "gain": 0.6
+  },
+  {
+   "word": "baguettes",
+   "type": "whoosh",
+   "gain": 0.6,
+   "repeat": 3,
+   "gap": 0.25
+  },
+  {
+   "word": "grille",
+   "in": "concert",
+   "type": "ding",
+   "gain": 0.7
+  },
+  {
+   "word": "feu",
+   "type": "explosion",
+   "gain": 0.7
+  },
+  {
+   "word": "pompiers",
+   "type": "siren",
+   "dur": 2.5,
+   "gain": 0.6
+  },
+  {
+   "word": "autographe",
+   "type": "applause",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "villa",
+   "type": "magic",
+   "gain": 0.5
+  },
+  {
+   "word": "cru",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.7
+  },
+  {
+   "word": "débranche",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "shirt",
+   "type": "pop",
+   "gain": 0.6
+  }
+ ]
+}
