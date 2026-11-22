@@ -1,0 +1,246 @@
+{
+ "title": "Ton ventilateur a décollé",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Il faisait tellement chaud que tu as mis ton *ventilateur* sur la vitesse *dix*. Et il a *décollé*."
+  },
+  {
+   "scene": "room",
+   "text": "Il fait trois tours dans ta chambre. Tes feuilles s'envolent. Ton poisson rouge sort du *bocal*. Ta perruque... aussi."
+  },
+  {
+   "scene": "window",
+   "text": "Puis il passe par la *fenêtre*. Et il part au-dessus de la ville, comme un *hélicoptère*."
+  },
+  {
+   "scene": "city",
+   "text": "Il souffle sur tout le monde. Les chapeaux s'envolent. Les jupes se soulèvent. Un *pigeon* fait trois *saltos*. Une mamie s'envole avec son *caddie*. Elle dit : enfin, des vacances."
+  },
+  {
+   "scene": "like",
+   "text": "Il s'arrête en plein ciel. Il regarde la caméra. Et il dit : mets-moi un *like*. Sinon, je souffle tes *sous-titres*."
+  },
+  {
+   "scene": "blow",
+   "text": "Et comme personne ne réagit assez vite... il le fait. *Pfffff*."
+  },
+  {
+   "scene": "plane",
+   "text": "Un avion le croise. Le pilote fait des grands yeux. Le ventilateur lui fait un *coucou*... et lui vole sa *casquette*. Le pilote atterrit... en *slip*."
+  },
+  {
+   "scene": "heat",
+   "text": "Pendant ce temps, toi, tu as *chaud*. Très chaud. Tu t'éventes avec une tranche de *jambon*. Ton chat a mis son *maillot de bain*."
+  },
+  {
+   "scene": "return",
+   "text": "Le soir, il revient enfin. Il se pose sur ta table. Il fait un dernier petit *souffle*... et il tombe en *panne*. Tu lui fais un bisou. Il est *brûlant*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et ne mets jamais ton ventilateur sur dix."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "ventilateur",
+   "in": "hook",
+   "type": "wind",
+   "dur": 4.0,
+   "gain": 0.6
+  },
+  {
+   "word": "dix",
+   "in": "hook",
+   "type": "ding",
+   "gain": 0.7
+  },
+  {
+   "word": "décollé",
+   "type": "engine",
+   "dur": 2.5,
+   "gain": 0.8
+  },
+  {
+   "word": "décollé",
+   "type": "jump",
+   "gain": 0.7
+  },
+  {
+   "word": "tours",
+   "type": "whoosh",
+   "gain": 0.7,
+   "repeat": 3,
+   "gap": 0.3
+  },
+  {
+   "word": "feuilles",
+   "type": "wind",
+   "dur": 2.0,
+   "gain": 0.6
+  },
+  {
+   "word": "bocal",
+   "type": "splash",
+   "gain": 0.8
+  },
+  {
+   "word": "perruque",
+   "type": "boing",
+   "gain": 0.6
+  },
+  {
+   "word": "fenêtre",
+   "type": "glass",
+   "gain": 0.6
+  },
+  {
+   "word": "hélicoptère",
+   "type": "engine",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "souffle",
+   "in": "city",
+   "type": "wind",
+   "dur": 4.0,
+   "gain": 0.7
+  },
+  {
+   "word": "chapeaux",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "pigeon",
+   "type": "birds",
+   "dur": 1.5,
+   "gain": 0.7
+  },
+  {
+   "word": "saltos",
+   "type": "boing",
+   "gain": 0.6,
+   "repeat": 3,
+   "gap": 0.18
+  },
+  {
+   "word": "regarde",
+   "in": "like",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "like",
+   "in": "like",
+   "type": "ding",
+   "gain": 0.8
+  },
+  {
+   "word": "titres",
+   "type": "drumroll",
+   "dur": 0.8,
+   "gain": 0.6
+  },
+  {
+   "word": "pfffff",
+   "type": "wind",
+   "dur": 2.5,
+   "gain": 1.0
+  },
+  {
+   "word": "pfffff",
+   "type": "whoosh",
+   "gain": 0.8
+  },
+  {
+   "word": "avion",
+   "type": "engine",
+   "dur": 3.0,
+   "gain": 0.6
+  },
+  {
+   "word": "coucou",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "casquette",
+   "type": "whoosh",
+   "gain": 0.7
+  },
+  {
+   "word": "chaud",
+   "in": "heat",
+   "n": 0,
+   "type": "bubbles",
+   "dur": 1.5,
+   "gain": 0.3
+  },
+  {
+   "word": "jambon",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "revient",
+   "type": "engine",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "pose",
+   "type": "land",
+   "gain": 0.8
+  },
+  {
+   "word": "souffle",
+   "in": "return",
+   "type": "wind",
+   "dur": 0.8,
+   "gain": 0.5
+  },
+  {
+   "word": "panne",
+   "type": "shrink",
+   "gain": 0.7
+  },
+  {
+   "word": "panne",
+   "type": "thud",
+   "offset": 0.6,
+   "gain": 0.5
+  },
+  {
+   "word": "dix",
+   "in": "outro",
+   "type": "wind",
+   "dur": 1.5,
+   "gain": 0.6
+  },
+  {
+   "word": "caddie",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "slip",
+   "type": "sad_trombone",
+   "offset": 0.2,
+   "gain": 0.5
+  },
+  {
+   "word": "maillot",
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "word": "brûlant",
+   "type": "crack",
+   "gain": 0.6
+  }
+ ]
+}

@@ -1,0 +1,212 @@
+{
+ "title": "Ton ombre a démissionné",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ce matin, tu es sorti au soleil... et tu n'avais plus d'*ombre*. Elle a *démissionné*."
+  },
+  {
+   "scene": "note",
+   "text": "Elle t'a laissé un mot sur le frigo : vingt-cinq ans à te suivre partout. Même aux *toilettes*. J'en peux *plus*."
+  },
+  {
+   "scene": "party",
+   "text": "Tu la retrouves le soir, en *boîte de nuit*. Elle danse toute seule. Et franchement... elle danse *mieux* que toi. Le DJ lui demande son *numéro*."
+  },
+  {
+   "scene": "chase",
+   "text": "Tu essaies de l'attraper. Mais c'est une ombre. Elle passe sous les *portes*. Elle se cache derrière les *lampadaires*. Elle te fait des *grimaces* sur les murs."
+  },
+  {
+   "scene": "job",
+   "text": "Le lendemain, elle a trouvé un nouveau travail. Elle fait de l'*ombre* aux gens à la plage. Dix euros l'heure. Elle est *riche*."
+  },
+  {
+   "scene": "problem",
+   "text": "Toi, sans ombre, tu as des problèmes. Les vampires te prennent pour un *collègue*. Et les enfants te jettent de l'*ail*. Même ton miroir refuse de te *montrer*."
+  },
+  {
+   "scene": "date",
+   "text": "Un jour, ton ombre tombe amoureuse. De l'ombre d'un *palmier*. Ils se marient à midi pile. Personne ne les *voit*."
+  },
+  {
+   "scene": "return",
+   "text": "Finalement, elle revient. Mais elle a changé. Maintenant... c'est *toi* qui la suis. Elle a pris des cours de *tango*. Elle te dit : à gauche. Tu vas à gauche. Elle te dit : *tourne*. Tu tournes."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et dis merci à ton *ombre*. Elle t'écoute."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "soleil",
+   "type": "birds",
+   "dur": 2.0,
+   "gain": 0.4
+  },
+  {
+   "word": "ombre",
+   "in": "hook",
+   "type": "magic",
+   "gain": 0.6
+  },
+  {
+   "word": "démissionné",
+   "type": "door_slam",
+   "gain": 0.8
+  },
+  {
+   "word": "frigo",
+   "type": "pop",
+   "gain": 0.5
+  },
+  {
+   "word": "toilettes",
+   "type": "flush",
+   "gain": 0.6
+  },
+  {
+   "word": "plus",
+   "in": "note",
+   "type": "thud",
+   "gain": 0.6
+  },
+  {
+   "word": "boîte",
+   "type": "drumroll",
+   "dur": 0.8,
+   "gain": 0.5
+  },
+  {
+   "word": "boîte",
+   "type": "crowd",
+   "dur": 4.5,
+   "gain": 0.5
+  },
+  {
+   "word": "danse",
+   "in": "party",
+   "type": "footsteps",
+   "dur": 3.0,
+   "gain": 0.7
+  },
+  {
+   "word": "mieux",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.5
+  },
+  {
+   "word": "attraper",
+   "type": "run",
+   "dur": 2.0,
+   "gain": 0.6
+  },
+  {
+   "word": "portes",
+   "type": "whoosh",
+   "gain": 0.7
+  },
+  {
+   "word": "lampadaires",
+   "type": "boing",
+   "gain": 0.6
+  },
+  {
+   "word": "travail",
+   "type": "ding",
+   "gain": 0.5
+  },
+  {
+   "word": "plage",
+   "type": "wind",
+   "dur": 2.5,
+   "gain": 0.4
+  },
+  {
+   "word": "riche",
+   "type": "cash",
+   "gain": 0.8
+  },
+  {
+   "word": "vampires",
+   "type": "creak",
+   "gain": 0.6
+  },
+  {
+   "word": "collègue",
+   "type": "thud",
+   "gain": 0.5
+  },
+  {
+   "word": "ail",
+   "type": "punch",
+   "gain": 0.6,
+   "repeat": 3,
+   "gap": 0.2
+  },
+  {
+   "word": "amoureuse",
+   "type": "magic",
+   "gain": 0.6
+  },
+  {
+   "word": "marient",
+   "type": "ding",
+   "gain": 0.7,
+   "repeat": 3,
+   "gap": 0.3
+  },
+  {
+   "word": "voit",
+   "type": "applause",
+   "dur": 1.5,
+   "gain": 0.4
+  },
+  {
+   "word": "revient",
+   "type": "footsteps",
+   "dur": 1.5,
+   "gain": 0.5
+  },
+  {
+   "word": "suis",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "écoute",
+   "type": "creak",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "numéro",
+   "type": "ding",
+   "gain": 0.5
+  },
+  {
+   "word": "grimaces",
+   "type": "boing",
+   "gain": 0.6
+  },
+  {
+   "word": "montrer",
+   "type": "glass",
+   "gain": 0.5
+  },
+  {
+   "word": "tango",
+   "type": "drumroll",
+   "dur": 0.8,
+   "gain": 0.5
+  },
+  {
+   "word": "tournes",
+   "type": "whoosh",
+   "gain": 0.6
+  }
+ ]
+}

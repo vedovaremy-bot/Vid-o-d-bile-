@@ -82,3 +82,6 @@ like réclamé par la brosse à dents dès le début (~3-9 s, « c'est mon indem
 Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thunder, slurp.
 ## Vidéo 21 — « Ton grille-pain est devenu rappeur » (70 s) — `video21_grille_pain_rappeur.mp4`, voix 1, like en freestyle (~20-29 s)
 ## Vidéo 22 — « Une mouette a volé ta vie » (68 s) — `video22_mouette.mp4`, voix 1, pas de like
+## Vidéo 23 — « Ton ventilateur a décollé » (72 s) — `video23_ventilateur.mp4`, like vers 28 s (+ gag : il souffle les sous-titres, `window.hideSubs`)
+## Vidéo 24 — « Ton ombre a démissionné » (71 s) — `video24_ombre.mp4`, pas de like (silhouette via `ctx` swappable dans engine.js)
+## Vidéo 25 — « Ta tortue a gagné le Tour de France » (75 s) — `video25_tortue_tour_de_france.mp4`, like vers 14 s (avec compte à rebours)

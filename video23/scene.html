@@ -1,0 +1,155 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ LE VENTILATEUR (personnage principal)
+// o: {speed, talk, smug, angry, flying, cap, dead, shades}
+function fan(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  if (!o.flying) shadow(0, 0, 160);
+  const tilt = o.flying ? Math.sin(t * 3) * .15 : 0; ctx.rotate(tilt);
+  // pied + tige
+  rr(-150, -40, 300, 50, 25, '#dfe6e9'); rr(-20, -420, 40, 400, 14, '#dfe6e9');
+  // grille + pales
+  const cy = -620;
+  ell(0, cy, 240, 240, 'rgba(116,185,255,.25)', 8);
+  ctx.save(); ctx.translate(0, cy); ctx.rotate(o.dead ? 0 : t * (o.speed || 10));
+  for (let i = 0; i < 3; i++) { ctx.rotate(Math.PI * 2 / 3); ctx.beginPath(); ctx.ellipse(0, -120, 60, 110, 0, 0, 7); shape(o.speed > 20 ? 'rgba(116,185,255,.45)' : '#74b9ff', 5); }
+  ctx.restore();
+  for (let i = 0; i < 8; i++) { const a = i / 8 * Math.PI * 2; line(Math.cos(a) * 80, cy + Math.sin(a) * 80, Math.cos(a) * 238, cy + Math.sin(a) * 238, '#b2bec3', 4); }
+  ell(0, cy, 238, 238, null, 8);
+  // moyeu = visage
+  ell(0, cy, 95, 95, '#fdfdfd', 7);
+  const ey = cy - 20;
+  if (o.dead) { for (const sx of [-1, 1]) { line(sx * 34 - 14, ey - 14, sx * 34 + 14, ey + 14, OUT, 6); line(sx * 34 + 14, ey - 14, sx * 34 - 14, ey + 14, OUT, 6); } }
+  else if (o.shades) { rr(-72, ey - 22, 64, 40, 12, '#111', 4); rr(8, ey - 22, 64, 40, 12, '#111', 4); }
+  else { ell(-34, ey, 16, 18, '#fff', 4); ell(34, ey, 16, 18, '#fff', 4); ell(-32, ey + 3, 7, 8, '#111', 0); ell(36, ey + 3, 7, 8, '#111', 0);
+    if (o.smug) for (const sx of [-34, 34]) { ctx.save(); ctx.beginPath(); ctx.ellipse(sx, ey, 17, 19, 0, Math.PI, 0); shape('#fdfdfd', 4); ctx.restore(); } }
+  if (o.angry) { line(-60, ey - 34, -14, ey - 22, OUT, 7); line(60, ey - 34, 14, ey - 22, OUT, 7); }
+  if (o.talk && Math.sin(t * 16) > 0) ell(0, cy + 40, 22, 16, '#7a2b2b', 5);
+  else if (o.dead) line(-20, cy + 40, 20, cy + 40, OUT, 6);
+  else { ctx.beginPath(); ctx.arc(0, cy + 22, 24, Math.PI * .15, Math.PI * .85); shape(null, 6); }
+  if (o.cap) { ctx.save(); ctx.translate(0, cy - 230); ctx.beginPath(); ctx.ellipse(0, 0, 110, 60, 0, Math.PI, 0); shape('#0984e3'); rr(-10, -10, 160, 26, 12, '#0984e3'); ctx.restore(); }
+  ctx.restore();
+}
+function windLines(g, x0, y0, n = 8, dir = 1) { ctx.save(); ctx.globalAlpha = .6; for (let i = 0; i < n; i++) { const k = (g * 2 + i / n) % 1; const y = y0 - 200 + (i * 53) % 400; ctx.beginPath(); ctx.moveTo(x0 + dir * k * 700, y); ctx.quadraticCurveTo(x0 + dir * (k * 700 + 80), y - 30, x0 + dir * (k * 700 + 160), y); shape(null, 8, '#fff'); } ctx.restore(); }
+function cityBg(g) {
+  sky('#74b9ff', '#dff9fb'); clouds(g);
+  for (let i = 0; i < 7; i++) { const h = 500 + (i * 137) % 500; rr(i * 160 - 30, 1900 - h, 150, h, 4, ['#a29bfe', '#fab1a0', '#81ecec', '#ffeaa7'][i % 4]); for (let r = 0; r < h / 120 - 1; r++) rr(i * 160, 1950 - h + r * 120, 40, 50, 4, '#fff', 0); }
+}
+const subsBlown = (t) => { const s = SPANS.find(x => x.scene === 'blow'); return s && t >= s.start + .3 && t < s.end; };
+window.hideSubs = subsBlown;
+
+window.SCENES = {
+  hook(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    const dx = lw(/dix/i, 'hook'), dc = lw(/décollé/i, 'hook');
+    const up = lt > dc ? ease((lt - dc) / 1.5) * 500 : 0;
+    fan(540, 2060 - up, 1.0, g, { speed: lt > dx ? 30 : 8, flying: lt > dc, smug: lt > dc });
+    if (lt > dx) windLines(g, 540, 1300, 10);
+    human(170, 2150, .85, g, { expr: lt > dc ? 'shock' : 'neutral', hair: '#5a3a22' });
+    // thermomètre
+    rr(860, 600, 70, 380, 35, '#fff', 6); rr(878, 620, 34, 340, 17, '#ff3838', 0); ell(895, 990, 50, 50, '#ff3838');
+    popText('VITESSE 10', 540, 330, 160, '#fff', dx, lt, -.05, dc - .1);
+    popText('DÉCOLLAGE', 540, 330, 180, '#ffd32a', dc, lt, .05);
+  },
+  room(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    const a = g * 1.5;
+    fan(540 + Math.cos(a) * 250, 1650 + Math.sin(a) * 120, .6, g, { speed: 30, flying: true, smug: true });
+    // feuilles qui volent
+    for (let i = 0; i < 8; i++) { const k = (g * .7 + i / 8) % 1; ctx.save(); ctx.translate((i * 151 + k * 900) % 1080, 400 + (i * 97) % 600 + Math.sin(g * 3 + i) * 40); ctx.rotate(g * 3 + i); rr(-50, -65, 100, 130, 4, '#fff', 4); ctx.restore(); }
+    const bo = lw(/bocal/i, 'room'), pe = lw(/perruque/i, 'room');
+    rr(800, 1450, 180, 200, 30, 'rgba(116,185,255,.5)', 6);
+    if (lt > bo) { const k = clamp((lt - bo) / 1.5); ctx.save(); ctx.translate(lerp(890, 300, k), lerp(1500, 900, k) - Math.sin(k * Math.PI) * 200); ctx.rotate(k * 10); ell(0, 0, 50, 30, '#ff9f43', 4); poly([[40, 0], [80, -24], [80, 24]], '#ff9f43', 4); ell(-24, -6, 6, 6, '#111', 0); ctx.restore(); }
+    human(200, 2150, .85, g, { expr: 'shock', bald: lt > pe, hair: '#5a3a22' });
+    if (lt > pe) { const k = clamp((lt - pe) / 1.2); ctx.save(); ctx.translate(lerp(200, 900, k), lerp(1460, 600, k)); ctx.rotate(k * 8); ctx.beginPath(); ctx.ellipse(0, 0, 100, 60, 0, Math.PI, 0); shape('#5a3a22'); ctx.restore(); }
+    popText('LE POISSON !', 540, 330, 160, '#ff9f43', bo, lt, -.05, pe - .1);
+    popText('TA PERRUQUE ?!', 540, 330, 150, '#fff', pe, lt, .05);
+  },
+  window(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    const fe = lw(/fenêtre/i, 'window');
+    const k = clamp((lt - fe + .3) / 1.5);
+    fan(lerp(540, 800, k), lerp(1500, 450, k), lerp(.6, .3, k), g, { speed: 30, flying: true, smug: true });
+    human(250, 2150, .9, g, { expr: 'shock', armL: -2.5, armR: 2.5, bald: true });
+    popText('HÉLICOPTÈRE', 540, 1000, 150, '#ffd32a', lw(/hélicoptère/i, 'window'), lt, -.05);
+  },
+  city(lt, d, g) {
+    cityBg(g);
+    fan(540 + Math.sin(g) * 200, 900, .55, g, { speed: 30, flying: true, smug: true });
+    windLines(g, 0, 1500, 10);
+    const ch = lw(/chapeaux/i, 'city'), pi = lw(/pigeon/i, 'city'), ca = lw(/caddie/i, 'city');
+    if (lt > ch) for (let i = 0; i < 3; i++) { const k = clamp((lt - ch - i * .2) / 2); ctx.save(); ctx.translate(lerp(150 + i * 300, 1100, k), lerp(1700, 500, k)); ctx.rotate(k * 8); rr(-70, -30, 140, 40, 14, '#2d3436'); rr(-40, -80, 80, 60, 14, '#2d3436'); ctx.restore(); }
+    if (lt > pi) { ctx.save(); ctx.translate(300, 1200); ctx.rotate(g * 10); ell(0, 0, 60, 40, '#9aa3ae', 5); ell(40, -30, 30, 28, '#7d8693', 5); poly([[66, -30], [90, -24], [66, -18]], '#3a3a3a', 3); ctx.restore(); popText('SALTO x3', 300, 1050, 90, '#fff', pi, lt, .06); }
+    if (lt > ca) { const k = clamp((lt - ca) / 3); ctx.save(); ctx.translate(lerp(-200, 1200, k), lerp(1600, 600, k)); ctx.rotate(-.2); human(0, 300, .4, g, { hair: '#dfe6e9', bun: true, glasses: true, shirt: '#e17055', skirt: '#2d3436', expr: 'neutral', armL: -2.4, armR: 2.4 }); rr(40, 100, 140, 100, 10, null, 6); ctx.restore(); }
+    popText('VACANCES !', 540, 330, 170, '#ffd32a', lw(/vacances/i, 'city'), lt, -.05);
+  },
+  like(lt, d, g) {
+    sky('#74b9ff', '#dff9fb'); clouds(g * 3);
+    const lk = lw(/like/i, 'like');
+    fan(540, 2350, 1.6, g, { speed: 14, flying: true, talk: lt > lw(/dit/i, 'like') && lt < d - .3, angry: lt > lw(/sinon/i, 'like') });
+    likeButton(lt, lk, g, 330);
+    popText('METS-MOI UN LIKE', 540, 650, 110, '#ffd32a', lk, lt, -.03, lw(/sinon/i, 'like') - .1);
+    popText('…SINON 🌬️', 540, 650, 130, '#fff', lw(/sinon/i, 'like'), lt, .04);
+  },
+  blow(lt, d, g) {
+    sky('#74b9ff', '#dff9fb'); clouds(g * 4);
+    fan(540, 2350, 1.6, g, { speed: 40, flying: true, smug: true });
+    windLines(g, 0, 1100, 14);
+    // les sous-titres s'envolent lettre par lettre
+    const word = 'SOUS-TITRES';
+    ctx.font = '900 98px Mont';
+    for (let i = 0; i < word.length; i++) { const k = clamp((lt - .3 - i * .05) / 1.4); ctx.save(); ctx.translate(200 + i * 62 + k * 900, 1240 - Math.sin(i + k * 6) * 160 * k - k * 300); ctx.rotate(k * (i % 2 ? 6 : -6)); ctx.globalAlpha = 1 - k * .6; txt(word[i], 0, 0, 98, '#fff', 'Mont', 'center', 18, '#000'); ctx.restore(); }
+    popText('PFFFFF', 540, 330, 220, '#fff', lw(/pfffff/i, 'blow'), lt, -.06);
+  },
+  plane(lt, d, g) {
+    sky('#a5d8ff', '#e7f5ff'); clouds(g * 2);
+    const k = clamp(lt / 4);
+    ctx.save(); ctx.translate(lerp(1300, 300, k), 900); rr(-380, -70, 760, 140, 70, '#fdfdfd'); poly([[-60, 0], [100, 0], [0, 180]], '#dfe6e9'); poly([[300, -50], [360, -200], [260, -50]], '#0984e3');
+    for (let i = 0; i < 6; i++) ell(-220 + i * 80, -10, 18, 18, '#74b9ff', 3);
+    // pilote dans le cockpit
+    ctx.save(); ctx.beginPath(); ctx.ellipse(-330, -20, 60, 50, 0, 0, 7); ctx.clip(); ell(-330, -20, 60, 50, '#9fd8ff', 0); human(-330, 330, .45, g, { expr: 'shock', cap: lt < lw(/casquette/i, 'plane') ? '#2d3436' : undefined, armL: lt > lw(/slip/i, 'plane') ? -2 : .1 }); ctx.restore();
+    ctx.restore();
+    fan(560, 1550, .5, g, { speed: 30, flying: true, smug: true, cap: lt > lw(/casquette/i, 'plane') + .3 });
+    popText('COUCOU 👋', 540, 330, 150, '#fff', lw(/coucou/i, 'plane'), lt, -.05, lw(/casquette/i, 'plane') - .1);
+    popText('SA CASQUETTE', 540, 330, 150, '#ffd32a', lw(/casquette/i, 'plane'), lt, .05, lw(/slip/i, 'plane') - .1);
+    popText('EN SLIP', 540, 330, 200, '#ff3838', lw(/slip/i, 'plane'), lt, -.05);
+  },
+  heat(lt, d, g) {
+    apartment('#ffbe76', '#b5835a');
+    ctx.save(); ctx.globalAlpha = .2; ctx.fillStyle = '#ff3838'; ctx.fillRect(0, 0, W, H); ctx.restore();
+    human(380, 2150, 1.0, g, { expr: 'sad', armR: 2.3 + Math.sin(g * 12) * .3 });
+    for (let i = 0; i < 3; i++) { const q = (g * 1.5 + i * .33) % 1; ell(280 + i * 100, 1300 + q * 120, 12, 18, '#74b9ff', 3); }
+    // tranche de jambon
+    if (lt > lw(/jambon/i, 'heat') - .3) { ctx.save(); ctx.translate(560 + Math.sin(g * 12) * 30, 1250); ctx.rotate(Math.sin(g * 12) * .4); ell(0, 0, 110, 80, '#ff9ff3', 6); ell(-20, -10, 50, 30, '#ffc8f0', 0); ctx.restore(); }
+    // chat en maillot
+    if (lt > lw(/maillot/i, 'heat') - .3) { ctx.save(); ctx.translate(850, 1880); ell(0, -100, 110, 100, '#636e72'); rr(-90, -90, 180, 50, 14, '#e84393', 0); poly([[-80, -170], [-70, -260], [-20, -190]], '#636e72'); poly([[80, -170], [70, -260], [20, -190]], '#636e72'); ell(-30, -140, 14, 16, '#c8e66b', 3); ell(30, -140, 14, 16, '#c8e66b', 3); rr(-70, -180, 140, 40, 12, '#111', 0); ctx.restore(); }
+    popText('40°', 540, 330, 220, '#ff3838', lw(/chaud/i, 'heat'), lt, -.06, lw(/jambon/i, 'heat') - .1);
+    popText('AU JAMBON', 540, 330, 190, '#ff9ff3', lw(/jambon/i, 'heat'), lt, .05);
+  },
+  return(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    rr(240, 1700, 600, 50, 10, '#8d6e63'); rr(280, 1750, 30, 300, 6, '#6d4c41'); rr(770, 1750, 30, 300, 6, '#6d4c41');
+    const po = lw(/pose/i, 'return'), pa = lw(/panne/i, 'return');
+    const k = clamp((lt - po + 1.5) / 1.5);
+    fan(lerp(1200, 540, k), lerp(400, 1700, k), .45, g, { speed: lt > pa ? 0 : 20, flying: lt < po, dead: lt > pa + .3, smug: lt < pa });
+    human(900, 2150, .85, g, { expr: lt > pa ? 'sad' : 'neutral', flip: true });
+    popText('BRÛLANT', 540, 330, 190, '#ff3838', lw(/brûlant/i, 'return'), lt, -.05, pa - .1);
+    popText('EN PANNE', 540, 330, 200, '#fff', pa, lt, .05);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    fan(540, 2300, 1.4, g, { speed: lt > lw(/dix/i, 'outro') ? 30 : 6, smug: true });
+    if (lt > lw(/dix/i, 'outro')) windLines(g, 540, 1300, 10);
+    subscribe(lt);
+  },
+};
+</script></body></html>

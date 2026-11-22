@@ -1,0 +1,142 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ L'OMBRE (personnage principal) : silhouette noire de toi
+// o: {pose, armL, armR, flip, dance, alpha, eyes, smug, talk, veil, glasses}
+function shadowChar(x, y, s, t, o = {}) {
+  ctx.save(); ctx.globalAlpha = o.alpha ?? .92;
+  ctx.translate(x, y);
+  if (o.dance) { ctx.rotate(Math.sin(t * 8) * .12); }
+  ctx.translate(-x, -y);
+  // dessin d'une silhouette avec la forme humaine : on dessine en noir via un canvas temporaire
+  const S = shadowChar.cv || (shadowChar.cv = document.createElement('canvas')); S.width = W; S.height = H;
+  const c2 = S.getContext('2d'); c2.clearRect(0, 0, W, H);
+  const save = ctx; ctxSwap(c2);
+  human(x, y, s, t, { ...o, expr: 'neutral', armL: o.dance ? -2 + Math.sin(t * 8) : o.armL, armR: o.dance ? 2 - Math.sin(t * 8) : o.armR });
+  ctxSwap(save);
+  c2.globalCompositeOperation = 'source-in'; c2.fillStyle = '#1e1e2e'; c2.fillRect(0, 0, W, H); c2.globalCompositeOperation = 'source-over';
+  ctx.drawImage(S, 0, 0);
+  ctx.restore();
+  // yeux blancs (l'ombre est vivante)
+  if (o.eyes !== false) {
+    const hy = y - 790 * s; ctx.save();
+    if (o.smug) { line(x - 52 * s, hy, x - 22 * s, hy, '#fff', 8 * s); line(x + 22 * s, hy, x + 52 * s, hy, '#fff', 8 * s); }
+    else { ell(x - 40 * s, hy, 16 * s, 20 * s, '#fff', 0); ell(x + 40 * s, hy, 16 * s, 20 * s, '#fff', 0); }
+    if (o.talk && Math.sin(t * 16) > 0) ell(x, hy + 60 * s, 16 * s, 12 * s, '#fff', 0); else { ctx.beginPath(); ctx.arc(x, hy + 40 * s, 26 * s, Math.PI * .15, Math.PI * .85); ctx.lineWidth = 7 * s; ctx.strokeStyle = '#fff'; ctx.stroke(); }
+    if (o.veil) { ctx.globalAlpha = .7; ctx.beginPath(); ctx.moveTo(x - 80 * s, hy - 100 * s); ctx.quadraticCurveTo(x - 220 * s, hy + 200 * s, x - 160 * s, hy + 500 * s); ctx.lineTo(x + 40 * s, hy + 500 * s); ctx.quadraticCurveTo(x + 40 * s, hy, x + 40 * s, hy - 110 * s); ctx.closePath(); ctx.fillStyle = '#fff'; ctx.fill(); }
+    ctx.restore();
+  }
+}
+// le moteur dessine via la variable globale ctx : on la remplace temporairement
+function ctxSwap(c) { ctx = c; }
+function sun(x, y, r, g) { ell(x, y, r, r, '#feca57', 0); for (let i = 0; i < 10; i++) { const a = i / 10 * 6.28 + g * .3; line(x + Math.cos(a) * (r + 25), y + Math.sin(a) * (r + 25), x + Math.cos(a) * (r + 70), y + Math.sin(a) * (r + 70), '#feca57', 10); } }
+function park(g) { sky('#74b9ff', '#dff9fb'); sun(880, 240, 100, g); clouds(g); ctx.fillStyle = '#78e08f'; ctx.fillRect(-400, 1450, W + 800, 1000); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    park(g);
+    const om = lw(/ombre/i, 'hook');
+    human(400, 1950, 1.0, g, { expr: lt > om ? 'shock' : 'neutral' });
+    if (lt < om) { ctx.save(); ctx.translate(400, 1950); ctx.transform(1, 0, -1.2, .35, 0, 0); ctx.globalAlpha = .45; ell(0, -400, 120, 400, '#1e1e2e', 0); ctx.restore(); }
+    else { const k = clamp((lt - om) / 2); shadowChar(lerp(560, 1250, k), 1950, .9, g, { pose: 'run', smug: true }); }
+    popText('PLUS D\'OMBRE', 540, 330, 160, '#2d3436', om, lt, -.05, lw(/démissionné/i, 'hook') - .1);
+    popText('DÉMISSION', 540, 330, 190, '#ff3838', lw(/démissionné/i, 'hook'), lt, .05);
+  },
+  note(lt, d, g) {
+    apartment();
+    rr(560, 400, 400, 1150, 30, '#f5f6fa'); line(560, 820, 960, 820, '#b2bec3', 8);
+    const k = easeOutBack(lt / .5);
+    ctx.save(); ctx.translate(760, 1150); ctx.scale(k, k); ctx.rotate(.05); rr(-170, -220, 340, 440, 8, '#ffeaa7', 6);
+    txt('25 ANS', 0, -150, 64, '#2d3436', 'Anton'); txt('à te suivre', 0, -80, 40, '#2d3436', 'Mont'); if (lt > lw(/toilettes/i, 'note')) txt('MÊME AUX 🚽', 0, 0, 46, '#e74c3c', 'Anton'); if (lt > lw(/plus/i, 'note')) txt('J\'EN PEUX PLUS', 0, 90, 44, '#e74c3c', 'Anton'); txt('— ton ombre', 0, 170, 32, '#636e72', 'Mont'); ctx.restore();
+    human(230, 2150, .95, g, { expr: 'sad' });
+  },
+  party(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 4; i++) { ctx.save(); ctx.globalAlpha = .25; ctx.translate(540, -100); ctx.rotate(Math.sin(g * 2 + i * 1.7) * .6); poly([[0, 0], [-170, 2200], [170, 2200]], ['#ff4757', '#2ed573', '#1e90ff', '#ffa502'][i], 0); ctx.restore(); }
+    ell(540, -40, 80, 80, '#ccc'); ctx.fillStyle = '#2c2c54'; ctx.fillRect(-400, 1600, W + 800, 900);
+    ctx.save(); ctx.globalAlpha = .55; ell(560, 1700, 330, 520, '#ffeaa7', 0); ctx.restore();
+    shadowChar(560, 2250, 1.0, g, { dance: true, smug: true, alpha: .95 });
+    // toi qui danses mal
+    const mi = lw(/mieux/i, 'party');
+    if (lt > mi - .3) human(180, 2150, .8, g, { expr: 'sad', armL: Math.sin(g * 3) * .3, armR: -.6 });
+    // DJ
+    const nu = lw(/numéro/i, 'party');
+    if (lt > nu - .3) { rr(740, 1350, 300, 200, 10, '#2d3436'); human(890, 1700, .5, g, { cap: '#e84393', shirt: '#2d3436', expr: 'neutral', phone: true, armR: 2.6 }); bubble(860, 980, 400, 130, 'TON 06 ?', 64, 0, nu, lt); }
+    popText('ELLE DANSE MIEUX', 540, 330, 120, '#fff', mi, lt, -.04);
+  },
+  chase(lt, d, g) {
+    sky('#2c3e50', '#7f8c8d'); ctx.fillStyle = '#636e72'; ctx.fillRect(-400, 1500, W + 800, 900);
+    // mur + porte + lampadaire
+    rr(-100, 500, 700, 1000, 4, '#b2bec3'); rr(200, 1050, 200, 450, 8, '#6d4c41');
+    line(860, 1500, 860, 700, '#2d3436', 18); ell(860, 690, 60, 40, '#f9ca24'); ctx.save(); ctx.globalAlpha = .2; poly([[820, 700], [900, 700], [1080, 1500], [640, 1500]], '#f9ca24', 0); ctx.restore();
+    const po = lw(/portes/i, 'chase'), la = lw(/lampadaires/i, 'chase'), gr = lw(/grimaces/i, 'chase');
+    if (lt < po + .4) shadowChar(lerp(700, 300, clamp(lt / (po + .4))), 1980, .7, g, { pose: 'run', smug: true });
+    else if (lt < gr) shadowChar(900, 1950, .5, g, { smug: true, alpha: .8 });
+    else { // grimaces sur le mur
+      ctx.save(); ctx.translate(300, 1500); ctx.transform(1, 0, 0, 1, 0, 0); shadowChar(300, 1500, .7, g, { armL: -2.6, armR: 2.6, alpha: .6, talk: true }); ctx.restore();
+    }
+    human(150, 2150, .85, g, { pose: 'run', expr: 'angry' });
+    popText('SOUS LA PORTE', 540, 330, 150, '#fff', po, lt, -.05, la - .1);
+    popText('LAMPADAIRE', 540, 330, 160, '#f9ca24', la, lt, .05, gr - .1);
+    popText('GRIMACES', 540, 330, 180, '#fff', gr, lt, -.05);
+  },
+  job(lt, d, g) {
+    sky('#48dbfb', '#c8f7ff'); sun(880, 240, 100, g); ctx.fillStyle = '#0abde3'; ctx.fillRect(-400, 900, W + 800, 260); ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, 1150, W + 800, 1000);
+    // touristes allongés à l'ombre
+    for (const x of [300, 760]) { rr(x - 200, 1780, 400, 60, 20, '#e17055'); ctx.save(); ctx.translate(x - 150, 1770); ctx.rotate(-Math.PI / 2); human(0, 0, .45, g, { expr: 'sleep', shirt: '#fd79a8' }); ctx.restore(); }
+    // l'ombre allongée en parasol au-dessus
+    shadowChar(540, 1650, .75, g, { armL: -1.6, armR: 1.6, smug: true, alpha: .7 });
+    rr(780, 1250, 260, 130, 20, '#fff', 6); txt('10 €/H', 910, 1318, 60, '#00b894', 'Anton');
+    popText('RICHE', 540, 330, 220, '#2ed573', lw(/riche/i, 'job'), lt, -.06);
+    popText('OMBRE À LOUER', 540, 330, 150, '#fff', lw(/ombre/i, 'job'), lt, .05, lw(/riche/i, 'job') - .1);
+  },
+  problem(lt, d, g) {
+    ctx.fillStyle = '#2c2c54'; ctx.fillRect(-400, -400, W + 800, H + 800); ell(860, 260, 90, 90, '#fff6c8', 0); ctx.fillStyle = '#40407a'; ctx.fillRect(-400, 1500, W + 800, 900);
+    const va = lw(/vampires/i, 'problem'), ai = lw(/ail/i, 'problem'), mi = lw(/montrer/i, 'problem');
+    human(450, 2150, .9, g, { expr: lt > ai ? 'shock' : 'neutral' });
+    if (lt > va - .3 && lt < ai) { human(820, 2150, .9, g, { shirt: '#111', pants: '#111', hair: '#111', expr: 'neutral', flip: true, armR: 1.4 }); ctx.save(); ctx.translate(820, 2150 - 790 * .9 + 60); poly([[-14, 0], [-6, 22], [2, 0]], '#fff', 2); poly([[6, 0], [14, 22], [22, 0]], '#fff', 2); ctx.restore(); poly([[700, 1300], [940, 1300], [1000, 1900], [640, 1900]], 'rgba(192,57,43,.8)', 5); bubble(800, 960, 360, 130, 'SALUT FRÈRE', 56, 0, va + .3, lt); }
+    if (lt > ai) for (let i = 0; i < 5; i++) { const k = ((lt - ai) * 1.5 + i * .2) % 1; ctx.save(); ctx.translate(lerp(1100, 450, k), lerp(1500 + i * 60, 1300, k)); ell(0, 0, 30, 34, '#fdfdfd', 4); line(0, -34, 0, -50, '#6ab04c', 5); ctx.restore(); }
+    if (lt > mi) { rr(60, 500, 280, 420, 20, '#dff9fb', 10); txt('?', 200, 720, 160, '#b2bec3', 'Anton'); }
+    popText('UN COLLÈGUE ?', 540, 330, 150, '#c0392b', lw(/collègue/i, 'problem'), lt, -.05, ai - .1);
+    popText('DE L\'AIL !', 540, 330, 180, '#fff', ai, lt, .05, mi - .1);
+    popText('MIROIR VIDE', 540, 330, 160, '#74b9ff', mi, lt, -.05);
+  },
+  date(lt, d, g) {
+    sky('#ffeaa7', '#fab1a0'); sun(540, 200, 90, g); ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, 1400, W + 800, 1000);
+    // palmier + son ombre
+    line(860, 1500, 820, 700, '#a0522d', 30); for (let i = 0; i < 6; i++) { ctx.save(); ctx.translate(820, 700); ctx.rotate(-2.8 + i * .55); ell(110, 0, 140, 34, '#27ae60'); ctx.restore(); }
+    const pa = lw(/palmier/i, 'date'), ma = lw(/marient/i, 'date');
+    if (lt > pa - .3) { ctx.save(); ctx.globalAlpha = .85; line(820, 1900, 760, 1300, '#1e1e2e', 30); for (let i = 0; i < 5; i++) { ctx.save(); ctx.translate(760, 1300); ctx.rotate(-2.6 + i * .5); ell(100, 0, 120, 30, '#1e1e2e', 0); ctx.restore(); } ell(740, 1250, 14, 16, '#fff', 0); ell(790, 1250, 14, 16, '#fff', 0); ctx.restore(); }
+    shadowChar(420, 1900, .85, g, { veil: lt > ma, smug: lt > ma });
+    if (lt > ma) hearts(g, 600, 1100, 6);
+    popText('AMOUREUSE', 540, 330, 180, '#ff4757', lw(/amoureuse/i, 'date'), lt, -.05, ma - .1);
+    popText('MARIAGE À MIDI', 540, 330, 150, '#fff', ma, lt, .04, lw(/voit/i, 'date') - .1);
+    popText('PERSONNE NE VOIT RIEN', 540, 330, 100, '#2d3436', lw(/voit/i, 'date'), lt, -.03);
+  },
+  return(lt, d, g) {
+    park(g);
+    const su = lw(/suis/i, 'return'), ta = lw(/tango/i, 'return'), to = lw(/tournes/i, 'return');
+    shadowChar(700, 2170, .9, g, { smug: true, talk: lt > lw(/dit/i, 'return'), armR: 1.8 });
+    human(300 + (lt > lw(/gauche/i, 'return', 1) ? -80 : 0), 2150, .9, g, { expr: 'sad', pose: lt > to && lt < to + 1 ? 'run' : 'stand' });
+    popText('C\'EST TOI QUI SUIS', 540, 330, 120, '#fff', su, lt, -.04, ta - .1);
+    popText('COURS DE TANGO', 540, 330, 140, '#e84393', ta, lt, .04, lw(/gauche/i, 'return') - .1);
+    popText('← À GAUCHE', 540, 330, 160, '#ffd32a', lw(/gauche/i, 'return'), lt, -.05, to - .3);
+    popText('TOURNE !', 540, 330, 190, '#ff3838', to - .3, lt, .05);
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    human(380, 2150, .9, g, { expr: 'neutral' });
+    ctx.save(); ctx.fillStyle = '#fff'; ctx.globalAlpha = .08; ctx.fillRect(0, 0, W, H); ctx.restore();
+    shadowChar(720, 2200, .9, g, { smug: true });
+    subscribe(lt);
+  },
+};
+</script></body></html>

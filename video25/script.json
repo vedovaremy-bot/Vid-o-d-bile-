@@ -1,0 +1,234 @@
+{
+ "title": "Ta tortue a gagné le Tour de France",
+ "segments": [
+  {
+   "scene": "hook",
+   "text": "Ta *tortue* s'est inscrite au *Tour de France*. Et elle l'a *gagné*."
+  },
+  {
+   "scene": "train",
+   "text": "Ça faisait des mois qu'elle s'entraînait en cachette. Elle faisait des pompes. Elle mangeait de la salade *protéinée*. Elle courait sur un tapis de course. Très, très *lentement*."
+  },
+  {
+   "scene": "like",
+   "text": "Avant le départ, elle regarde la caméra. Elle dit : je suis lente, mais toi, sois *rapide*. Lâche un *like*... avant que j'arrive au bout de cette *phrase*."
+  },
+  {
+   "scene": "start",
+   "text": "Coup de pistolet. Tous les cyclistes partent à fond. La tortue... avance de *trois centimètres*. Le public *rigole*. Même un escargot la *double*."
+  },
+  {
+   "scene": "secret",
+   "text": "Mais elle a une arme secrète. Sous sa carapace... il y a un *moteur de fusée*."
+  },
+  {
+   "scene": "rocket",
+   "text": "*Boum*. Elle double tout le peloton. Elle monte les montagnes à *deux cents* à l'heure. Les vaches tombent dans les *pommes*."
+  },
+  {
+   "scene": "control",
+   "text": "Au contrôle antidopage, on lui demande ce qu'elle a pris. Elle répond : de la *laitue*. Ils la *croient*. Les journalistes lui demandent son secret. Elle dit : dormir *quatorze heures* par jour."
+  },
+  {
+   "scene": "win",
+   "text": "Elle arrive sur les Champs-Élysées avec *trois jours* d'avance. Elle gagne le maillot *jaune*. Il lui fait une jolie robe."
+  },
+  {
+   "scene": "end",
+   "text": "Aujourd'hui, elle est célèbre. Et toi ? Tu dois la *promener*. Et ça prend *six heures*. Elle signe des autographes avec sa *patte*."
+  },
+  {
+   "scene": "outro",
+   "text": "Abonne-toi... et surveille bien ta tortue."
+  }
+ ],
+ "sfx": [
+  {
+   "word": "tortue",
+   "in": "hook",
+   "type": "pop",
+   "gain": 0.6
+  },
+  {
+   "word": "france",
+   "in": "hook",
+   "type": "crowd",
+   "dur": 3.0,
+   "gain": 0.5
+  },
+  {
+   "word": "gagné",
+   "type": "applause",
+   "dur": 2.0,
+   "gain": 0.8
+  },
+  {
+   "word": "pompes",
+   "type": "thud",
+   "gain": 0.5,
+   "repeat": 3,
+   "gap": 0.3
+  },
+  {
+   "word": "protéinée",
+   "type": "crunch",
+   "gain": 0.7
+  },
+  {
+   "word": "regarde",
+   "in": "like",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "rapide",
+   "type": "whoosh",
+   "gain": 0.6
+  },
+  {
+   "word": "like",
+   "in": "like",
+   "type": "ding",
+   "gain": 0.8
+  },
+  {
+   "word": "phrase",
+   "type": "tick",
+   "dur": 1.0,
+   "gain": 0.6
+  },
+  {
+   "word": "pistolet",
+   "type": "explosion",
+   "dur": 0.8,
+   "gain": 0.7
+  },
+  {
+   "word": "partent",
+   "type": "whoosh",
+   "gain": 0.8
+  },
+  {
+   "word": "partent",
+   "type": "crowd",
+   "dur": 3.0,
+   "gain": 0.5
+  },
+  {
+   "word": "centimètres",
+   "type": "sad_trombone",
+   "offset": 0.3,
+   "gain": 0.6
+  },
+  {
+   "word": "rigole",
+   "type": "crowd",
+   "dur": 1.5,
+   "gain": 0.6
+  },
+  {
+   "word": "secrète",
+   "type": "drumroll",
+   "dur": 1.0,
+   "gain": 0.6
+  },
+  {
+   "word": "fusée",
+   "type": "magic",
+   "gain": 0.6
+  },
+  {
+   "word": "boum",
+   "type": "explosion",
+   "gain": 0.9
+  },
+  {
+   "word": "boum",
+   "type": "engine",
+   "dur": 4.0,
+   "gain": 0.6
+  },
+  {
+   "word": "peloton",
+   "type": "whoosh",
+   "gain": 0.8,
+   "repeat": 3,
+   "gap": 0.2
+  },
+  {
+   "word": "vaches",
+   "type": "land",
+   "gain": 0.6,
+   "repeat": 2,
+   "gap": 0.3
+  },
+  {
+   "word": "contrôle",
+   "type": "siren",
+   "dur": 1.5,
+   "gain": 0.4
+  },
+  {
+   "word": "laitue",
+   "type": "crunch",
+   "gain": 0.7
+  },
+  {
+   "word": "croient",
+   "type": "ding",
+   "gain": 0.6
+  },
+  {
+   "word": "élysées",
+   "type": "crowd",
+   "dur": 4.0,
+   "gain": 0.7
+  },
+  {
+   "word": "jaune",
+   "type": "applause",
+   "dur": 2.5,
+   "gain": 0.8
+  },
+  {
+   "word": "robe",
+   "type": "magic",
+   "gain": 0.5
+  },
+  {
+   "word": "promener",
+   "type": "footsteps",
+   "dur": 2.5,
+   "gain": 0.4
+  },
+  {
+   "word": "heures",
+   "type": "sad_trombone",
+   "offset": 0.2,
+   "gain": 0.6
+  },
+  {
+   "word": "lentement",
+   "type": "footsteps",
+   "dur": 1.5,
+   "gain": 0.4
+  },
+  {
+   "word": "double",
+   "in": "start",
+   "type": "whoosh",
+   "gain": 0.4
+  },
+  {
+   "word": "quatorze",
+   "type": "snore",
+   "dur": 1.8,
+   "gain": 0.6
+  },
+  {
+   "word": "patte",
+   "type": "pop",
+   "gain": 0.5
+  }
+ ]
+}

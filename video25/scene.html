@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ LA TORTUE (personnage principal)
+// o: {bike, helmet, rocket, jersey, talk, smug, angry, shades, flip, pedal, dress, leash, noShadow}
+function turtle(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (!o.noShadow) shadow(0, 0, 200);
+  if (o.bike) { // vélo
+    const wr = 110; for (const wx of [-170, 170]) { ell(wx, -wr, wr, wr, null, 10, 0); ctx.beginPath(); ctx.arc(wx, -wr, wr, 0, 7); ctx.lineWidth = 12; ctx.strokeStyle = '#2d3436'; ctx.stroke(); ctx.save(); ctx.translate(wx, -wr); ctx.rotate(t * (o.pedal || 0)); for (let i = 0; i < 6; i++) { ctx.rotate(Math.PI / 3); line(0, 0, wr, 0, '#b2bec3', 3); } ctx.restore(); }
+    line(-170, -110, 0, -110, '#e74c3c', 14); line(0, -110, 80, -300, '#e74c3c', 14); line(-170, -110, -40, -300, '#e74c3c', 14); line(-40, -300, 120, -300, '#e74c3c', 14); line(170, -110, 120, -330, '#e74c3c', 14); line(100, -340, 170, -360, OUT, 12);
+    ctx.translate(0, -230);
+  }
+  // pattes
+  for (const [lx, ph] of [[-110, 0], [110, 1.5]]) { const a = o.pedal ? Math.sin(t * o.pedal + ph) * .5 : 0; ctx.save(); ctx.translate(lx, -40); ctx.rotate(a); ell(0, 20, 34, 44, '#6ab04c'); ctx.restore(); }
+  // tête
+  ctx.save(); ctx.translate(210, -170 + (o.bike ? -40 : 0));
+  ell(0, 0, 80, 66, '#6ab04c');
+  const ey = -14;
+  if (o.shades) { rr(-20, ey - 24, 80, 44, 14, '#111', 4); }
+  else { ell(24, ey, 20, 22, '#fff', 4); ell(28, ey + 2, 9, 10, '#111', 0); if (o.smug) { ctx.save(); ctx.beginPath(); ctx.ellipse(24, ey, 21, 23, 0, Math.PI, 0); shape('#6ab04c', 4); ctx.restore(); } }
+  if (o.angry) line(0, ey - 34, 50, ey - 24, OUT, 7);
+  if (o.talk && Math.sin(t * 16) > 0) ell(50, 30, 20, 14, '#7a2b2b', 4); else { ctx.beginPath(); ctx.arc(40, 14, 26, Math.PI * .15, Math.PI * .7); shape(null, 6); }
+  if (o.helmet) { ctx.beginPath(); ctx.ellipse(0, -30, 84, 60, 0, Math.PI, 0); shape('#f9ca24', 6); line(-60, -60, 60, -60, '#2d3436', 4); }
+  ctx.restore();
+  // carapace
+  ctx.beginPath(); ctx.ellipse(0, -150, 200, 150, 0, Math.PI, 0); ctx.lineTo(200, -130); ctx.lineTo(-200, -130); ctx.closePath(); shape(o.jersey ? '#f9ca24' : '#8d6e63');
+  if (!o.jersey) { for (const [hx, hy] of [[-100, -200], [0, -240], [100, -200], [-50, -150], [50, -150]]) { ctx.beginPath(); for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2; ctx.lineTo(hx + Math.cos(a) * 40, hy + Math.sin(a) * 34); } ctx.closePath(); shape('#a1887f', 4); } }
+  else { txt('★', 0, -200, 80, '#e67e22', 'serif'); }
+  rr(-210, -150, 420, 30, 14, '#6d4c41');
+  if (o.dress) { poly([[-180, -130], [180, -130], [240, 20], [-240, 20]], '#f9ca24', 6); }
+  // queue
+  poly([[-200, -110], [-260, -90], [-200, -80]], '#6ab04c', 5);
+  // moteur de fusée
+  if (o.rocket) { rr(-300, -260, 120, 90, 20, '#636e72', 6); if (o.rocket > 1) { const f = Math.sin(t * 30) * 30; poly([[-300, -250], [-520 - f, -215], [-300, -180]], '#ff9f43', 5); poly([[-300, -235], [-430 - f, -215], [-300, -195]], '#f9ca24', 0); } }
+  ctx.restore();
+}
+function road(g, speed = 0) {
+  sky('#74b9ff', '#dff9fb'); clouds(g);
+  ctx.fillStyle = '#6ab04c'; ctx.fillRect(-400, 1200, W + 800, 1000);
+  ctx.fillStyle = '#636e72'; ctx.fillRect(-400, 1650, W + 800, 300);
+  for (let i = 0; i < 8; i++) rr(((-g * speed + i * 260) % 2080 + 2080) % 2080 - 400, 1790, 140, 20, 6, '#fff', 0);
+}
+function crowdLine(g, y = 1600) { for (let i = 0; i < 10; i++) { const x = 30 + i * 115, yy = y - Math.abs(Math.sin(g * 5 + i)) * 18; ell(x, yy - 140, 40, 40, ['#f3c9a4', '#e1a95f', '#8d5524'][i % 3], 4); rr(x - 50, yy - 100, 100, 140, 30, ['#e74c3c', '#0984e3', '#f9ca24', '#00b894'][i % 4], 4); } }
+function cyclist(x, y, s, t, col) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); for (const wx of [-120, 120]) { ctx.beginPath(); ctx.arc(wx, -80, 80, 0, 7); ctx.lineWidth = 10; ctx.strokeStyle = '#2d3436'; ctx.stroke(); } line(-120, -80, 0, -80, col, 10); line(0, -80, 60, -220, col, 10); line(-120, -80, -30, -220, col, 10); ctx.restore(); human(x, y - 140 * s, s * .55, t, { shirt: col, cap: col, pose: 'run', expr: 'neutral' }); }
+function mountain(x, y, w, h, col) { poly([[x - w, y], [x, y - h], [x + w, y]], col); poly([[x - w * .25, y - h * .75], [x, y - h], [x + w * .25, y - h * .75]], '#fff', 0); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    road(g);
+    ctx.save(); ctx.translate(540, 900); rr(-380, -110, 760, 220, 30, '#f9ca24', 8); txt('TOUR DE FRANCE', 0, 0, 110, '#2d3436', 'Anton'); ctx.restore();
+    crowdLine(g, 1600);
+    turtle(540, 1920, 1.0, g, { bike: true, helmet: true, jersey: lt > lw(/gagné/i, 'hook'), smug: true });
+    if (lt > lw(/gagné/i, 'hook')) confetti(g, 50);
+    popText('GAGNÉ !', 540, 330, 220, '#f9ca24', lw(/gagné/i, 'hook'), lt, -.06);
+  },
+  train(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    const po = lw(/pompes/i, 'train'), sa = lw(/protéinée/i, 'train'), le = lw(/lentement/i, 'train');
+    if (lt < sa - .2) { turtle(500, 1950 + Math.abs(Math.sin(g * 4)) * -30, 1.3, g, { angry: true, helmet: true }); popText('POMPES', 540, 330, 200, '#fff', po, lt, -.05); }
+    else if (lt < le - .5) { turtle(480, 1950, 1.3, g, { talk: true, smug: true }); ctx.save(); ctx.translate(800, 1500); ell(0, 0, 110, 80, '#6ab04c', 6); for (let i = 0; i < 4; i++) ell(-50 + i * 34, -20, 30, 40, '#badc58', 3); ctx.restore(); popText('SALADE PROTÉINÉE', 540, 330, 120, '#6ab04c', sa, lt, .04); }
+    else { rr(160, 1800, 760, 120, 20, '#2d3436'); for (let i = 0; i < 6; i++) line(200 + ((i * 130 + g * 10) % 700), 1810, 200 + ((i * 130 + g * 10) % 700), 1910, '#636e72', 6); turtle(540, 1800, .9, g, { pedal: 2, helmet: true }); popText('TRÈS LENTEMENT', 540, 330, 150, '#fff', le, lt, -.04); }
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#badc58'); gr.addColorStop(1, '#0984e3'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    const lk = lw(/like/i, 'like'), ph = lw(/phrase/i, 'like');
+    turtle(400, 2050, 2.0, g, { helmet: true, talk: lt > lw(/dit/i, 'like') && lt < d - .3, smug: lt < lk, angry: lt > lk });
+    likeButton(lt, lk, g, 330);
+    popText('SOIS RAPIDE', 540, 650, 140, '#fff', lw(/rapide/i, 'like'), lt, -.04, lk - .2);
+    popText('LÂCHE UN LIKE', 540, 650, 130, '#ffd32a', lk, lt, .03);
+    if (lt > lk) { const rem = Math.max(0, (ph - lt)); rr(780, 520, 240, 110, 20, '#111'); txt(rem.toFixed(1) + ' s', 900, 578, 70, '#ff3838', 'Anton'); }
+  },
+  start(lt, d, g) {
+    road(g, lt > lw(/partent/i, 'start') ? 1400 : 0);
+    crowdLine(g, 1600);
+    const pa = lw(/partent/i, 'start'), ce = lw(/centimètres/i, 'start'), es = lw(/double/i, 'start');
+    for (let i = 0; i < 3; i++) { const x = lt < pa ? 300 + i * 220 : 300 + i * 220 + (lt - pa) * 1200; cyclist(x, 1900, .8, g + i, ['#0984e3', '#e74c3c', '#00b894'][i]); }
+    turtle(lt > ce ? 220 : 200, 1930, .6, g, { bike: true, helmet: true, pedal: lt > pa ? 3 : 0, angry: true });
+    if (lt > es - .3) { const k = clamp((lt - es + .3) / 2); ctx.save(); ctx.translate(lerp(-100, 600, k), 1930); ell(0, -40, 50, 40, '#e1a95f', 5); ell(50, -40, 30, 26, '#c8d77a', 4); ctx.restore(); }
+    if (lt < pa) popText('PAN !', 540, 330, 220, '#ff3838', lw(/pistolet/i, 'start'), lt, -.06);
+    popText('3 CM', 540, 330, 220, '#fff', ce, lt, .05, es - .3);
+    popText('DOUBLÉE PAR UN ESCARGOT', 540, 330, 100, '#ffd32a', es, lt, -.03);
+  },
+  secret(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    ctx.save(); ctx.globalAlpha = .3; ell(540, 1500, 500, 300, '#f9ca24', 0); ctx.restore();
+    turtle(620, 1950, 1.5, g, { helmet: true, rocket: lt > lw(/fusée/i, 'secret') - .4 ? 1 : 0, smug: true });
+    popText('ARME SECRÈTE', 540, 330, 160, '#fff', lw(/secrète/i, 'secret'), lt, -.05, lw(/fusée/i, 'secret') - .1);
+    popText('🚀 FUSÉE', 540, 330, 200, '#ff9f43', lw(/fusée/i, 'secret'), lt, .05);
+  },
+  rocket(lt, d, g) {
+    sky('#74b9ff', '#dff9fb');
+    mountain(300, 1500, 500, 700, '#95a5a6'); mountain(800, 1500, 450, 900, '#7f8c8d');
+    ctx.fillStyle = '#6ab04c'; ctx.fillRect(-400, 1500, W + 800, 1000);
+    const bo = lw(/boum/i, 'rocket'), pe = lw(/peloton/i, 'rocket'), va = lw(/vaches/i, 'rocket'), mo = lw(/montagnes/i, 'rocket');
+    if (lt > bo && lt < bo + .4) { ctx.save(); ctx.globalAlpha = 1 - (lt - bo) / .4; ell(300, 1700, 300, 200, '#ff9f43', 0); ctx.restore(); }
+    for (let i = 0; i < 3; i++) cyclist(200 + i * 300 - (lt > pe ? (lt - pe) * 400 : 0), 1900, .5, g + i, ['#0984e3', '#e74c3c', '#00b894'][i]);
+    const tx = lt < mo ? lerp(100, 900, clamp((lt - bo) / 2)) : 540 + Math.sin(g) * 100, ty = lt < mo ? 1880 : 1500 - clamp((lt - mo) / 2) * 600;
+    turtle(tx, ty, .55, g, { bike: true, helmet: true, rocket: 2, pedal: 20, shades: true });
+    ctx.save(); ctx.globalAlpha = .5; for (let i = 0; i < 6; i++) line(tx - 300 - i * 30, ty - 150 + i * 20, tx - 120, ty - 150 + i * 20, '#fff', 8); ctx.restore();
+    if (lt > va - .2) for (let i = 0; i < 2; i++) { ctx.save(); ctx.translate(150 + i * 760, 1700); ctx.rotate(lt > va ? (i ? 1 : -1) * Math.min(1.5, (lt - va) * 4) : 0); ell(0, -90, 110, 70, '#fff', 5); ell(-40, -110, 30, 20, '#2d3436', 0); ell(100, -140, 50, 44, '#fff', 5); ctx.restore(); }
+    popText('200 KM/H', 540, 330, 200, '#ff3838', lw(/deux/i, 'rocket'), lt, -.05, va - .1);
+    popText('LES VACHES ⤵', 540, 330, 160, '#fff', va, lt, .05);
+  },
+  control(lt, d, g) {
+    ctx.fillStyle = '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1600, W + 800, 900);
+    rr(80, 300, 400, 140, 14, '#0984e3'); txt('ANTIDOPAGE', 280, 372, 60, '#fff', 'Anton');
+    turtle(360, 1950, 1.15, g, { helmet: true, talk: lt > lw(/répond/i, 'control') - .2 && lt < lw(/croient/i, 'control'), smug: true });
+    human(900, 2200, .9, g, { shirt: '#fff', pants: '#81ecec', cap: '#81ecec', glasses: true, expr: 'neutral', flip: true, armR: 1.4 });
+    const la = lw(/laitue/i, 'control'), qu = lw(/quatorze/i, 'control');
+    if (lt > la - .2 && lt < qu - 1) { ctx.save(); ctx.translate(620, 1250); ell(0, 0, 120, 90, '#badc58', 6); for (let i = 0; i < 5; i++) ell(-60 + i * 30, -30, 26, 50, '#6ab04c', 3); ctx.restore(); }
+    popText('DE LA LAITUE', 540, 600, 150, '#6ab04c', la, lt, -.05, lw(/croient/i, 'control') - .1);
+    popText('ILS LA CROIENT', 540, 600, 150, '#fff', lw(/croient/i, 'control'), lt, .05, qu - .6);
+    if (lt > qu - .5) { popText('😴 14 H / JOUR', 540, 600, 140, '#a29bfe', qu - .5, lt, -.04); for (let i = 0; i < 3; i++) { const z = (g * .8 + i * .33) % 1; ctx.globalAlpha = 1 - z; txt('Z', 500 + z * 80, 1200 - z * 160, 60, '#2d3436', 'Anton'); ctx.globalAlpha = 1; } }
+  },
+  win(lt, d, g) {
+    sky('#74b9ff', '#dff9fb');
+    // Arc de triomphe
+    ctx.fillStyle = '#e1d7c0'; rr(240, 400, 600, 800, 10, '#e1d7c0', 6); ctx.beginPath(); ctx.arc(540, 1200, 160, Math.PI, 0); ctx.lineTo(700, 1200); ctx.lineTo(380, 1200); ctx.closePath(); ctx.fillStyle = '#74b9ff'; ctx.fill();
+    ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900);
+    crowdLine(g, 1650);
+    const ja = lw(/jaune/i, 'win'), ro = lw(/robe/i, 'win');
+    turtle(540, 1950, 1.0, g, { jersey: lt > ja && lt < ro - .2, dress: lt > ro - .2, helmet: lt < ro - .2, smug: true });
+    if (lt > ja) confetti(g, 60);
+    popText('+3 JOURS', 540, 330, 200, '#fff', lw(/trois/i, 'win'), lt, -.05, ja - .1);
+    popText('MAILLOT JAUNE', 540, 330, 160, '#f9ca24', ja, lt, .05, ro - .2);
+    popText('JOLIE ROBE', 540, 330, 180, '#fd79a8', ro - .2, lt, -.05);
+  },
+  end(lt, d, g) {
+    const pr = lw(/promener/i, 'end');
+    if (lt < pr - .5) {
+      ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+      for (let i = 0; i < 8; i++) { if (Math.sin(g * 9 + i * 2) > .7) { ell(100 + i * 120, 300 + (i % 3) * 200, 80, 80, 'rgba(255,255,255,.6)', 0); } }
+      turtle(540, 1900, 1.1, g, { shades: true, smug: true });
+      rr(60, 1300, 300, 120, 14, '#fff', 5); txt('✍ ', 210, 1362, 60, '#2d3436', 'Anton');
+      popText('CÉLÈBRE', 540, 330, 200, '#f9ca24', lw(/célèbre/i, 'end'), lt, -.05);
+    } else {
+      road(g * .02);
+      human(300, 2150, .9, g, { expr: 'sad', armR: .9 });
+      line(400, 1520, 700, 1880, '#e74c3c', 6);
+      turtle(760, 1950, .5, g, { smug: true });
+      // horloge
+      rr(760, 300, 260, 140, 20, '#111'); txt((Math.floor(lt * 40) % 6 + 1) + ':00', 890, 372, 90, '#ff3838', 'Anton');
+      popText('6 HEURES', 540, 650, 190, '#fff', lw(/heures/i, 'end'), lt, .05);
+    }
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    turtle(540, 2000, 1.2, g, { helmet: true, rocket: 2, shades: true });
+    subscribe(lt);
+  },
+};
+</script></body></html>
