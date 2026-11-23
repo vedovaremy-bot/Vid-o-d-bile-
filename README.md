@@ -85,3 +85,5 @@ Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thun
 ## Vidéo 23 — « Ton ventilateur a décollé » (72 s) — `video23_ventilateur.mp4`, like vers 28 s (+ gag : il souffle les sous-titres, `window.hideSubs`)
 ## Vidéo 24 — « Ton ombre a démissionné » (71 s) — `video24_ombre.mp4`, pas de like (silhouette via `ctx` swappable dans engine.js)
 ## Vidéo 25 — « Ta tortue a gagné le Tour de France » (75 s) — `video25_tortue_tour_de_france.mp4`, like vers 14 s (avec compte à rebours)
+## Vidéo 26 — « Ton aspirateur robot a pris le pouvoir » (69 s) — `video26_aspirateur_robot.mp4`, pas de like
+## Vidéo 27 — « Une vache t'a volé ton skate » (76 s) — `video27_vache_skate.mp4`, like vers 43 s (après le triple salto)

@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+// ------------------------------------------------------------ LA VACHE SKATEUSE (personnage principal)
+// o: {skate, cap, shoes, talk, smug, shades, chantilly, medal, flip, rot, noShadow}
+function cow(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+  if (!o.noShadow) shadow(0, 0, 220);
+  if (o.rot) { ctx.translate(0, -200); ctx.rotate(o.rot); ctx.translate(0, 200); }
+  if (o.skate) { rr(-260, -40, 520, 34, 17, '#e17055', 5); for (const wx of [-170, 170]) ell(wx, 0, 24, 24, '#f9ca24', 4); ctx.translate(0, -40); }
+  // pattes
+  for (const lx of [-160, -70, 70, 160]) { rr(lx - 24, -150, 48, 150, 18, '#fff', 5); rr(lx - 28, -30, 56, 30, 10, o.shoes ? '#e84393' : '#2d3436', 4); }
+  // corps
+  ell(0, -240, 240, 130, '#fff');
+  ell(-80, -270, 70, 50, '#2d3436', 0); ell(90, -220, 60, 44, '#2d3436', 0); ell(-150, -200, 30, 26, '#2d3436', 0);
+  ell(-40, -150, 50, 26, '#ffb8b8', 4); // pis
+  // queue
+  ctx.beginPath(); ctx.moveTo(-230, -280); ctx.quadraticCurveTo(-300, -260 + Math.sin(t * 5) * 20, -290, -180); shape(null, 8); ell(-290, -175, 16, 22, '#2d3436', 0);
+  if (o.medal) { line(170, -330, 200, -240, '#e74c3c', 10); line(230, -330, 200, -240, '#0984e3', 10); ell(200, -220, 34, 34, '#f9ca24', 5); }
+  // tête
+  ctx.save(); ctx.translate(240, -340);
+  poly([[-70, -60], [-110, -130], [-40, -80]], '#f6e58d', 4); poly([[70, -60], [110, -130], [40, -80]], '#f6e58d', 4);
+  ell(-90, -30, 40, 20, '#fff', 5); ell(90, -30, 40, 20, '#fff', 5);
+  ell(0, 0, 100, 110, '#fff');
+  ell(0, 70, 80, 56, '#ffb8b8', 5); ell(-26, 70, 10, 14, '#7a2b2b', 0); ell(26, 70, 10, 14, '#7a2b2b', 0);
+  const ey = -20;
+  if (o.shades) { rr(-80, ey - 24, 70, 44, 14, '#111', 4); rr(10, ey - 24, 70, 44, 14, '#111', 4); line(-10, ey - 6, 10, ey - 6, '#111', 6); }
+  else { ell(-38, ey, 18, 22, '#fff', 4); ell(38, ey, 18, 22, '#fff', 4); ell(-36, ey + 4, 8, 10, '#111', 0); ell(40, ey + 4, 8, 10, '#111', 0);
+    if (o.smug) for (const sx of [-38, 38]) { ctx.save(); ctx.beginPath(); ctx.ellipse(sx, ey, 19, 23, 0, Math.PI, 0); shape('#fff', 4); ctx.restore(); } }
+  if (o.talk && Math.sin(t * 16) > 0) ell(0, 118, 22, 14, '#7a2b2b', 4);
+  if (o.cap) { ctx.beginPath(); ctx.ellipse(0, -70, 100, 60, 0, Math.PI, 0); shape('#0984e3'); rr(-10, -80, 150, 26, 12, '#0984e3'); ell(-60, -110, 16, 10, '#2d3436', 0); ell(60, -110, 16, 10, '#2d3436', 0); }
+  if (o.chantilly) { for (let i = 0; i < 6; i++) ell(-80 + i * 32, -90 - (i % 2) * 20, 30, 26, '#fffdf3', 3); ell(0, -130, 16, 16, '#e74c3c', 3); }
+  ctx.restore();
+  if (o.chantilly) { for (let i = 0; i < 6; i++) ell(-180 + i * 70, -360 - (i % 2) * 14, 40, 30, '#fffdf3', 3); }
+  ctx.restore();
+}
+function skateboard(x, y, s, rot = 0) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); rr(-260, -34, 520, 34, 17, '#e17055', 5); ell(-170, 6, 24, 24, '#f9ca24', 4); ell(170, 6, 24, 24, '#f9ca24', 4); ctx.restore(); }
+function field(g) { sky('#74b9ff', '#dff9fb'); clouds(g); ctx.fillStyle = '#78e08f'; ctx.fillRect(-400, 1300, W + 800, 1000); for (let x = -100; x < W + 100; x += 120) { rr(x, 1350, 20, 200, 4, '#a0522d', 0); } line(-100, 1400, W + 100, 1400, '#a0522d', 8); line(-100, 1480, W + 100, 1480, '#a0522d', 8); }
+function street(g, scroll = 0) { sky('#ffeaa7', '#fab1a0'); for (let i = 0; i < 6; i++) { const x = ((i * 280 - g * scroll) % 1680 + 1680) % 1680 - 300; const h = 500 + (i * 137) % 400; rr(x, 1500 - h, 250, h, 6, ['#a29bfe', '#fab1a0', '#81ecec', '#ffeaa7'][i % 4]); } ctx.fillStyle = '#636e72'; ctx.fillRect(-400, 1500, W + 800, 900); for (let i = 0; i < 8; i++) rr(((-g * scroll * 1.5 + i * 260) % 2080 + 2080) % 2080 - 400, 1700, 140, 18, 6, '#fff', 0); }
+function skatepark(g) { sky('#74b9ff', '#dff9fb'); clouds(g); ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900); ctx.beginPath(); ctx.moveTo(-100, 1000); ctx.quadraticCurveTo(-100, 1500, 300, 1500); ctx.lineTo(-100, 1500); ctx.closePath(); shape('#dfe6e9'); ctx.beginPath(); ctx.moveTo(1180, 1000); ctx.quadraticCurveTo(1180, 1500, 780, 1500); ctx.lineTo(1180, 1500); ctx.closePath(); shape('#dfe6e9'); }
+function iceTruck(x, y, s) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); rr(-320, -320, 640, 280, 30, '#fd79a8'); rr(-280, -280, 200, 120, 10, '#9fd8ff'); txt('GLACES', 80, -220, 70, '#fff', 'Anton'); ell(-200, -20, 50, 50, '#222'); ell(200, -20, 50, 50, '#222'); ctx.save(); ctx.translate(200, -380); poly([[-40, 0], [40, 0], [0, 100]], '#e1a95f', 4); ell(0, -10, 50, 40, '#fff', 4); ctx.restore(); ctx.restore(); }
+function crowdHands(g, y = 1950, n = 9) { for (let i = 0; i < n; i++) { const x = 60 + i * 120, yy = y - Math.abs(Math.sin(g * 6 + i)) * 30; ell(x, yy - 120, 50, 50, '#2d3436', 0); rr(x - 60, yy - 70, 120, 200, 40, '#2d3436', 0); line(x - 40, yy - 80, x - 70, yy - 250, '#2d3436', 22); line(x + 40, yy - 80, x + 70, yy - 250, '#2d3436', 22); } }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    street(g, 300);
+    cow(540, 1900, 1.0, g, { skate: true, cap: true, smug: true, shades: lt > lw(/meilleure/i, 'hook') });
+    human(150, 2200, .8, g, { expr: lt > lw(/meilleure/i, 'hook') ? 'sad' : 'shock' });
+    popText('MON SKATE ?!', 540, 330, 170, '#ff3838', lw(/skate/i, 'hook'), lt, -.05, lw(/meilleure/i, 'hook') - .1);
+    popText('MEILLEURE QUE TOI', 540, 330, 120, '#ffd32a', lw(/meilleure/i, 'hook'), lt, .04);
+  },
+  steal(lt, d, g) {
+    field(g);
+    const de = lw(/dessus/i, 'steal'), pa = lw(/part/i, 'steal');
+    if (lt < de - .3) { skateboard(540, 1900, 1.0); cow(820, 1850, .8, g, { smug: true }); }
+    else { const k = lt > pa ? clamp((lt - pa) / 2) : 0; cow(lerp(540, 1400, k), 1900, 1.0, g, { skate: true, smug: true }); }
+    if (lt > lw(/reviens/i, 'steal')) human(140, 2200, .8, g, { expr: lt > pa ? 'angry' : 'shock' });
+    popText('2 MINUTES', 540, 330, 180, '#fff', lw(/minutes/i, 'steal'), lt, -.05, de - .1);
+    popText('ELLE EST DESSUS', 540, 330, 140, '#ffd32a', de, lt, .04, pa - .1);
+    popText('BYE !', 540, 330, 220, '#ff3838', pa, lt, -.06);
+  },
+  tricks(lt, d, g) {
+    street(g, 700);
+    const ol = lw(/ollie/i, 'tricks'), kf = lw(/kickflip/i, 'tricks'), sa = lw(/salto/i, 'tricks');
+    let jump = 0, rot = 0, sk = 0;
+    if (lt > ol && lt < ol + .6) jump = Math.sin((lt - ol) / .6 * Math.PI) * 250;
+    if (lt > kf && lt < kf + .6) { jump = Math.sin((lt - kf) / .6 * Math.PI) * 280; sk = (lt - kf) / .6 * Math.PI * 2; }
+    if (lt > sa && lt < sa + 1.2) { jump = Math.sin((lt - sa) / 1.2 * Math.PI) * 450; rot = -(lt - sa) / 1.2 * Math.PI * 2; }
+    cow(540, 1850 - jump, .9, g, { skate: sk === 0, cap: true, smug: true, rot, noShadow: jump > 0 });
+    if (sk) skateboard(540, 1850 - jump + 10, .9, sk);
+    shadow(540, 1850, 200);
+    popText('OLLIE', 540, 330, 200, '#fff', ol, lt, -.06, kf - .1);
+    popText('KICKFLIP', 540, 330, 190, '#ffd32a', kf, lt, .05, sa - .1);
+    popText('SALTO 4 PATTES', 540, 330, 140, '#ff3838', sa, lt, -.04);
+  },
+  viral(lt, d, g) {
+    ctx.fillStyle = '#2d3436'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    rr(150, 150, 780, 1560, 80, '#111', 10); rr(180, 200, 720, 1460, 50, '#fff', 0);
+    ctx.save(); ctx.beginPath(); ctx.roundRect(180, 200, 720, 1460, 50); ctx.clip();
+    street(g, 400); cow(540, 1500, .65, g, { skate: true, cap: true, smug: true });
+    ctx.restore();
+    rr(220, 250, 150, 70, 14, '#ff3838', 0); txt('LIVE', 295, 288, 52, '#fff', 'Anton');
+    const mi = lw(/millions/i, 'viral'); const n = lt > mi ? Math.floor(lerp(1000, 10000000, ease((lt - mi) / 1.5))) : Math.floor(lt * 4000);
+    rr(400, 250, 450, 70, 14, 'rgba(0,0,0,.5)', 0); txt('👁 ' + n.toLocaleString('fr-FR'), 625, 288, 44, '#fff', 'Mont');
+    const ti = lw(/titre/i, 'viral');
+    if (lt > ti) { rr(200, 1480, 680, 160, 20, 'rgba(0,0,0,.6)', 0); txt('LA MEUH-GIQUE', 540, 1530, 56, '#fff', 'Anton'); txt('VACHE SKATEUSE 🐄🛹', 540, 1600, 50, '#ffd32a', 'Anton'); }
+    popText('10 MILLIONS', 540, 110, 150, '#ffd32a', mi, lt, -.05);
+  },
+  sponsor(lt, d, g) {
+    apartment('#dff9fb', '#a4b0be');
+    const ba = lw(/baskets/i, 'sponsor', 1), co = lw(/cornes/i, 'sponsor');
+    cow(540, 1950, 1.0, g, { shoes: lt > ba, cap: lt > co - .3, smug: true });
+    for (let i = 0; i < 4; i++) { if (lt > lw(/baskets/i, 'sponsor') && lt < ba) { ctx.save(); ctx.translate(200 + i * 230, 1000 + Math.sin(g * 3 + i) * 20); rr(-60, -30, 120, 60, 20, '#e84393', 5); rr(-60, 10, 130, 20, 8, '#fff', 3); ctx.restore(); } }
+    popText('4 BASKETS', 540, 330, 190, '#e84393', ba, lt, -.05, co - .1);
+    popText('TROUS POUR LES CORNES', 540, 330, 100, '#0984e3', co, lt, .03);
+  },
+  contest(lt, d, g) {
+    skatepark(g);
+    rr(60, 260, 960, 140, 20, '#2d3436'); txt('🏆 CHAMPIONNAT DU MONDE', 540, 332, 62, '#f9ca24', 'Anton');
+    const tr = lw(/triple/i, 'contest'), gl = lw(/glaces/i, 'contest');
+    iceTruck(540, 1820, .8);
+    if (lt < tr) { cow(160, 1850, .6, g, { skate: true, cap: true, smug: true }); for (let i = 0; i < 3; i++) human(620 + i * 150, 2150, .6, g + i, { cap: ['#e74c3c', '#00b894', '#fdcb6e'][i], expr: lt > lw(/rigolent/i, 'contest') ? 'neutral' : 'neutral', armR: 1.6 }); }
+    else { const k = clamp((lt - tr) / 2); cow(lerp(160, 920, k), 1850 - Math.sin(k * Math.PI) * 900, .6, g, { skate: true, cap: true, shades: true, rot: -k * Math.PI * 6, noShadow: true }); }
+    popText('HA HA HA', 540, 600, 130, '#fff', lw(/rigolent/i, 'contest'), lt, -.05, tr - .1);
+    popText('TRIPLE SALTO', 540, 600, 160, '#ffd32a', tr, lt, .05);
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#fff'); gr.addColorStop(1, '#0984e3'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    for (let i = 0; i < 6; i++) ell(100 + i * 180, 1800 + (i % 2) * 80, 90, 60, '#2d3436', 0);
+    const tk = lw(/meuh/i, 'like'), lk = lw(/like/i, 'like');
+    cow(300, 2150, 1.6, g, { cap: true, talk: lt > tk && lt < d - .3, smug: lt < lk });
+    likeButton(lt, lk, g, 330);
+    popText('MEUH.', 540, 650, 160, '#fff', tk, lt, -.04, lk - .2);
+    popText('LÂCHE UN LIKE', 540, 650, 130, '#ffd32a', lk, lt, .03, lw(/tourné/i, 'like') - .4);
+    const to = lw(/tourné/i, 'like');
+    if (lt > to - .4) { const k = easeOutBack((lt - to + .4) / .35); ctx.save(); ctx.translate(540, 680); ctx.scale(k, k); rr(-100, -150, 200, 300, 30, '#fff', 6); rr(-100, -150, 200, 90, 30, '#0984e3', 0); txt('LAIT', 0, -100, 50, '#fff', 'Anton'); txt('🤢', 0, 40, 90, '#000', 'serif'); ctx.restore(); }
+  },
+  crash(lt, d, g) {
+    skatepark(g);
+    const to = lw(/tombe/i, 'crash'), ch = lw(/chantilly/i, 'crash');
+    iceTruck(540, 1820, .8);
+    if (lt < to + .4) { const k = clamp((lt - to + .8) / 1.2); cow(lerp(200, 600, k), lerp(1000, 1500, k), .55, g, { skate: true, cap: true, rot: k * 3, noShadow: true }); }
+    if (lt > to + .4) { ctx.save(); ctx.globalAlpha = clamp((lt - to - .4) / .3); for (let i = 0; i < 10; i++) { const a = i / 10 * Math.PI; ell(560 + Math.cos(Math.PI + a) * 260, 1500 + Math.sin(Math.PI + a) * 200, 50, 40, ['#fffdf3', '#fd79a8', '#a0522d'][i % 3], 3); } ctx.restore(); }
+    if (lt > ch - .3) cow(540, 1950, .8, g, { chantilly: true, smug: true });
+    crowdHands(g, 2250);
+    popText('SPLOUTCH', 540, 330, 200, '#fd79a8', to + .4, lt, -.06, ch - .3);
+    popText('CHANTILLY', 540, 330, 190, '#fff', ch, lt, .05);
+  },
+  win(lt, d, g) {
+    ctx.fillStyle = '#1e3799'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    confetti(g, 60);
+    // podium
+    rr(340, 1600, 400, 320, 10, '#f9ca24'); txt('1', 540, 1760, 160, '#7f5f00', 'Anton');
+    cow(540, 1610, .85, g, { medal: lt > lw(/or/i, 'win'), chantilly: true, smug: true });
+    const mk = lw(/milkshake/i, 'win');
+    popText('MÉDAILLE D\'OR', 540, 330, 160, '#f9ca24', lw(/or/i, 'win'), lt, -.05, mk - .1);
+    if (lt > mk) { const k = easeOutBack((lt - mk) / .35); ctx.save(); ctx.translate(540, 520); ctx.scale(k, k); rr(-320, -100, 640, 200, 30, '#fd79a8', 8); txt('🥤 LE MILKSHAKE', 0, 6, 90, '#fff', 'Anton'); ctx.restore(); }
+  },
+  end(lt, d, g) {
+    field(g);
+    const br = lw(/broutes/i, 'end');
+    human(540, 2150, 1.0, g, { expr: lt > br ? 'sad' : 'neutral', armR: lt < br ? 1.4 : -.1 });
+    skateboard(800, 1950, .6, -.2);
+    if (lt > br) { ctx.save(); ctx.translate(540, 2150 - 790 + 60); for (let i = 0; i < 5; i++) line(-30 + i * 14, 0, -40 + i * 18, 60, '#6ab04c', 6); ctx.restore(); popText('TU BROUTES', 540, 330, 200, '#6ab04c', br, lt, .05); }
+    cow(150, 1800, .5, g, { skate: true, cap: true, shades: true, smug: true });
+  },
+  outro(lt, d, g) {
+    ctx.fillStyle = '#130f40'; ctx.fillRect(-400, -400, W + 800, H + 800);
+    cow(480, 1950, 1.1, g, { skate: true, cap: true, shades: true, medal: true });
+    subscribe(lt);
+  },
+};
+</script></body></html>
