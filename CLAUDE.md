@@ -5,7 +5,9 @@
   faisaient plus de vues. ElevenLabs (voix `3Tp5mYhT9wrfnry9pzvV`, `"engine": "elevenlabs"`) reste disponible mais
   uniquement si l'utilisateur le redemande. Si `voices/` est vide, télécharger la voix :
   `https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-fr_FR-tom-medium.tar.bz2`
-- Format : vertical 1080x1920, **plus de 60 s**, histoire VRAIMENT débile et absurde (nonsense, jeux de mots idiots, personnages objets/animaux qui parlent — comme le pigeon ou le caca ; éviter les histoires trop logiques) racontée à la 2e personne (« tu »),
+- Format : vertical 1080x1920, **plus de 60 s** en général, MAIS **de temps en temps (≈ 1 vidéo sur 3-4) une vidéo courte de 20 à 30 s**
+  (demande de l'utilisateur ; une seule idée débile, 3-5 scènes, ~60-80 mots avec la voix 1). Le dire quand c'est une courte.
+  Reste du format : histoire VRAIMENT débile et absurde (nonsense, jeux de mots idiots, personnages objets/animaux qui parlent — comme le pigeon ou le caca ; éviter les histoires trop logiques) racontée à la 2e personne (« tu »),
   hook très fort dans la 1re phrase, sous-titres mot par mot (blanc + mots-clés jaunes), style dessin animé 2D.
 - Pipeline : `videoXX/script.json` + `videoXX/scene.html` → `python3 ../lib/tts.py` → `node ../lib/render.js`.
 - Demande de like : **pas dans toutes les vidéos** (environ une sur deux, en variant). Quand il y en a une, c'est le
@@ -17,3 +19,6 @@
   plouf, sirène, pas, porte, applaudissements, trombone de l'échec… Les déclarer dans `script.json` → `sfx`
   (par mot : `{"word": "...", "type": "land"}`, ou par scène : `{"scene": "...", "at": 0.5, "type": "alarm", "dur": 3}`).
   Mettre des bruitages à chaque action visible.
+- **Demande d'abonnement en cours de vidéo** : de temps en temps (pas à chaque vidéo, et pas toujours avec la demande de like),
+  glisser un « abonne-toi » au milieu de l'histoire, dit par un personnage à sa façon (« abonne-toi ou je… », « t'es pas encore
+  abonné ? »…), avec un petit visuel (bouton S'ABONNER qui apparaît). Varier le moment, comme pour le like.
