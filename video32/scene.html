@@ -1,0 +1,97 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "Quand tu fais coucou…\nmais c'était pas pour toi";
+const wave = (g) => 2.6 + Math.sin(g * 10) * .25;
+function street(g) {
+  sky('#74b9ff', '#dff9fb'); clouds(g);
+  for (let i = 0; i < 4; i++) { const x = i * 280 - 40; rr(x, 500, 260, 1000, 6, ['#fab1a0', '#ffeaa7', '#81ecec', '#a29bfe'][i]); rr(x + 40, 600, 70, 90, 4, '#fff', 4); rr(x + 150, 600, 70, 90, 4, '#fff', 4); }
+  ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900);
+}
+function tokyo(g) {
+  sky('#fd79a8', '#ffeaa7');
+  // torii + cerisiers
+  rr(300, 700, 40, 800, 6, '#e74c3c'); rr(740, 700, 40, 800, 6, '#e74c3c'); rr(240, 680, 600, 50, 10, '#e74c3c'); rr(270, 780, 540, 30, 6, '#e74c3c');
+  for (let i = 0; i < 4; i++) { const x = 100 + i * 300; line(x, 1500, x, 1100, '#6d4c41', 16); ell(x, 1050, 130, 90, '#ffb8d9', 0); }
+  for (let i = 0; i < 12; i++) { const k = (g * .3 + i / 12) % 1; ell((i * 97 + k * 200) % 1080, k * 1500, 8, 6, '#ffb8d9', 0); }
+  ctx.fillStyle = '#b2bec3'; ctx.fillRect(-400, 1500, W + 800, 900);
+}
+// le passant qui fait coucou (au fond)
+function waver(x, y, s, g, waving = true, o = {}) { human(x, y, s, g, { shirt: o.shirt || '#00b894', hair: o.hair || '#2d3436', expr: o.expr || 'neutral', armR: waving ? wave(g) : -.1, flip: o.flip }); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    street(g);
+    const tw = lw(/coucou/i, 'hook', 1), pa = lw(/pas/i, 'hook');
+    waver(760, 1800, .55, g, true);
+    human(330, 2300, 1.05, g, { expr: lt > pa ? 'shock' : 'neutral', armR: lt > tw ? wave(g * 1.1) : -.1 });
+  },
+  behind(lt, d, g) {
+    street(g);
+    waver(760, 1800, .55, g, true);
+    human(330, 2300, 1.05, g, { expr: 'shock', armR: 2.6 });
+    // la vraie destinataire, derrière
+    human(120, 2050, .75, g, { longHair: true, hair: '#e1b12c', shirt: '#fd79a8', expr: 'neutral', armR: wave(g) });
+    const vu = lw(/vu/i, 'behind');
+    if (lt > vu) for (let i = 0; i < 5; i++) { const x = 120 + i * 210; ctx.save(); ctx.translate(x, 400 + (i % 2) * 120); ell(0, 0, 60, 60, '#fff', 5); ell(0, 0, 26, 26, '#111', 0); ctx.restore(); }
+    popText('TOUT LE MONDE A VU', 540, 1060, 100, '#ff3838', vu, lt, -.03);
+  },
+  pretend(lt, d, g) {
+    street(g);
+    const re = lw(/recoiffer/i, 'pretend'), mo = lw(/mouche/i, 'pretend'), da = lw(/danser/i, 'pretend');
+    let o = { expr: 'neutral', armR: 2.9, armL: -.2 };
+    if (lt > mo) o = { expr: 'angry', armR: 1.5 + Math.sin(g * 14) * .8, armL: -.2 };
+    if (lt > da) o = { expr: 'neutral', armL: -2 + Math.sin(g * 9), armR: 2 - Math.sin(g * 9) };
+    ctx.save(); if (lt > da) { ctx.translate(540, 2300); ctx.rotate(Math.sin(g * 9) * .1); ctx.translate(-540, -2300); }
+    human(540, 2300, 1.05, g, o); ctx.restore();
+    if (lt > mo && lt < da) { const a = g * 8; txt('🪰', 540 + Math.cos(a) * 200, 1300 + Math.sin(a) * 80, 60, '#000', 'serif'); }
+    popText('*SE RECOIFFE*', 540, 1060, 110, '#fff', re, lt, -.04, mo - .1);
+    popText('*UNE MOUCHE*', 540, 1060, 110, '#fff', mo, lt, .04, da - .1);
+    popText('*DANSE*', 540, 1060, 150, '#ffd32a', da, lt, -.05);
+  },
+  japan(lt, d, g) {
+    const jp = lw(/japon/i, 'japan');
+    if (lt < jp - .2) {
+      apartment('#dfe6e9', '#a4b0be');
+      ctx.save(); ctx.translate(540, 760); ctx.rotate(-.05); rr(-260, -170, 520, 340, 20, '#c0392b', 8); txt('PASSEPORT', 0, -100, 64, '#f6e58d', 'Anton'); txt('Nom : Jean Inconnu', 0, 0, 44, '#fff', 'Mont'); ctx.restore();
+      human(540, 2300, 1.05, g, { expr: 'sad', glasses: true, mustache: true, hair: '#2d3436' });
+      popText('NOUVEAU NOM', 540, 1060, 130, '#fff', lw(/nom/i, 'japan'), lt, -.04);
+    } else {
+      tokyo(g);
+      const k = clamp((lt - jp) / 1.5); ctx.save(); ctx.translate(lerp(-300, 1400, k), lerp(500, 300, k)); rr(-200, -40, 400, 80, 40, '#fdfdfd', 5); poly([[-30, 0], [50, 0], [0, 90]], '#dfe6e9', 4); ctx.restore();
+      human(540, 2300, 1.05, g, { expr: 'neutral', glasses: true, mustache: true, hair: '#2d3436' });
+      popText('JAPON 🇯🇵', 540, 1060, 150, '#e74c3c', 0, lt - jp, -.05);
+    }
+  },
+  years(lt, d, g) {
+    tokyo(g);
+    const re = lw(/réponds/i, 'years');
+    waver(780, 1850, .6, g, lt > lw(/coucou/i, 'years') - .2, { shirt: '#0984e3', hair: '#111' });
+    human(330, 2300, 1.05, g, { expr: lt > re ? 'angry' : 'neutral', armL: lt > re ? .9 : .1, armR: lt > re ? -.9 : -.1, glasses: true, mustache: true, hair: '#dfe6e9' });
+    popText('10 ANS PLUS TARD', 540, 1060, 110, '#fff', .1, lt, -.03, re - .1);
+    popText('PAS QUESTION', 540, 1060, 140, '#ff3838', re, lt, .04);
+  },
+  loop(lt, d, g) {
+    const le = lw(/lendemain/i, 'loop');
+    if (lt < le - .2) {
+      tokyo(g);
+      const k = clamp((lt - lw(/vexé/i, 'loop') + .3) / 1.5);
+      waver(lerp(780, 1250, k), 1850, .6, g, false, { shirt: '#0984e3', hair: '#111', expr: 'sad', flip: true });
+      human(330, 2300, 1.05, g, { expr: 'shock', glasses: true, mustache: true, hair: '#dfe6e9' });
+      popText('C\'ÉTAIT POUR TOI', 540, 1060, 110, '#ffd32a', .1, lt, -.03);
+    } else {
+      street(g);
+      waver(760, 1800, .55, g, true);
+      human(330, 2300, 1.05, g, { expr: 'neutral' });
+    }
+  },
+};
+</script></body></html>

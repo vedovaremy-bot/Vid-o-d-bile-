@@ -1,0 +1,30 @@
+{
+  "title": "Juste un épisode",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",   "text": "Allez... *juste un épisode*. Et après, *dodo*."},
+    {"scene": "night",  "text": "Épisode deux. Épisode trois. Il est *deux heures* du matin."},
+    {"scene": "sun",    "text": "Le soleil se lève. Les oiseaux chantent. Ton chat t'apporte un *café*."},
+    {"scene": "like",   "text": "Le héros de la série regarde la caméra : mets un *like*. Sinon, je lance l'épisode *suivant*."},
+    {"scene": "beard",  "text": "La plateforme te demande : êtes-vous encore *vivant* ? Tu as une *barbe* de trois semaines."},
+    {"scene": "loop",   "text": "Dernier épisode. La série est finie. Tu soupires... et tu dis :"}
+  ],
+  "sfx": [
+    {"word": "épisode", "in": "hook", "type": "ding", "gain": 0.6},
+    {"word": "dodo", "type": "snore", "dur": 1.0, "gain": 0.5},
+    {"word": "deux", "in": "night", "type": "pop", "gain": 0.5},
+    {"word": "trois", "in": "night", "type": "pop", "gain": 0.5},
+    {"word": "heures", "in": "night", "type": "tick", "dur": 1.2, "gain": 0.6},
+    {"word": "oiseaux", "type": "birds", "dur": 1.8, "gain": 0.7},
+    {"word": "café", "type": "ding", "gain": 0.5},
+    {"word": "caméra", "type": "whoosh", "gain": 0.6},
+    {"word": "like", "in": "like", "type": "ding", "gain": 0.8},
+    {"word": "suivant", "type": "drumroll", "dur": 0.8, "gain": 0.6},
+    {"word": "vivant", "type": "thud", "gain": 0.6},
+    {"word": "barbe", "type": "magic", "gain": 0.6},
+    {"word": "finie", "type": "sad_trombone", "gain": 0.4},
+    {"word": "soupires", "type": "wind", "dur": 0.8, "gain": 0.5}
+  ]
+}

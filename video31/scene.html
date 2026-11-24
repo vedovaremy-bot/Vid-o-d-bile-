@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "Quand tu dis\n« juste un épisode »";
+function room(night) { ctx.fillStyle = night ? '#1e272e' : '#ffeaa7'; ctx.fillRect(-400, -400, W + 800, H + 800); ctx.fillStyle = night ? '#2d3436' : '#b5835a'; ctx.fillRect(-400, 1500, W + 800, 900); }
+function tv(content, g) { rr(110, 420, 860, 560, 24, '#111', 8); ctx.save(); ctx.beginPath(); ctx.roundRect(140, 450, 800, 500, 12); ctx.clip(); ctx.fillStyle = '#0c2461'; ctx.fillRect(140, 450, 800, 500); content(); ctx.restore(); rr(500, 980, 80, 60, 6, '#111', 0); ctx.save(); ctx.globalAlpha = .18; poly([[140, 960], [940, 960], [1100, 1600], [-20, 1600]], '#74b9ff', 0); ctx.restore(); }
+function hero(x, y, s, g, o = {}) { human(x, y, s, g, { shirt: '#c0392b', hair: '#2d3436', expr: o.expr || 'angry', armR: o.armR ?? 2.4, armL: o.armL }); ctx.save(); ctx.translate(x, y - 640 * s); ctx.scale(s, s); ctx.beginPath(); ctx.moveTo(-90, 0); ctx.quadraticCurveTo(-200, 300, -150, 500); ctx.lineTo(-90, 300); ctx.closePath(); shape('#e74c3c', 4); ctx.restore(); }
+function couch() { rr(90, 1560, 900, 220, 60, '#6c5ce7'); rr(40, 1700, 1000, 200, 50, '#a29bfe'); }
+function viewer(g, o = {}) { human(540, 2300, 1.0, g, { expr: o.expr || 'neutral', armR: o.armR ?? 1.2, mustache: o.beard, hair: o.beard ? '#2d3436' : undefined }); if (o.beard) { ctx.save(); ctx.translate(540, 2300 - 790 + 90); ctx.beginPath(); ctx.moveTo(-90, -20); ctx.quadraticCurveTo(0, 180, 90, -20); ctx.closePath(); shape('#2d3436', 4); ctx.restore(); } ctx.save(); ctx.translate(700, 1700); ctx.rotate(-.3); rr(-25, -70, 50, 140, 18, '#2d3436', 4); ctx.restore(); rr(40, 1760, 1000, 200, 50, '#a29bfe'); }
+function counter(text, col) { rr(330, 1060, 420, 100, 20, '#111', 0); txt(text, 540, 1112, 64, col || '#55efc4', 'Anton'); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    room(true); tv(() => { hero(540, 1260, .55, g, { armR: 1.4 }); txt('ÉPISODE 1', 540, 500, 40, '#fff', 'Anton'); }, g);
+    couch(); viewer(g, { expr: 'neutral' });
+  },
+  night(lt, d, g) {
+    room(true);
+    const e3 = lw(/trois/i, 'night');
+    tv(() => { hero(540 + Math.sin(g * 3) * 120, 1260, .55, g, { armR: 2.4 }); txt(lt > e3 ? 'ÉPISODE 3' : 'ÉPISODE 2', 540, 500, 40, '#fff', 'Anton'); }, g);
+    couch(); viewer(g, { expr: 'shock' });
+    counter(lt > lw(/heures/i, 'night') ? '02:00' : '00:30', '#ff3838');
+  },
+  sun(lt, d, g) {
+    room(false);
+    // fenêtre avec lever de soleil
+    rr(700, 120, 300, 260, 10, '#fab1a0'); ell(850, 360, 70, 70, '#feca57', 0); rr(690, 110, 320, 280, 12, null, 10);
+    tv(() => { hero(540, 1260, .55, g, { armR: 1.4 }); txt('ÉPISODE 9', 540, 500, 40, '#fff', 'Anton'); }, g);
+    couch(); viewer(g, { expr: 'neutral' });
+    if (lt > lw(/café/i, 'sun') - .3) { ctx.save(); ctx.translate(880, 1850); ell(0, -80, 100, 80, '#e58e26'); poly([[-70, -130], [-60, -210], [-20, -150]], '#e58e26'); poly([[70, -130], [60, -210], [20, -150]], '#e58e26'); ell(-30, -100, 12, 14, '#111', 0); ell(30, -100, 12, 14, '#111', 0); rr(-150, -120, 80, 80, 12, '#fff', 4); ctx.restore(); }
+    for (let i = 0; i < 3; i++) { const x = 150 + i * 120 + Math.sin(g * 3 + i) * 20; txt('🐦', x, 220 + i * 40, 60, '#000', 'serif'); }
+    popText('LE CAFÉ ☕', 540, 1110, 120, '#fff', lw(/café/i, 'sun'), lt, -.04);
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#74b9ff'); gr.addColorStop(1, '#0c2461'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    hero(540, 3150, 2.1, g, { expr: lt > lw(/sinon/i, 'like') ? 'angry' : 'neutral', armR: 2.6 });
+    likeButton(lt, lw(/like/i, 'like'), g, 330);
+    popText('METS UN LIKE', 540, 640, 130, '#ffd32a', lw(/like/i, 'like'), lt, -.03, lw(/sinon/i, 'like') - .1);
+    popText('SINON ÉPISODE SUIVANT ▶', 540, 640, 80, '#fff', lw(/sinon/i, 'like'), lt, .03);
+  },
+  beard(lt, d, g) {
+    room(true);
+    tv(() => { ctx.fillStyle = '#111'; ctx.fillRect(140, 450, 800, 500); txt('Êtes-vous encore', 540, 600, 54, '#fff', 'Mont'); txt('VIVANT ?', 540, 690, 80, '#ffd32a', 'Anton'); rr(330, 780, 180, 80, 14, '#e74c3c', 0); txt('OUI', 420, 822, 40, '#fff', 'Anton'); rr(570, 780, 180, 80, 14, '#636e72', 0); txt('BOF', 660, 822, 40, '#fff', 'Anton'); }, g);
+    couch(); viewer(g, { expr: 'sleep', beard: lt > lw(/barbe/i, 'beard') - .3 });
+    popText('3 SEMAINES', 540, 1110, 120, '#fff', lw(/barbe/i, 'beard'), lt, -.04);
+  },
+  loop(lt, d, g) {
+    room(true);
+    tv(() => { ctx.fillStyle = '#111'; ctx.fillRect(140, 450, 800, 500); txt('FIN', 540, 700, 140, '#fff', 'Anton'); }, g);
+    couch(); viewer(g, { expr: lt > lw(/soupires/i, 'loop') ? 'sad' : 'neutral' });
+  },
+};
+</script></body></html>

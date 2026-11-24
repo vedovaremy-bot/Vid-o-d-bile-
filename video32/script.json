@@ -1,0 +1,29 @@
+{
+  "title": "Coucou pas pour toi",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",    "text": "Quelqu'un te fait *coucou*. Tu fais coucou aussi. Mais c'était *pas pour toi*."},
+    {"scene": "behind",  "text": "C'était pour la personne *derrière* toi. Et tout le monde a *vu*."},
+    {"scene": "pretend", "text": "Tu fais semblant de te *recoiffer*. Puis de chasser une *mouche*. Puis de *danser*."},
+    {"scene": "japan",   "text": "Trop tard. Tu changes de *nom*. Tu pars vivre au *Japon*."},
+    {"scene": "years",   "text": "Dix ans plus tard, dans une rue de Tokyo, quelqu'un te fait coucou. Cette fois, tu *réponds pas*."},
+    {"scene": "loop",    "text": "C'était pour toi. Il est parti *vexé*. Et le lendemain..."}
+  ],
+  "sfx": [
+    {"word": "coucou", "in": "hook", "n": 1, "type": "pop", "gain": 0.6},
+    {"word": "toi", "in": "hook", "type": "sad_trombone", "offset": 0.2, "gain": 0.6},
+    {"word": "derrière", "type": "whoosh", "gain": 0.6},
+    {"word": "vu", "type": "crowd", "dur": 1.5, "gain": 0.6},
+    {"word": "recoiffer", "type": "zip", "gain": 0.5},
+    {"word": "mouche", "type": "buzz", "dur": 1.2, "gain": 0.6},
+    {"word": "danser", "type": "footsteps", "dur": 1.5, "gain": 0.6},
+    {"word": "nom", "type": "ding", "gain": 0.5},
+    {"word": "japon", "type": "engine", "dur": 1.5, "gain": 0.5},
+    {"word": "japon", "type": "whoosh", "offset": 0.4, "gain": 0.6},
+    {"word": "coucou", "in": "years", "type": "pop", "gain": 0.6},
+    {"word": "réponds", "type": "thud", "gain": 0.5},
+    {"word": "vexé", "type": "sad_trombone", "gain": 0.6}
+  ]
+}
