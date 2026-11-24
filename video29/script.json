@@ -1,0 +1,29 @@
+{
+  "title": "Ton téléphone est à 1 %",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",    "text": "Ton téléphone est à *un pour cent*. Et il le *sait*."},
+    {"scene": "dying",   "text": "Il transpire. Il tousse. Il te dit : vite... un *chargeur*... je vois une *lumière blanche*."},
+    {"scene": "search",  "text": "Tu cours partout. Le chargeur de ta mère : *pas le bon*. Celui de ton frère : *mangé par le chien*."},
+    {"scene": "cpr",     "text": "Alors tu lui fais un *massage cardiaque*. Un, deux, trois... il *vibre*."},
+    {"scene": "saved",   "text": "Tu le branches. Cent pour cent. Il est sauvé. Il te dit merci... et il lance une *mise à jour*."},
+    {"scene": "loop",    "text": "Trois heures plus tard, la mise à jour est finie. Et ton téléphone est à..."}
+  ],
+  "sfx": [
+    {"word": "cent", "in": "hook", "type": "ding", "gain": 0.6},
+    {"word": "sait", "type": "thud", "gain": 0.6},
+    {"word": "tousse", "type": "pop", "gain": 0.6, "repeat": 2, "gap": 0.2},
+    {"word": "blanche", "type": "magic", "gain": 0.7},
+    {"word": "cours", "type": "run", "dur": 1.5, "gain": 0.6},
+    {"word": "bon", "type": "sad_trombone", "gain": 0.4},
+    {"word": "chien", "type": "crunch", "gain": 0.7},
+    {"word": "cardiaque", "type": "thud", "gain": 0.6},
+    {"word": "trois", "in": "cpr", "type": "thud", "gain": 0.6},
+    {"word": "vibre", "type": "engine", "dur": 0.8, "gain": 0.6},
+    {"word": "cent", "in": "saved", "type": "magic", "gain": 0.7},
+    {"word": "jour", "in": "saved", "type": "sad_trombone", "offset": 0.2, "gain": 0.6},
+    {"word": "heures", "type": "tick", "dur": 1.5, "gain": 0.5}
+  ]
+}

@@ -1,0 +1,98 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "Quand le prof dit\n« mettez-vous par deux »";
+// ------------------------------------------------------------ GÉRARD, le squelette de SVT
+function skeleton(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  const B = '#fdfdfd';
+  // support
+  line(0, 0, 0, -120, '#636e72', 10); line(-80, 0, 80, 0, '#636e72', 12);
+  // jambes
+  line(-40, -120, -50, -420, B, 22); line(40, -120, 50, -420, B, 22); line(-40, -120, -50, -420, OUT, 0);
+  for (const sx of [-1, 1]) { ctx.save(); ctx.strokeStyle = OUT; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(sx * 40, -120); ctx.lineTo(sx * 50, -420); ctx.stroke(); ctx.restore(); }
+  // bassin
+  ell(0, -440, 90, 50, B, 5);
+  // colonne + côtes
+  line(0, -480, 0, -760, B, 18);
+  for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.ellipse(0, -560 - i * 38, 110 - i * 6, 22, 0, 0, Math.PI); shape(null, 10, B); }
+  // bras
+  const [al, ar] = o.arms || [.3, -.3];
+  for (const [sd, a] of [[-1, al], [1, ar]]) { ctx.save(); ctx.translate(sd * 110, -740); ctx.rotate(a * sd); line(0, 0, sd * 0, 260, B, 16); ell(0, 270, 22, 22, B, 4); ctx.restore(); }
+  // crâne
+  ctx.save(); ctx.translate(0, -880);
+  ell(0, 0, 110, 120, B, 6); rr(-60, 60, 120, 70, 20, B, 5);
+  for (let i = -2; i <= 2; i++) line(i * 22, 66, i * 22, 120, OUT, 4);
+  ell(-42, -10, 30, 34, '#2d3436', 0); ell(42, -10, 30, 34, '#2d3436', 0);
+  if (o.glasses) { ell(-42, -10, 40, 40, null, 6); ell(42, -10, 40, 40, null, 6); line(-2, -10, 2, -10, OUT, 6); }
+  ell(-42, -6, 8, 8, '#fff', 0); ell(42, -6, 8, 8, '#fff', 0);
+  poly([[-10, 40], [10, 40], [0, 20]], '#2d3436', 0);
+  if (o.talk && Math.sin(t * 16) > 0) { rr(-50, 90, 100, 30, 10, '#2d3436', 0); }
+  if (o.sash) { ctx.restore(); ctx.save(); ctx.beginPath(); ctx.rect(-130, -760, 260, 300); ctx.clip(); ctx.translate(0, -620); ctx.rotate(.6); rr(-200, -22, 400, 44, 6, '#e74c3c', 4); txt('DÉLÉGUÉ', 0, 2, 30, '#fff', 'Anton'); }
+  ctx.restore();
+  ctx.restore();
+}
+function classroom() {
+  ctx.fillStyle = '#ffeaa7'; ctx.fillRect(-400, -400, W + 800, H + 800);
+  rr(60, 420, 960, 420, 14, '#2d6a4f', 10); txt('SVT', 540, 520, 60, '#fff', 'Mont');
+  ctx.fillStyle = '#d1a679'; ctx.fillRect(-400, 1500, W + 800, 900);
+}
+function desk(x, y) { rr(x - 160, y - 30, 320, 40, 8, '#a0785a'); rr(x - 140, y + 10, 20, 180, 6, '#6d4c41'); rr(x + 120, y + 10, 20, 180, 6, '#6d4c41'); }
+function prof(x, y, s, g, o = {}) { human(x, y, s, g, { bald: true, mustache: true, glasses: true, shirt: '#8e6e53', pants: '#2d3436', expr: o.expr || 'neutral', armR: o.armR ?? 1.6, flip: o.flip }); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    classroom();
+    prof(880, 2150, .85, g, { flip: true });
+    human(280, 2250, .95, g, { expr: lt > lw(/personne/i, 'hook') ? 'sad' : 'neutral' });
+    if (lt > lw(/personne/i, 'hook')) { ctx.save(); ctx.globalAlpha = .25; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H); ctx.restore(); ctx.save(); ctx.globalAlpha = .5; ell(280, 1800, 250, 500, '#fff', 0); ctx.restore(); human(280, 2250, .95, g, { expr: 'sad' }); }
+  },
+  pairs(lt, d, g) {
+    classroom();
+    for (let i = 0; i < 2; i++) { human(160 + i * 160, 2150, .6, g + i, { shirt: ['#e17055', '#0984e3'][i], expr: 'neutral' }); }
+    // le radiateur + la poubelle amoureux
+    if (lt > lw(/radiateur/i, 'pairs') - .3) {
+      rr(560, 1500, 220, 300, 20, '#dfe6e9', 5); for (let i = 0; i < 5; i++) rr(580 + i * 40, 1520, 24, 260, 10, '#b2bec3', 3); ell(630, 1600, 10, 12, '#111', 0); ell(700, 1600, 10, 12, '#111', 0);
+      poly([[830, 1520], [990, 1520], [970, 1800], [850, 1800]], '#2d3436', 5); ell(880, 1600, 10, 12, '#fff', 0); ell(940, 1600, 10, 12, '#fff', 0);
+      hearts(g, 790, 1450, 4);
+    }
+    popText('MÊME EUX', 540, 1550, 150, '#ff4757', lw(/radiateur/i, 'pairs'), lt, -.05);
+  },
+  gerard(lt, d, g) {
+    classroom();
+    skeleton(700, 2380, 1.05, g, { arms: [.3, lt > lw(/gérard/i, 'gerard') ? 2.2 : -.3] });
+    human(250, 2250, .95, g, { expr: 'neutral', armR: 1.4 });
+    popText('GÉRARD', 700, 1550, 170, '#fff', lw(/gérard/i, 'gerard'), lt, -.05);
+  },
+  sub(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#ffeaa7'); gr.addColorStop(1, '#e17055'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    skeleton(540, 2620, 1.8, g, { talk: true, arms: [.3, 2.4] });
+    const ab = lw(/abonne/i, 'sub');
+    if (lt > ab - .2) { const p = easeOutBack((lt - ab + .2) / .35), beat = 1 + Math.max(0, Math.sin(g * 9)) * .06; ctx.save(); ctx.translate(540, 300); ctx.scale(p * beat, p * beat); rr(-330, -90, 660, 180, 90, '#ff3838', 0); txt("S'ABONNER", 0, 6, 100, '#fff', 'Anton'); ctx.restore(); }
+    popText('…SINON TOUT SEUL 💀', 540, 520, 90, '#fff', lw(/sinon/i, 'sub'), lt, -.03);
+  },
+  genius(lt, d, g) {
+    classroom();
+    skeleton(300, 2200, .9, g, { glasses: true, arms: [.3, 2.4] });
+    const vi = lw(/vingt/i, 'genius', 1);
+    if (lt > vi - .3) { const k = easeOutBack((lt - vi + .3) / .3); ctx.save(); ctx.translate(560, 560); ctx.scale(k, k); ctx.rotate(-.06); rr(-170, -110, 340, 220, 10, '#fff', 6); txt('20/20', 0, 6, 110, '#e74c3c', 'Anton'); ctx.restore(); }
+    prof(850, 2150, .85, g, { flip: true, expr: lt > lw(/pleure/i, 'genius') ? 'sad' : 'shock', armR: -.1 });
+    if (lt > lw(/applaudit/i, 'genius')) { for (let i = 0; i < 8; i++) popText('CLAP', 100 + (i * 137) % 880, 1500 + (i * 61) % 300, 70, '#fff', lw(/applaudit/i, 'genius') + i * .08, lt, (i % 3 - 1) * .2); confetti(g, 40); }
+  },
+  loop(lt, d, g) {
+    classroom();
+    skeleton(320, 2200, .9, g, { sash: true, glasses: true, arms: [.3, -.3] });
+    for (let i = 0; i < 3; i++) human(620 + i * 150, 2150, .55, g + i, { shirt: ['#fd79a8', '#74b9ff', '#fdcb6e'][i], expr: 'neutral' });
+    prof(900, 2150, .85, g, { flip: true, armR: lt > lw(/dit/i, 'loop') ? 1.6 : -.1 });
+    popText('DÉLÉGUÉ', 540, 1550, 170, '#e74c3c', lw(/délégué/i, 'loop'), lt, -.05, lw(/dit/i, 'loop'));
+  },
+};
+</script></body></html>

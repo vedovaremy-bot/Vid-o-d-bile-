@@ -10,12 +10,13 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VOICE = os.environ.get("VOICE", "fr_FR-tom-medium")   # voix choisie par l'utilisateur (voix 1)
 CFG = SynthesisConfig(
     speaker_id=int(os.environ["SPEAKER"]) if "SPEAKER" in os.environ else None,
-    length_scale=float(os.environ.get("LENGTH_SCALE", "0.86")),
+    length_scale=float(os.environ.get("LENGTH_SCALE", "0")) or None,
     noise_scale=float(os.environ.get("NOISE", "0.667")),     # + = intonation plus vivante
     noise_w_scale=float(os.environ.get("NOISE_W", "0.8")),  # + = rythme plus varié
 )
 SR_OUT = 44100
 script = json.load(open("script.json", encoding="utf-8"))
+CFG.length_scale = float(os.environ.get("LENGTH_SCALE", script.get("length_scale", 0.86)))   # format court : 0.78-0.8
 ENGINE = os.environ.get("ENGINE", script.get("engine", "piper"))   # défaut : voix 1 Piper (retour demandé par l'utilisateur) ; "elevenlabs" possible
 EL_VOICE = os.environ.get("EL_VOICE", script.get("el_voice", "3Tp5mYhT9wrfnry9pzvV"))
 EL_MODEL = os.environ.get("EL_MODEL", "eleven_multilingual_v2")
@@ -144,7 +145,7 @@ subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", f"{tmp}/v.wav", "-af
     "aecho=0.8:0.6:28|47:0.10|0.06,alimiter=limit=0.95", "-ar", str(SR_OUT), f"{tmp}/vm.wav"], check=True)
 with wave.open(f"{tmp}/vm.wav") as w:
     voice_track = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
-total = len(voice_track) / SR_OUT + 1.0
+total = len(voice_track) / SR_OUT + float(script.get("tail", 1.0))   # tail court (0.15) pour les vidéos en boucle
 
 # -------- musique de fond
 mus = script.get("music", {}) or {}

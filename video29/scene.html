@@ -1,0 +1,87 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "Quand ton téléphone\nest à 1 %";
+// ------------------------------------------------------------ LE TÉLÉPHONE (personnage principal)
+// o: {pct, sweat, dying, talk, happy, update (0..1), shake, light}
+function phone(x, y, s, t, o = {}) {
+  ctx.save(); ctx.translate(x + (o.shake ? Math.sin(t * 50) * 8 : 0), y); ctx.scale(s, s);
+  shadow(0, 0, 240);
+  rr(-240, -980, 480, 960, 70, '#2d3436', 8);
+  rr(-210, -940, 420, 880, 46, o.dying ? '#636e72' : '#74b9ff', 0);
+  // batterie
+  const pct = o.pct ?? 1; const low = pct < 15;
+  rr(40, -920, 120, 50, 10, '#fff', 4); rr(160, -905, 12, 20, 4, '#fff', 0);
+  rr(46, -914, Math.max(6, 108 * pct / 100), 38, 6, low ? '#ff3838' : '#2ed573', 0);
+  txt(Math.round(pct) + ' %', -60, -895, 44, low ? '#ff3838' : '#fff', 'Anton');
+  // visage sur l'écran
+  const ey = -620;
+  if (o.dying) { for (const sx of [-1, 1]) { ctx.beginPath(); ctx.arc(sx * 80, ey, 34, Math.PI * .15, Math.PI * .85); shape(null, 8, '#2d3436'); } }
+  else { ell(-80, ey, 40, 46, '#fff', 6); ell(80, ey, 40, 46, '#fff', 6); ell(-76, ey + 8, 16, 20, '#111', 0); ell(84, ey + 8, 16, 20, '#111', 0); }
+  if (o.update != null) { rr(-170, -360, 340, 40, 20, '#dfe6e9', 4); rr(-166, -356, 332 * o.update, 32, 16, '#2ed573', 0); txt('Mise à jour… ' + Math.round(o.update * 100) + ' %', 0, -270, 38, '#2d3436', 'Mont'); }
+  const my = -470;
+  if (o.talk && Math.sin(t * 16) > 0) ell(0, my, 40, 30, '#7a2b2b', 6);
+  else if (o.happy) { ctx.beginPath(); ctx.arc(0, my - 40, 60, Math.PI * .15, Math.PI * .85); shape(null, 8); }
+  else { ctx.beginPath(); ctx.arc(0, my + 40, 50, Math.PI * 1.15, Math.PI * 1.85); shape(null, 8); }
+  if (o.sweat) for (const sx of [-1, 1]) { const k = (t * 1.6 + (sx > 0 ? .5 : 0)) % 1; ell(sx * 190, -800 + k * 300, 16, 24, '#74b9ff', 4); }
+  ctx.restore();
+  if (o.light) { ctx.save(); ctx.globalAlpha = .35 + Math.sin(t * 3) * .1; const gr = ctx.createRadialGradient(540, 200, 20, 540, 200, 700); gr.addColorStop(0, '#fff'); gr.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, 1200); ctx.restore(); }
+}
+function room() { apartment('#dfe6e9', '#a4b0be'); }
+function cable(x, y, s, rot, broken) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); ctx.beginPath(); ctx.moveTo(-200, 0); ctx.bezierCurveTo(-100, -80, 0, 80, 120, 0); shape(null, 14, '#fff'); line(-200, 0, -200, 0, OUT, 0); rr(120, -24, 70, 48, 10, '#dfe6e9', 5); if (broken) { line(-60, -40, -20, 40, '#ff3838', 10); } ctx.restore(); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    room();
+    phone(540, 1310, .9, g, { pct: 1, sweat: lt > lw(/sait/i, 'hook') });
+  },
+  dying(lt, d, g) {
+    room();
+    phone(540, 1310, .9, g, { pct: 1, sweat: true, talk: lt > lw(/dit/i, 'dying'), dying: lt > lw(/lumière/i, 'dying'), shake: lt < lw(/dit/i, 'dying'), light: lt > lw(/lumière/i, 'dying') });
+    popText('*TOUSSE*', 540, 1550, 150, '#fff', lw(/tousse/i, 'dying'), lt, -.05, lw(/vite/i, 'dying') - .1);
+    popText('UN CHARGEUR…', 540, 1550, 140, '#ffd32a', lw(/chargeur/i, 'dying'), lt, .04, lw(/lumière/i, 'dying') - .1);
+  },
+  search(lt, d, g) {
+    room();
+    const pb = lw(/bon/i, 'search'), ch = lw(/chien/i, 'search');
+    human(300 + Math.sin(g * 4) * 120, 2200, 1.0, g, { pose: 'run', expr: 'shock' });
+    if (lt > lw(/mère/i, 'search') - .3) { cable(760, 1000, 1.0, .2, lt > pb); popText('PAS LE BON', 760, 800, 120, '#ff3838', pb, lt, .05, ch - .5); }
+    if (lt > ch - .4) { ctx.save(); ctx.translate(820, 1900); ell(0, -100, 140, 90, '#d9a066'); ctx.translate(-120, -200); ell(0, 0, 95, 85, '#d9a066'); ell(-70, 10, 40, 80, '#a0663a'); ell(0, 40, 50, 36, '#f3d2a2'); ell(0, 22, 18, 13, '#111', 0); ell(-35, -15, 11, 13, '#111', 0); ell(35, -15, 11, 13, '#111', 0); ctx.save(); ctx.translate(40, 70); ctx.rotate(.3); line(-60, 0, 60, 0, '#fff', 12); ctx.restore(); ctx.restore(); popText('LE CHIEN 🐶', 540, 600, 150, '#fff', ch, lt, -.05); }
+  },
+  cpr(lt, d, g) {
+    room();
+    const vi = lw(/vibre/i, 'cpr');
+    phone(540, 1310, .9, g, { pct: 1, dying: lt < vi, shake: lt > vi, happy: lt > vi });
+    if (lt < vi) { const p = Math.abs(Math.sin(g * 9)) * 40; ctx.save(); ctx.translate(540, 840 + p); rr(-120, -200, 110, 200, 50, '#f3c9a4', 5); rr(10, -200, 110, 200, 50, '#f3c9a4', 5); ctx.restore(); }
+    [lw(/un/i, 'cpr', 1), lw(/deux/i, 'cpr'), lw(/trois/i, 'cpr')].forEach((t0, i) => popText(['1', '2', '3'][i], 250 + i * 290, 1550, 200, '#fff', t0, lt, (i - 1) * .1, vi));
+    popText('BZZZ !', 540, 1550, 200, '#2ed573', vi, lt, .05);
+  },
+  saved(lt, d, g) {
+    room();
+    const ce = lw(/cent/i, 'saved'), mj = lw(/mise/i, 'saved');
+    const pct = lt < ce ? 1 + clamp(lt / ce) * 99 : 100;
+    phone(540, 1310, .9, g, { pct, happy: lt < mj, talk: lt > lw(/merci/i, 'saved') && lt < mj, update: lt > mj ? clamp((lt - mj) / 6) * .05 : null });
+    // câble branché
+    line(540, 1310, 540, 1920, '#fff', 16);
+    if (lt > ce && lt < mj) { ctx.save(); ctx.globalAlpha = .6; for (let i = 0; i < 6; i++) txt('✦', 140 + i * 160, 1700 + Math.sin(g * 4 + i) * 30, 50, '#2ed573', 'serif'); ctx.restore(); }
+    popText('100 %', 540, 1550, 220, '#2ed573', ce, lt, -.05, mj - .1);
+    popText('MISE À JOUR…', 540, 1550, 150, '#ff3838', mj, lt, .05);
+  },
+  loop(lt, d, g) {
+    room();
+    const p = clamp(lt / (d - .5));
+    phone(540, 1310, .9, g, { pct: Math.max(1, 100 - p * 99), update: Math.min(1, .05 + p), dying: p > .9, sweat: p > .7 });
+    // horloge accélérée
+    ell(880, 1720, 100, 100, '#fff', 8); ctx.save(); ctx.translate(880, 1720); ctx.rotate(g * 30); line(0, 0, 0, -80, OUT, 8); ctx.restore();
+    popText('3 H PLUS TARD', 540, 1550, 130, '#fff', 0.1, lt, -.04, d - 1.5);
+  },
+};
+</script></body></html>

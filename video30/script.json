@@ -1,0 +1,27 @@
+{
+  "title": "Mettez-vous par deux",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",    "text": "*Mettez-vous par deux*, dit le prof. Et toi... t'as *personne*."},
+    {"scene": "pairs",   "text": "Tout le monde a son binôme. Même le *radiateur* est avec la *poubelle*."},
+    {"scene": "gerard",  "text": "Alors tu te mets avec le *squelette* de la salle de SVT. Il s'appelle *Gérard*."},
+    {"scene": "sub",     "text": "Gérard regarde la caméra : abonne-toi. Sinon, je te laisse *tout seul*."},
+    {"scene": "genius",  "text": "Gérard est un génie. Vingt sur *vingt*. Le prof pleure. La classe *applaudit*."},
+    {"scene": "loop",    "text": "L'année d'après, Gérard est délégué. Il a plein d'amis. Et le prof dit :"}
+  ],
+  "sfx": [
+    {"word": "personne", "type": "sad_trombone", "gain": 0.5},
+    {"word": "radiateur", "type": "clank", "gain": 0.5},
+    {"word": "poubelle", "type": "pop", "gain": 0.6},
+    {"word": "squelette", "type": "clank", "gain": 0.7, "repeat": 3, "gap": 0.12},
+    {"word": "gérard", "in": "gerard", "type": "ding", "gain": 0.6},
+    {"word": "caméra", "type": "whoosh", "gain": 0.6},
+    {"word": "seul", "type": "ding", "gain": 0.7},
+    {"word": "vingt", "in": "genius", "n": 1, "type": "cash", "gain": 0.7},
+    {"word": "pleure", "type": "bubbles", "dur": 1.0, "gain": 0.4},
+    {"word": "applaudit", "type": "applause", "dur": 1.8, "gain": 0.8},
+    {"word": "délégué", "type": "applause", "dur": 1.2, "gain": 0.5}
+  ]
+}

@@ -1,0 +1,82 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "POV : tu dis\n« j'arrive dans 5 min »";
+function phoneChat(x, y, s, msgs, lt) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  rr(-260, -460, 520, 920, 60, '#111', 8); rr(-235, -420, 470, 840, 40, '#ece5dd', 0);
+  rr(-235, -420, 470, 90, 40, '#075e54', 0); txt('Ton pote', -60, -375, 40, '#fff', 'Mont');
+  msgs.forEach(([txtS, mine, t0], i) => { if (lt < t0) return; const k = easeOutBack((lt - t0) / .25); ctx.save(); ctx.translate(mine ? 90 : -90, -250 + i * 130); ctx.scale(k, k); rr(-170, -45, 340, 90, 24, mine ? '#dcf8c6' : '#fff', 3); txt(txtS, 0, 4, 36, '#111', 'Mont'); ctx.restore(); });
+  ctx.restore();
+}
+function bed(x, y) { rr(x - 340, y - 120, 680, 200, 30, '#6c5ce7'); rr(x - 360, y - 300, 60, 380, 20, '#a0522d'); ell(x - 220, y - 120, 110, 50, '#fff'); }
+function clock(x, y, r, g, speed) { ell(x, y, r, r, '#fff', 8); for (let i = 0; i < 12; i++) { const a = i / 12 * 6.28; line(x + Math.cos(a) * r * .8, y + Math.sin(a) * r * .8, x + Math.cos(a) * r * .9, y + Math.sin(a) * r * .9, OUT, 5); } ctx.save(); ctx.translate(x, y); ctx.rotate(g * speed); line(0, 0, 0, -r * .75, OUT, 8); ctx.restore(); ctx.save(); ctx.translate(x, y); ctx.rotate(g * speed / 12); line(0, 0, 0, -r * .5, OUT, 12); ctx.restore(); }
+function bench(x, y) { rr(x - 300, y - 200, 600, 40, 10, '#a0522d'); rr(x - 300, y - 300, 600, 30, 10, '#a0522d'); rr(x - 260, y - 160, 30, 160, 6, '#6d4c41'); rr(x + 230, y - 160, 30, 160, 6, '#6d4c41'); }
+function park(g) { sky('#74b9ff', '#dff9fb'); clouds(g); ctx.fillStyle = '#78e08f'; ctx.fillRect(-400, 1450, W + 800, 1000); }
+// le pote qui vieillit : age 0..1
+function friend(x, y, s, g, age, o = {}) { human(x, y, s, g, { shirt: '#00b894', hair: age > .8 ? '#dfe6e9' : age > .4 ? '#95a5a6' : '#2d3436', mustache: age > .2, glasses: age > .6, expr: o.expr || (age > .5 ? 'sad' : 'neutral'), phone: o.phone, armR: o.armR, flip: o.flip }); if (age > .2) { ctx.save(); ctx.translate(x, y - 790 * s + 90 * s); ctx.scale(s, s); ctx.beginPath(); ctx.moveTo(-80, -20); ctx.quadraticCurveTo(0, 60 + age * 160, 80, -20); ctx.closePath(); shape(age > .8 ? '#dfe6e9' : '#2d3436', 4); ctx.restore(); } if (age > .8) { line(x + 120 * s, y - 300 * s, x + 140 * s, y, '#6d4c41', 12 * s); } }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    bed(540, 1900);
+    ctx.save(); ctx.translate(560, 1820); ctx.rotate(-Math.PI / 2); human(0, 0, .6, g, { expr: 'neutral', phone: true, armR: 2.6 }); ctx.restore();
+    rr(-40, 1820, 680, 200, 30, '#6c5ce7');
+    phoneChat(540, 980, .85, [['t\'es où ?', false, -1], ['j\'arrive dans 5 min', true, lw(/minutes/i, 'hook') - .4]], lt);
+  },
+  bed(lt, d, g) {
+    apartment('#ffeaa7', '#b5835a');
+    bed(540, 1900);
+    human(540, 2260, 1.0, g, { expr: 'neutral', shirt: '#ffeaa7', armR: Math.sin(g * 6) > 0 ? 2.2 : 1.6 });
+    rr(-40, 1820, 680, 220, 30, '#6c5ce7');
+    if (lt > lw(/chips/i, 'bed') - .3) { ctx.save(); ctx.translate(770, 1250); ctx.rotate(-.2); poly([[-70, -110], [70, -110], [60, 110], [-60, 110]], '#f1c40f'); txt('CHIPS', 0, 0, 44, '#c0392b', 'Anton'); ctx.restore(); }
+    popText('EN SLIP', 540, 600, 200, '#fff', lw(/slip/i, 'bed'), lt, -.05);
+  },
+  shower(lt, d, g) {
+    const tee = lw(/t-shirt/i, 'shower') - .3;
+    if (lt < tee) {
+      ctx.fillStyle = '#c7ecee'; ctx.fillRect(-400, -400, W + 800, H + 800);
+      human(540, 2150, 1.0, g, { expr: 'sleep', shirt: '#f3c9a4', armR: 2.6 + Math.sin(g * 8) * .2 });
+      for (let i = 0; i < 30; i++) { const h1 = Math.abs(Math.sin(i * 12.9898) * 43758.5453) % 1; const y = (g * 900 + h1 * 1400) % 1400 + 200; line(300 + h1 * 480, y, 296 + h1 * 480, y + 60, '#74b9ff', 6); }
+      clock(860, 520, 130, g, 12); popText('20 MIN', 860, 760, 120, '#0984e3', 0.2, lt, .05);
+    } else {
+      apartment('#ffeaa7', '#b5835a');
+      const cols = ['#e74c3c', '#0984e3', '#00b894', '#fdcb6e', '#a29bfe'];
+      human(540, 2150, 1.0, g, { expr: 'neutral', shirt: cols[Math.floor(g * 3) % 5] });
+      for (let i = 0; i < 6; i++) { const k = (g * .8 + i / 6) % 1; ctx.save(); ctx.translate(100 + i * 170, 400 + k * 900); ctx.rotate(k * 5); rr(-60, -50, 120, 100, 20, cols[i % 5], 4); ctx.restore(); }
+      clock(860, 520, 130, g, 20); popText('40 MIN', 860, 760, 120, '#e74c3c', 0, lt - tee, .05);
+    }
+  },
+  friend(lt, d, g) {
+    park(g); bench(540, 2080);
+    const age = clamp(lt / (d + 4)) * .5;
+    friend(540, 2200, 1.0, g, age, { expr: 'neutral' });
+    const en = lw(/enfants/i, 'friend');
+    if (lt > en) for (let i = 0; i < 3; i++) { const k = easeOutBack((lt - en - i * .15) / .3); if (k > 0) { ctx.save(); ctx.translate([140, 940, 820][i], 2200 - (i === 2 ? 0 : 0)); ctx.scale(k, k); human(0, 0, .5, g + i, { shirt: ['#fd79a8', '#74b9ff', '#fdcb6e'][i], expr: 'neutral' }); ctx.restore(); } }
+    clock(860, 520, 110, g, 40);
+    popText('LA BARBE', 540, 600, 170, '#2d3436', lw(/barbe/i, 'friend'), lt, -.05, en - .1);
+    popText('+3 ENFANTS', 540, 600, 170, '#fd79a8', en, lt, .05);
+  },
+  arrive(lt, d, g) {
+    park(g); bench(380, 2080);
+    friend(380, 2200, 1.0, g, 1, { expr: 'sad' });
+    const k = clamp(lt / 1.2);
+    human(lerp(1300, 820, k), 2250, .95, g, { pose: k < 1 ? 'run' : 'stand', expr: 'neutral', flip: true, armR: lt > lw(/désolé/i, 'arrive') ? 1.5 : -.1 });
+    popText('80 ANS', 540, 600, 220, '#fff', lw(/ans/i, 'arrive'), lt, -.06, lw(/désolé/i, 'arrive') - .1);
+    popText('« Y AVAIT DES BOUCHONS »', 540, 600, 100, '#ffd32a', lw(/bouchons/i, 'arrive') - .3, lt, .03);
+  },
+  loop(lt, d, g) {
+    park(g); bench(540, 2080);
+    friend(540, 2200, 1.0, g, 1, { phone: true, armR: 2.6 });
+    phoneChat(540, 900, .8, [['t\'es où ?', true, lw(/où/i, 'loop') - .3]], lt);
+  },
+};
+</script></body></html>

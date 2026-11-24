@@ -22,3 +22,6 @@
 - **Demande d'abonnement en cours de vidéo** : de temps en temps (pas à chaque vidéo, et pas toujours avec la demande de like),
   glisser un « abonne-toi » au milieu de l'histoire, dit par un personnage à sa façon (« abonne-toi ou je… », « t'es pas encore
   abonné ? »…), avec un petit visuel (bouton S'ABONNER qui apparaît). Varier le moment, comme pour le like.
+- **PHASE ACTUELLE = CROISSANCE (voir STRATEGIE.md)** : vidéos courtes 15-30 s par défaut (`length_scale` 0.8, `tail` 0.15),
+  titre d'accroche à l'écran dès l'image 0 (`window.HOOK_TITLE`, « POV : … » / « Quand … »), situation vécue par tout le monde
+  + escalade absurde, **fin qui boucle** sur la 1re phrase (pas d'outro « abonne-toi »). Les longues (> 60 s) reviendront en phase 2.

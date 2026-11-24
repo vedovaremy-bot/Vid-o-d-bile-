@@ -1,0 +1,26 @@
+{
+  "title": "J'arrive dans 5 minutes",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",    "text": "J'arrive dans *cinq minutes*. C'est ce que t'as répondu à ton pote."},
+    {"scene": "bed",     "text": "En vrai, t'es encore au *lit*. En *slip*. Avec des *chips*."},
+    {"scene": "shower",  "text": "Douche : vingt minutes. Choisir ton t-shirt : *quarante* minutes."},
+    {"scene": "friend",  "text": "Pendant ce temps, ton pote t'attend. Il se laisse pousser la *barbe*. Il a trois *enfants*."},
+    {"scene": "arrive",  "text": "Quand tu arrives enfin, il a *quatre-vingts ans*. Et tu dis : désolé... y avait des *bouchons*."},
+    {"scene": "loop",    "text": "Il prend son téléphone. Il écrit à son fils : t'es où ? Et son fils répond :"}
+  ],
+  "sfx": [
+    {"word": "minutes", "in": "hook", "type": "ding", "gain": 0.7},
+    {"word": "lit", "type": "snore", "dur": 1.2, "gain": 0.6},
+    {"word": "chips", "type": "crunch", "gain": 0.8},
+    {"word": "douche", "type": "rain", "dur": 1.5, "gain": 0.6},
+    {"word": "quarante", "in": "shower", "type": "tick", "dur": 1.5, "gain": 0.6},
+    {"word": "barbe", "type": "magic", "gain": 0.5},
+    {"word": "enfants", "type": "pop", "gain": 0.6, "repeat": 3, "gap": 0.12},
+    {"word": "ans", "in": "arrive", "type": "sad_trombone", "gain": 0.5},
+    {"word": "bouchons", "type": "honk", "gain": 0.6},
+    {"word": "écrit", "type": "knock", "gain": 0.4, "repeat": 3, "gap": 0.1}
+  ]
+}

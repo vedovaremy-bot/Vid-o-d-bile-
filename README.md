@@ -87,3 +87,7 @@ Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thun
 ## Vidéo 25 — « Ta tortue a gagné le Tour de France » (75 s) — `video25_tortue_tour_de_france.mp4`, like vers 14 s (avec compte à rebours)
 ## Vidéo 26 — « Ton aspirateur robot a pris le pouvoir » (69 s) — `video26_aspirateur_robot.mp4`, pas de like
 ## Vidéo 27 — « Une vache t'a volé ton skate » (76 s) — `video27_vache_skate.mp4`, like vers 43 s (après le triple salto)
+## Phase « croissance » (voir STRATEGIE.md)
+## Vidéo 28 — « POV : tu dis j'arrive dans 5 min » (27 s, boucle) — `video28_court_jarrive_5min.mp4`
+## Vidéo 29 — « Quand ton téléphone est à 1 % » (32 s, boucle) — `video29_court_batterie_1pct.mp4`
+## Vidéo 30 — « Quand le prof dit mettez-vous par deux » (28 s, boucle + abonne-toi par Gérard) — `video30_court_par_deux.mp4`
