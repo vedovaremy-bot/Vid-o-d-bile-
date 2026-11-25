@@ -1,0 +1,77 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "Quand tu sors\nton téléphone\npour voir l'heure";
+// main qui tient le téléphone (vue subjective)
+function handPhone(g, screen, o = {}) {
+  ctx.save(); ctx.translate(540, 1300);
+  rr(-260, -560, 520, 980, 60, '#111', 8);
+  ctx.save(); ctx.beginPath(); ctx.roundRect(-235, -520, 470, 900, 40); ctx.clip(); ctx.fillStyle = '#fff'; ctx.fillRect(-235, -520, 470, 900); screen(); ctx.restore();
+  // main + pouce
+  rr(-300, 200, 600, 600, 140, '#f3c9a4', 7);
+  const th = o.scroll ? Math.sin(g * 14) * 60 : 0;
+  ctx.save(); ctx.translate(200, 160 + th); ctx.rotate(-.5); rr(-50, -200, 100, 260, 50, '#f3c9a4', 7); rr(-34, -186, 68, 60, 22, '#fbe3d2', 4);
+  if (o.thumbFace) { ell(-18, -100, 9, 10, '#111', 0); ell(18, -100, 9, 10, '#111', 0); ctx.beginPath(); ctx.arc(0, -70, 14, Math.PI * 1.15, Math.PI * 1.85); shape(null, 4); rr(-50, -40, 100, 30, 6, '#fff', 3); line(-10, -40, -10, -10, '#e74c3c', 4); line(-25, -25, 5, -25, '#e74c3c', 4); }
+  ctx.restore();
+  ctx.restore();
+}
+function lockScreen(time) { ctx.fillStyle = '#6c5ce7'; ctx.fillRect(-235, -520, 470, 900); txt(time, 0, -330, 110, '#fff', 'Anton'); }
+function feed(g, speed) { for (let i = 0; i < 6; i++) { const y = ((i * 300 - g * speed) % 1800 + 1800) % 1800 - 700; rr(-215, y, 430, 280, 20, ['#fab1a0', '#81ecec', '#ffeaa7', '#a29bfe', '#55efc4', '#fd79a8'][i], 0); txt(['🐱🎹', '🍝', '🚜', '🐶', '💃', '🤡'][i], 0, y + 140, 120, '#000', 'serif'); } }
+function room(night) { ctx.fillStyle = night ? '#1e272e' : '#dfe6e9'; ctx.fillRect(-400, -400, W + 800, H + 800); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    room(false);
+    handPhone(g, () => lockScreen(''));
+  },
+  notif(lt, d, g) {
+    room(false);
+    const no = lw(/notif/i, 'notif'), me = lw(/message/i, 'notif'), ch = lw(/chat/i, 'notif');
+    handPhone(g, () => {
+      if (lt < ch - .2) { lockScreen(''); if (lt > no) { rr(-210, -420, 420, 110, 20, '#fff', 0); txt('🔔 1 notification', 0, -365, 34, '#2d3436', 'Mont'); } if (lt > me) { rr(-210, -290, 420, 110, 20, '#fff', 0); txt('💬 Nouveau message', 0, -235, 34, '#2d3436', 'Mont'); } }
+      else { ctx.fillStyle = '#fab1a0'; ctx.fillRect(-235, -520, 470, 900); ctx.save(); ctx.translate(0, 0); ell(0, -50, 110, 90, '#e58e26'); poly([[-80, -100], [-70, -180], [-20, -120]], '#e58e26'); poly([[80, -100], [70, -180], [20, -120]], '#e58e26'); ell(-35, -60, 14, 16, '#111', 0); ell(35, -60, 14, 16, '#111', 0); rr(-200, 80, 400, 120, 10, '#fff', 4); for (let i = 0; i < 7; i++) rr(-190 + i * 56, 80, 30, 70, 4, '#111', 0); ctx.restore(); }
+    });
+    popText('LE CHAT PIANISTE', 540, 1550, 120, '#fff', ch, lt, -.04);
+  },
+  scroll(lt, d, g) {
+    room(false);
+    handPhone(g, () => feed(g, 900), { scroll: true });
+    popText('300 VIDÉOS', 540, 1550, 150, '#fff', lw(/cents/i, 'scroll'), lt, -.05, lw(/lasagne/i, 'scroll') - .1);
+    popText('🍝 LASAGNE', 540, 1550, 140, '#e17055', lw(/lasagne/i, 'scroll'), lt, .05, lw(/tracteur/i, 'scroll') - .1);
+    popText('🚜 TRACTEUR', 540, 1550, 140, '#00b894', lw(/tracteur/i, 'scroll'), lt, -.05);
+  },
+  night(lt, d, g) {
+    room(true);
+    ell(880, 200, 70, 70, '#fff6c8', 0);
+    handPhone(g, () => feed(g, 400), { scroll: true, thumbFace: lt > lw(/fatigué/i, 'night') - .3 });
+    popText('ARRÊT MALADIE 🩹', 540, 1560, 110, '#ff3838', lw(/maladie/i, 'night'), lt, -.04);
+  },
+  watch(lt, d, g) {
+    room(true);
+    // bras avec montre qui pleure
+    ctx.save(); ctx.translate(0, -330);
+    rr(-100, 900, 1300, 300, 140, '#f3c9a4', 7);
+    rr(400, 820, 280, 460, 40, '#2d3436', 0);
+    ell(540, 1050, 170, 170, '#2d3436'); ell(540, 1050, 140, 140, '#fdfdfd', 6);
+    ell(490, 1020, 18, 22, '#111', 0); ell(590, 1020, 18, 22, '#111', 0); line(460, 980, 510, 995, OUT, 6); line(620, 980, 570, 995, OUT, 6);
+    ctx.beginPath(); ctx.arc(540, 1120, 34, Math.PI * 1.15, Math.PI * 1.85); shape(null, 6);
+    for (const sx of [-1, 1]) { const k = (g * 1.6 + (sx > 0 ? .5 : 0)) % 1; ell(540 + sx * 50, 1040 + k * 160, 10, 16, '#74b9ff', 3); }
+    ctx.restore();
+    popText('« J\'ÉTAIS LÀ, MOI »', 540, 1550, 120, '#fff', lw(/dit/i, 'watch'), lt, -.04);
+  },
+  loop(lt, d, g) {
+    room(false);
+    human(540, 2300, 1.05, g, { expr: lt > lw(/réalises/i, 'loop') ? 'shock' : 'neutral', armR: lt > lw(/réalises/i, 'loop') ? 2.6 : -.1 });
+    if (lt > lw(/réalises/i, 'loop')) { txt('?', 300, 1250, 160, '#2d3436', 'Anton', 'center', 0); txt('?', 800, 1150, 120, '#2d3436', 'Anton'); }
+    popText('QUELLE HEURE ?!', 540, 700, 150, '#ff3838', lw(/heure/i, 'loop'), lt, -.05);
+  },
+};
+</script></body></html>

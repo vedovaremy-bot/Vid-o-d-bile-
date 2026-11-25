@@ -1,0 +1,31 @@
+{
+  "title": "Il y a à manger à la maison",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",   "text": "Tu demandes un burger. Ta mère dit : non. Il y a *à manger* à la maison."},
+    {"scene": "fridge", "text": "Tu ouvres le frigo. Il y a un *œuf*. Une carotte *triste*. Et de la moutarde de *2009*."},
+    {"scene": "egg",    "text": "L'œuf te regarde. Abonne-toi... sinon je deviens une *omelette*."},
+    {"scene": "cook",   "text": "Tu cuisines quand même. Carotte, moutarde... Ça explose. Les *pompiers* arrivent."},
+    {"scene": "fire",   "text": "Les pompiers goûtent ton plat. Ils *pleurent*. Ils appellent leur *mère*."},
+    {"scene": "loop",   "text": "Ils lui demandent un burger. Et elle répond : non."}
+  ],
+  "sfx": [
+    {"word": "burger", "in": "hook", "type": "pop", "gain": 0.5},
+    {"word": "non", "in": "hook", "type": "thud", "gain": 0.6},
+    {"word": "ouvres", "type": "creak", "gain": 0.6},
+    {"word": "œuf", "in": "fridge", "type": "ding", "gain": 0.5},
+    {"word": "triste", "type": "sad_trombone", "gain": 0.4},
+    {"word": "2009", "type": "buzz", "dur": 1.2, "gain": 0.6},
+    {"word": "regarde", "in": "egg", "type": "whoosh", "gain": 0.6},
+    {"word": "omelette", "type": "crack", "gain": 0.8},
+    {"word": "cuisines", "type": "bubbles", "dur": 1.2, "gain": 0.5},
+    {"word": "explose", "type": "explosion", "gain": 0.8},
+    {"word": "pompiers", "in": "cook", "type": "siren", "dur": 1.8, "gain": 0.5},
+    {"word": "goûtent", "type": "gulp", "gain": 0.7},
+    {"word": "pleurent", "type": "bubbles", "dur": 1.0, "gain": 0.4},
+    {"word": "mère", "in": "fire", "type": "phone_ring", "dur": 1.2, "gain": 0.5},
+    {"word": "non", "in": "loop", "type": "thud", "gain": 0.6}
+  ]
+}

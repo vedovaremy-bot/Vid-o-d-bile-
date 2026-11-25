@@ -93,3 +93,6 @@ Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thun
 ## Vidéo 30 — « Quand le prof dit mettez-vous par deux » (28 s, boucle + abonne-toi par Gérard) — `video30_court_par_deux.mp4`
 ## Vidéo 31 — « Quand tu dis juste un épisode » (29 s, boucle, like réclamé par le héros de la série) — `video31_court_juste_un_episode.mp4`
 ## Vidéo 32 — « Quand tu fais coucou… mais c'était pas pour toi » (25 s, boucle) — `video32_court_coucou.mp4`
+## Vidéo 33 — « Quand ta mère dit y a à manger à la maison » (28 s, boucle, abonne-toi par l'œuf) — `video33_court_a_manger_maison.mp4`
+## Vidéo 34 — « Quand tu sors ton téléphone pour voir l'heure » (25 s, boucle) — `video34_court_regarder_heure.mp4`
+(Titre d'accroche : taille auto-ajustée pour ne jamais déborder.)

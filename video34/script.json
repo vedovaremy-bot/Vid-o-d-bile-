@@ -1,0 +1,30 @@
+{
+  "title": "Regarder l'heure",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",   "text": "Tu sors ton téléphone pour regarder *l'heure*."},
+    {"scene": "notif",  "text": "Une notif. Un message. Une vidéo de *chat* qui fait du piano."},
+    {"scene": "scroll", "text": "Trois cents vidéos plus tard, tu sais faire une *lasagne*... et réparer un *tracteur*."},
+    {"scene": "night",  "text": "Il fait *nuit*. Ton pouce est *fatigué*. Il a demandé un *arrêt maladie*."},
+    {"scene": "watch",  "text": "Ta montre te regarde. Elle pleure. Elle dit : j'étais là, *moi*."},
+    {"scene": "loop",   "text": "Tu ranges ton téléphone. Et tu réalises que tu sais toujours pas l'heure. Alors..."}
+  ],
+  "sfx": [
+    {"word": "heure", "in": "hook", "type": "tick", "dur": 1.0, "gain": 0.5},
+    {"word": "notif", "type": "ding", "gain": 0.7},
+    {"word": "message", "type": "pop", "gain": 0.6},
+    {"word": "piano", "type": "magic", "gain": 0.6},
+    {"word": "cents", "type": "whoosh", "gain": 0.6, "repeat": 4, "gap": 0.15},
+    {"word": "lasagne", "type": "ding", "gain": 0.5},
+    {"word": "tracteur", "type": "engine", "dur": 1.2, "gain": 0.6},
+    {"word": "nuit", "type": "snore", "dur": 1.0, "gain": 0.3},
+    {"word": "fatigué", "type": "sad_trombone", "gain": 0.4},
+    {"word": "maladie", "type": "siren", "dur": 1.0, "gain": 0.4},
+    {"word": "pleure", "type": "bubbles", "dur": 1.0, "gain": 0.4},
+    {"word": "moi", "type": "thud", "gain": 0.5},
+    {"word": "ranges", "type": "zip", "gain": 0.5},
+    {"word": "heure", "in": "loop", "type": "tick", "dur": 1.0, "gain": 0.5}
+  ]
+}
