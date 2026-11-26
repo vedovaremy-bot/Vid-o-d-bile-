@@ -1,0 +1,90 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Mont;src:url(../lib/fonts/Montserrat.ttf);font-weight:100 900}
+@font-face{font-family:Anton;src:url(../lib/fonts/Anton.ttf)}
+html,body{margin:0;background:#000} canvas{display:block}
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="../lib/engine.js"></script>
+<script src="../lib/common.js"></script>
+<script>
+window.HOOK_TITLE = "Quand ta mère dit\nton prénom en entier";
+const MOM = { longHair: true, hair: '#8e6e53', shirt: '#e17055' };
+function dog(x, y, s, g, o = {}) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+  const wag = o.scared ? 0 : Math.sin(g * 14) * .5;
+  ctx.save(); ctx.translate(110, -150); ctx.rotate(-.8 + wag); rr(-12, -110, 24, 110, 12, '#d9a066'); ctx.restore();
+  rr(-90, -110, 40, 110, 18, '#d9a066'); rr(50, -110, 40, 110, 18, '#d9a066');
+  ell(0, -170, 140, 85, '#d9a066');
+  ctx.save(); ctx.translate(-120, -260 + (o.scared ? Math.sin(g * 40) * 4 : 0));
+  ell(-70, 10, 40, 80, '#a0663a'); ell(70, 10, 40, 80, '#a0663a');
+  ell(0, 0, 95, 85, '#d9a066'); ell(0, 40, 50, 36, '#f3d2a2'); ell(0, 22, 18, 13, '#111', 0);
+  const r = o.scared ? 20 : 12; ell(-35, -15, r, r + 3, '#fff', 3); ell(35, -15, r, r + 3, '#fff', 3); ell(-35, -12, 8, 9, '#111', 0); ell(35, -12, 8, 9, '#111', 0);
+  if (o.talk && Math.sin(g * 16) > 0) ell(0, 70, 16, 12, '#7a2b2b', 4);
+  ctx.restore(); ctx.restore();
+}
+function house(dark) { ctx.fillStyle = dark ? '#2d3436' : '#ffeaa7'; ctx.fillRect(-400, -400, W + 800, H + 800); rr(660, 420, 300, 260, 10, '#6d4c41'); rr(680, 440, 260, 220, 4, dark ? '#0c2461' : '#74b9ff', 0); ctx.fillStyle = dark ? '#1e272e' : '#b5835a'; ctx.fillRect(-400, 1500, W + 800, 900); }
+function fullName(lt, t0, big) { const k = t0 < 0 ? 1 : easeOutBack((lt - t0) / .25); if (k <= 0) return; const sh = Math.sin(lt * 60) * 8; ctx.save(); ctx.translate(540 + sh, big ? 820 : 760); ctx.scale(k, k); ctx.rotate(-.05); txt('KÉVIN', 0, -150, 170, '#ff3838', 'Anton', 'center', 22); txt('JEAN-MICHEL', 0, 10, 140, '#ff3838', 'Anton', 'center', 20); txt('DUPONT !!!', 0, 160, 150, '#ff3838', 'Anton', 'center', 20); ctx.restore(); }
+
+window.SCENES = {
+  hook(lt, d, g) {
+    house(false);
+    human(540, 2350, 1.1, g, { ...MOM, expr: 'angry', armL: -2.6, armR: 2.6 });
+    fullName(lt, -1, true);
+  },
+  silence(lt, d, g) {
+    house(false);
+    // oiseaux qui se taisent dans la fenêtre
+    const oi = lw(/oiseaux/i, 'silence'), ca = lw(/cache/i, 'silence');
+    for (let i = 0; i < 3; i++) { ctx.save(); ctx.translate(720 + i * 80, 560 + (lt > oi ? 0 : Math.sin(g * 8 + i) * 10)); ell(0, 0, 26, 20, '#f9ca24', 3); ell(16, -12, 14, 12, '#f9ca24', 3); if (lt > oi) { line(10, -14, 22, -14, OUT, 3); } ctx.restore(); }
+    if (lt > oi) popText('…', 820, 380, 120, '#2d3436', oi, lt, 0);
+    // canapé + chien qui se cache
+    rr(100, 1600, 880, 240, 60, '#6c5ce7'); rr(60, 1740, 960, 180, 50, '#a29bfe');
+    if (lt < ca) dog(560, 1980, 1.0, g); else { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, 1610); ctx.clip(); dog(580, 1840, .9, g, { scared: true }); ctx.restore(); rr(100, 1600, 880, 240, 60, '#6c5ce7'); rr(60, 1740, 960, 180, 50, '#a29bfe'); }
+    popText('EN ENTIER', 540, 1060, 150, '#ff3838', lw(/entier/i, 'silence'), lt, -.04, oi - .1);
+  },
+  like(lt, d, g) {
+    const gr = ctx.createRadialGradient(540, 900, 50, 540, 900, 1200); gr.addColorStop(0, '#ffeaa7'); gr.addColorStop(1, '#2d3436'); ctx.fillStyle = gr; ctx.fillRect(-400, -400, W + 800, H + 800);
+    dog(700, 2250, 2.2, g, { scared: true, talk: true });
+    likeButton(lt, lw(/like/i, 'like'), g, 330);
+    popText('🍀 ÇA PORTE CHANCE', 540, 640, 100, '#2ed573', lw(/chance/i, 'like'), lt, -.03);
+  },
+  will(lt, d, g) {
+    house(false);
+    human(300, 2350, 1.0, g, { expr: 'sad', armR: 1.4 });
+    ctx.save(); ctx.translate(700, 900); ctx.rotate(.05); rr(-230, -300, 460, 600, 10, '#fffdf3', 6); txt('TESTAMENT', 0, -230, 64, '#2d3436', 'Anton'); line(-180, -170, 180, -170, '#2d3436', 4);
+    if (lt > lw(/console/i, 'will') - .2) { txt('Ma console 🎮', 0, -60, 44, '#2d3436', 'Mont'); txt('→ au poisson rouge 🐟', 0, 20, 40, '#0984e3', 'Mont'); }
+    ctx.restore();
+    if (lt > lw(/rouge/i, 'will')) { ctx.save(); ctx.translate(820, 1700); rr(-120, -160, 240, 180, 30, 'rgba(116,185,255,.5)', 6); ell(0, -70, 50, 30, '#ff9f43', 4); poly([[40, -70], [80, -94], [80, -46]], '#ff9f43', 4); ell(-20, -76, 6, 6, '#111', 0); ctx.restore(); }
+  },
+  stairs(lt, d, g) {
+    house(true);
+    for (let i = 0; i < 8; i++) rr(-60 + i * 140, 700 + i * 150, 1400, 150, 0, i % 2 ? '#4b4b4b' : '#3d3d3d', 4);
+    const m1 = lw(/marche/i, 'stairs'), m2 = lw(/marches/i, 'stairs'), bo = lw(/boum/i, 'stairs');
+    const st = lt > m2 ? 2 : lt > m1 ? 1 : 0;
+    human(260 + st * 150, 2050 + st * 120, .95, g, { expr: 'shock' });
+    if (lt > bo) { const b = 1 + Math.max(0, Math.sin(g * 14)) * .25; ctx.save(); ctx.translate(800, 600); ctx.scale(b, b); heart(0, 0, 120, '#ff3838', 8); ctx.restore(); }
+    ctx.save(); ctx.globalAlpha = .5; const gr = ctx.createRadialGradient(540, 1100, 200, 540, 1100, 900); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, '#000'); ctx.fillStyle = gr; ctx.fillRect(0, 0, W, H); ctx.restore();
+    popText('BOUM BOUM', 540, 1060, 140, '#ff3838', bo, lt, -.04);
+  },
+  crepes(lt, d, g) {
+    house(false);
+    human(780, 2350, 1.05, g, { ...MOM, expr: 'neutral', flip: true, armR: 1.4 });
+    human(250, 2350, 1.0, g, { expr: lt > lw(/crêpes/i, 'crepes') ? 'shock' : 'sad' });
+    if (lt > lw(/crêpes/i, 'crepes') - .2) { ctx.save(); ctx.translate(560, 1450); ell(0, 0, 170, 40, '#fff', 5); for (let i = 0; i < 4; i++) ell(0, -10 - i * 18, 140, 30, '#f6b93b', 4); for (let i = 0; i < 5; i++) txt('✦', -200 + i * 100, -150 + Math.sin(g * 4 + i) * 20, 40, '#f9ca24', 'serif'); ctx.restore(); }
+    popText('DES CRÊPES ?!', 540, 1060, 150, '#f6b93b', lw(/crêpes/i, 'crepes'), lt, -.04);
+  },
+  loop(lt, d, g) {
+    const ch = lw(/chambre/i, 'loop');
+    if (lt < ch - .2) { house(false); human(540, 2350, 1.0, g, { expr: 'neutral' }); ctx.save(); ctx.translate(540, 1100); ell(0, 0, 170, 40, '#fff', 5); ctx.restore(); popText('OUF', 540, 1060, 180, '#2ed573', lw(/respires/i, 'loop'), lt, -.05); }
+    else {
+      house(false);
+      // chambre en bazar
+      for (let i = 0; i < 14; i++) { ctx.save(); ctx.translate(80 + (i * 137) % 920, 1550 + (i * 71) % 300); ctx.rotate(i); rr(-60, -30, 120, 60, 10, ['#e74c3c', '#0984e3', '#00b894', '#fdcb6e', '#a29bfe'][i % 5], 4); ctx.restore(); }
+      human(540, 2350, 1.1, g, { ...MOM, expr: 'angry', armL: -2.6, armR: 2.6 });
+      popText('LA CHAMBRE…', 540, 760, 150, '#fff', ch - .2, lt, -.04);
+    }
+  },
+};
+</script></body></html>

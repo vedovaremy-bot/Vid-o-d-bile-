@@ -96,3 +96,4 @@ Helpers de scène partagés : `lib/common.js`. Nouveaux bruitages : squeak, thun
 ## Vidéo 33 — « Quand ta mère dit y a à manger à la maison » (28 s, boucle, abonne-toi par l'œuf) — `video33_court_a_manger_maison.mp4`
 ## Vidéo 34 — « Quand tu sors ton téléphone pour voir l'heure » (25 s, boucle) — `video34_court_regarder_heure.mp4`
 (Titre d'accroche : taille auto-ajustée pour ne jamais déborder.)
+## Vidéo 35 — « Quand ta mère dit ton prénom en entier » (26 s, boucle, like réclamé par le chien) — `video35_court_prenom_en_entier.mp4`

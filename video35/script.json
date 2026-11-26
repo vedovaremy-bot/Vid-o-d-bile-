@@ -1,0 +1,33 @@
+{
+  "title": "Ta mère dit ton prénom en entier",
+  "format": "court-boucle",
+  "length_scale": 0.8,
+  "tail": 0.15,
+  "segments": [
+    {"scene": "hook",   "text": "*Kévin Jean-Michel Dupont* !"},
+    {"scene": "silence","text": "Ta mère a dit ton prénom *en entier*. Les oiseaux arrêtent de chanter. Le chien se *cache*."},
+    {"scene": "like",   "text": "Il te chuchote : mets un *like*. Ça porte *chance*."},
+    {"scene": "will",   "text": "Tu écris ton *testament*. Tu laisses ta console au *poisson rouge*."},
+    {"scene": "stairs", "text": "Tu descends l'escalier. Une marche. Deux marches. Ton cœur fait *boum*."},
+    {"scene": "crepes", "text": "Ta mère te regarde. Et elle dit : tu veux des *crêpes* ?"},
+    {"scene": "loop",   "text": "Tu respires enfin. Puis elle voit ta *chambre*. Et elle crie :"}
+  ],
+  "sfx": [
+    {"word": "kévin", "type": "thunder", "gain": 0.6},
+    {"word": "dupont", "type": "thud", "gain": 0.7},
+    {"word": "oiseaux", "type": "birds", "dur": 0.8, "gain": 0.6},
+    {"word": "chanter", "type": "pop", "gain": 0.4},
+    {"word": "cache", "type": "whoosh", "gain": 0.6},
+    {"word": "chuchote", "type": "wind", "dur": 0.8, "gain": 0.3},
+    {"word": "like", "in": "like", "type": "ding", "gain": 0.8},
+    {"word": "chance", "type": "magic", "gain": 0.6},
+    {"word": "testament", "type": "crack", "gain": 0.3},
+    {"word": "rouge", "type": "bubbles", "dur": 1.0, "gain": 0.5},
+    {"word": "marche", "n": 0, "type": "creak", "gain": 0.7},
+    {"word": "marches", "type": "creak", "gain": 0.7},
+    {"word": "boum", "type": "thud", "gain": 0.8, "repeat": 3, "gap": 0.25},
+    {"word": "crêpes", "type": "ding", "gain": 0.7},
+    {"word": "respires", "type": "wind", "dur": 1.0, "gain": 0.4},
+    {"word": "chambre", "type": "sad_trombone", "gain": 0.5}
+  ]
+}
